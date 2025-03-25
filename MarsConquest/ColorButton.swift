@@ -1,4 +1,3 @@
-import SwiftUICore
 import SwiftUI
 struct ColorButton: View {
     let color: String

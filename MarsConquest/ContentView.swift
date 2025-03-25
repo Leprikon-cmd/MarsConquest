@@ -1,150 +1,210 @@
-import SwiftData
+//
+//  ContentView.swift
+//
+//  Зачем:
+//  Главный экран приложения MarsConquest.
+//  Отсюда пользователь выбирает игровое поле, начинает новую игру
+//  и переходит к основным разделам приложения.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Назначение файла:
+//  - отображение главного экрана
+//  - выбор карты Марса
+//  - запуск новой игры
+//  - открытие экрана добавления игроков
+//  - переход к статистике
+//
+
 import SwiftUI
+import CoreData
 
 struct ContentView: View {
-    @Query(sort: \Game.date, order: .reverse) private var games: [Game]
-    @Environment(\.modelContext) private var modelContext
-    @State private var gameField: String = "Фарсида"
-    @State private var showAddPlayersView = false
+    /// Контекст CoreData из окружения SwiftUI.
+    @Environment(\.managedObjectContext) private var viewContext
     
-    // Список игровых полей
-    private let gameFields = ["Фарсида", "Эллада", "Элизий"]
+    /// Настройки
+    @State private var expansions = ExpansionSettingsManager.load()
     
-    // Индекс текущего игрового поля
-    private var currentGameFieldIndex: Int {
-        gameFields.firstIndex(of: gameField) ?? 0
+    /// Текущая выбранная карта Марса.
+    @State private var gameField = GameField.farsida.rawValue
+    
+    /// Флаг открытия окна настройки новой игры.
+    @State private var showGameSetup = false
+    
+    /// Выбранная игра для перехода на экран деталей.
+    @State private var navigateToGame: Game? = nil
+    
+    /// Локальная модель новой игры, которая заполняется до сохранения в CoreData.
+    @State private var localGame = LocalGameData.empty(field: GameField.farsida.rawValue)
+    
+    /// Подписываемся один раз
+    @State private var didSetupNotificationObserver = false
+
+    /// Доступные игровые поля.
+    private var gameFields: [GameField] {
+        expansions.hasHellasElysium ? GameField.allCases : [.farsida]
     }
-    
-    // Цвета для текста кнопки выбора игрового поля
-    private var buttonTextColor: Color {
-        switch gameField {
-        case "Фарсида": return .white
-        case "Эллада": return .white
-        case "Элизий": return .white
-        default: return .black
-        }
+    private var selectedGameField: GameField {
+        GameField(rawValue: gameField) ?? .farsida
     }
-    
-    private var buttonBackground: some View {
-        Group {
-            if gameField == "Фарсида" {
-                Image("farsida")
-                    .resizable()
-                    .scaledToFill()
-                    .clipShape(Circle())
-            } else if gameField == "Эллада" {
-                Image("ellada")
-                    .resizable()
-                    .scaledToFill()
-                    .clipShape(Circle())
-            } else if gameField == "Элизий" {
-                Image("elizium")
-                    .resizable()
-                    .scaledToFill()
-                    .clipShape(Circle())
-            } else {
-                Circle()
-                    .fill(Color.clear)
-            }
-        }
-    }
-    
+
     var body: some View {
         TabView {
-            // Главная страница
-            ZStack {
-                // Фон-картинка
-                Image("fon")
-                    .resizable()
-                    .scaledToFill()
-                    .edgesIgnoringSafeArea(.all)
-                
-                // Основной контент
-                VStack(spacing: 16) {
-                    // Заголовок "Покорение Марса"
-                    Text("Покорение Марса")
-                        .font(.largeTitle)
-                        .bold()
-                        .foregroundColor(.white)
-                        .padding(.top, 20)
-                        .padding(.horizontal)
-                    
-                    // Подпись "Выбор места высадки"
-                    Text("Выбор места высадки")
-                        .font(.system(size: 28))
-                        .foregroundColor(.white)
-                        .padding(.horizontal)
-                    
-                    // Круглая кнопка выбора игрового поля
-                    ZStack {
-                        buttonBackground
-                        Text(gameField)
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundColor(buttonTextColor)
-                    }
-                    .frame(width: 360, height: 360)
-                    .gesture(
-                        DragGesture()
-                            .onEnded { gesture in
+            NavigationStack {
+                ZStack {
+                    Image("fon")
+                        .resizable()
+                        .scaledToFill()
+                        .edgesIgnoringSafeArea(.all)
+
+                    VStack(spacing: 16) {
+                        Text("Покорение Марса")
+                            .font(.largeTitle)
+                            .bold()
+                            .foregroundColor(.white)
+                            .padding(.top, 20)
+
+                        Text("Выбор места высадки")
+                            .font(.title2)
+                            .foregroundColor(.white)
+
+                        ZStack {
+                            Image(selectedGameField.imageName)
+                                .resizable()
+                                .scaledToFill()
+                        }
+                        .clipShape(Circle())
+                        .frame(width: 360, height: 360)
+                        .overlay(
+                            Text(gameField)
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(.white)
+                        )
+                        .gesture(
+                            DragGesture().onEnded { gesture in
+                                let currentIndex = gameFields.firstIndex(where: { $0.rawValue == gameField }) ?? 0
+                                
                                 if gesture.translation.width < -50 {
                                     withAnimation {
-                                        let nextIndex = (currentGameFieldIndex + 1) % gameFields.count
-                                        gameField = gameFields[nextIndex]
+                                        gameField = gameFields[(currentIndex + 1) % gameFields.count].rawValue
                                     }
                                 } else if gesture.translation.width > 50 {
                                     withAnimation {
-                                        let previousIndex = (currentGameFieldIndex - 1 + gameFields.count) % gameFields.count
-                                        gameField = gameFields[previousIndex]
+                                        gameField = gameFields[(currentIndex - 1 + gameFields.count) % gameFields.count].rawValue
                                     }
                                 }
                             }
-                    )
-                    .padding(.vertical, 10)
-                    
-                    // Кнопка "Высадка!"
-                    Button(action: {
-                        showAddPlayersView = true
-                    }) {
-                        Text("Высадка!")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue)
-                            .cornerRadius(10)
-                            .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 2)
+                        )
+                        .padding(.vertical, 20)
+
+                        Button(action: startNewGame) {
+                            Text("Высадка!")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: 300)
+                                .background(
+                                    Image("button7")
+                                        .resizable()
+                                        .scaledToFill()
+                                )
+                                .cornerRadius(10)
+                                .shadow(radius: 5)
+                        }
+
+                        /// Скрытый переход на экран деталей игры.
+                        /// Срабатывает после получения уведомления с объектом Game.
+                        if let selectedGame = navigateToGame {
+                            NavigationLink(
+                                "",
+                                destination: GameDetailView(game: selectedGame),
+                                isActive: .constant(true)
+                            )
+                            .hidden()
+                        }
                     }
-                    .padding(.horizontal)
+                    .padding()
+                }
+                .navigationTitle("Главная")
+                .navigationBarHidden(true)
+                .navigationDestination(item: $navigateToGame) { game in
+                    GameDetailView(game: game)
                 }
             }
             .tabItem {
-                Image(systemName: "house.fill") // Иконка для главной страницы
-                Text("Главная")
+                Label("Главная", systemImage: "house.fill")
+            }
+
+            NavigationStack {
+                StatisticsScreen()
+            }
+            .tabItem {
+                Label("Статистика", systemImage: "chart.bar.fill")
             }
             
-            // Статистика
-            StatisticsScreen()
-                .tabItem {
-                    Image(systemName: "chart.bar.fill") // Иконка для статистики
-                    Text("Статистика")
-                }
-            
-            // Настройки (заглушка)
-            Text("Настройки")
-                .tabItem {
-                    Image(systemName: "gearshape.fill") // Иконка для настроек
-                    Text("Настройки")
-                }
-            
-            // Калькулятор (заглушка)
-            Text("Калькулятор")
-                .tabItem {
-                    Image(systemName: "plusminus.circle.fill") // Иконка для калькулятора
-                    Text("Калькулятор")
-                }
+            NavigationStack {
+                SettingsScreen()
+            }
+            .tabItem {
+                Label("Настройки", systemImage: "gearshape.fill")
+            }
         }
-        .sheet(isPresented: $showAddPlayersView) {
-            AddPlayersView(gameField: gameField)
+        .onAppear {
+            expansions = ExpansionSettingsManager.load()
+            
+            if !gameFields.contains(where: { $0.rawValue == gameField }) {
+                gameField = GameField.farsida.rawValue
+            }
+            
+            /// Первичная загрузка стартовых данных в базу.
+            if !UserDefaults.standard.bool(forKey: "initialDataLoaded") {
+                generateInitialGameData(in: viewContext)
+                UserDefaults.standard.set(true, forKey: "initialDataLoaded")
+            }
+
+            /// Отладочная проверка количества корпораций в базе.
+            let fetchRequest: NSFetchRequest<Corporation> = Corporation.fetchRequest()
+            if let corporations = try? viewContext.fetch(fetchRequest) {
+                print("Корпораций в базе: \(corporations.count)")
+            }
+
+            /// Подписка на уведомление для перехода к сохранённой игре.
+            if !didSetupNotificationObserver {
+                NotificationCenter.default.addObserver(
+                    forName: Notification.Name("NavigateToStatistics"),
+                    object: nil,
+                    queue: .main
+                ) { notification in
+                    if let game = notification.object as? Game {
+                        self.navigateToGame = game
+                        self.showGameSetup = false
+                    }
+                }
+                
+                didSetupNotificationObserver = true
+            }
         }
+        .onReceive(NotificationCenter.default.publisher(for: ExpansionSettingsManager.settingsChangedNotification)) { _ in
+            expansions = ExpansionSettingsManager.load()
+            
+            if !gameFields.contains(where: { $0.rawValue == gameField }) {
+                gameField = GameField.farsida.rawValue
+            }
+        }
+        
+        .sheet(isPresented: $showGameSetup) {
+            NavigationStack {
+                AddPlayersView(localGame: $localGame)
+            }
+        }
+    }
+
+    /// Создаёт новую локальную игру и открывает экран добавления игроков.
+    private func startNewGame() {
+        self.localGame = LocalGameData.empty(field: gameField)
+        self.showGameSetup = true
     }
 }

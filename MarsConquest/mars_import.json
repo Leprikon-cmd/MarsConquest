@@ -1,0 +1,1987 @@
+[
+  {
+    "sheetName": "Лист1 (6)",
+    "date": "2025-02-18",
+    "gameField": "Элада",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 33,
+          "greenery": 6,
+          "cities": 8,
+          "victoryPoints": 8,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 0,
+          "politics": 3
+        },
+        "parsedTotal": 68,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 41,
+          "greenery": 7,
+          "cities": 7,
+          "victoryPoints": 5,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 2,
+          "politics": 2
+        },
+        "parsedTotal": 69,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Тактик",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      },
+      {
+        "name": "Полярник",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Подрядчик",
+        "firstPlacePlayerNames": [
+          "Наташа"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 1
+  },
+  {
+    "sheetName": "Лист1 (2)",
+    "date": "2025-02-25",
+    "gameField": "Элада",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Евнегий",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 38,
+          "greenery": 1,
+          "cities": 1,
+          "victoryPoints": 7,
+          "resourcesOnCards": 5,
+          "conditionsOnCards": 0,
+          "politics": 1
+        },
+        "parsedTotal": 63,
+        "excelTotal": null
+      },
+      {
+        "name": "Наташа",
+        "color": "FF0070C0",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 34,
+          "greenery": 5,
+          "cities": 4,
+          "victoryPoints": 6,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 0,
+          "politics": 5
+        },
+        "parsedTotal": 64,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Эрудит",
+        "winnerPlayerNames": [
+          "Евнегий"
+        ]
+      },
+      {
+        "name": "Энергетик",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      },
+      {
+        "name": "Пионер",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Венерианец",
+        "firstPlacePlayerNames": [
+          "Евнегий"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 2
+  },
+  {
+    "sheetName": "Лист1",
+    "date": "2025-03-04",
+    "gameField": "Элизий",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 31,
+          "greenery": 15,
+          "cities": 23,
+          "victoryPoints": 5,
+          "resourcesOnCards": 9,
+          "conditionsOnCards": 0,
+          "politics": 3
+        },
+        "parsedTotal": 91,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 54,
+          "greenery": 4,
+          "cities": 8,
+          "victoryPoints": 23,
+          "resourcesOnCards": 17,
+          "conditionsOnCards": 8,
+          "politics": 2
+        },
+        "parsedTotal": 126,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Специалист",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Эколог",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Меценат",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 3
+  },
+  {
+    "sheetName": "Лист1 (3)",
+    "date": "2025-03-11",
+    "gameField": "Фарсида",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 38,
+          "greenery": 10,
+          "cities": 15,
+          "victoryPoints": 15,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 0,
+          "politics": 0
+        },
+        "parsedTotal": 78,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 51,
+          "greenery": 14,
+          "cities": 17,
+          "victoryPoints": 14,
+          "resourcesOnCards": 7,
+          "conditionsOnCards": 6,
+          "politics": 0
+        },
+        "parsedTotal": 121,
+        "excelTotal": null
+      },
+      {
+        "name": "Саша",
+        "color": "FF0070C0",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 29,
+          "greenery": 1,
+          "cities": 6,
+          "victoryPoints": 15,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 2,
+          "politics": 0
+        },
+        "parsedTotal": 63,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Колонизатор",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Садовод",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Строитель",
+        "winnerPlayerNames": [
+          "Саша"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Ученый",
+        "firstPlacePlayerNames": [
+          "Саша"
+        ],
+        "secondPlacePlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "gameNumber": 4
+  },
+  {
+    "sheetName": "Лист1 (4)",
+    "date": "2025-03-18",
+    "gameField": "Фарсида",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 31,
+          "greenery": 6,
+          "cities": 11,
+          "victoryPoints": 22,
+          "resourcesOnCards": 16,
+          "conditionsOnCards": 3,
+          "politics": 0
+        },
+        "parsedTotal": 94,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 48,
+          "greenery": 10,
+          "cities": 18,
+          "victoryPoints": 12,
+          "resourcesOnCards": 6,
+          "conditionsOnCards": 2,
+          "politics": 0
+        },
+        "parsedTotal": 106,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Колонизатор",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Строитель",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Банкир",
+        "firstPlacePlayerNames": [
+          "Наташа"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 5
+  },
+  {
+    "sheetName": "Лист1 (5)",
+    "date": "2025-03-25",
+    "gameField": "Элада",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Вика",
+        "color": "FF0070C0",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 35,
+          "greenery": 4,
+          "cities": 4,
+          "victoryPoints": 2,
+          "resourcesOnCards": 10,
+          "conditionsOnCards": 0,
+          "politics": 4
+        },
+        "parsedTotal": 74,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": null,
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 48,
+          "greenery": 9,
+          "cities": 9,
+          "victoryPoints": 13,
+          "resourcesOnCards": 8,
+          "conditionsOnCards": 1,
+          "politics": 2
+        },
+        "parsedTotal": 95,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Эрудит",
+        "winnerPlayerNames": [
+          "Вика"
+        ]
+      },
+      {
+        "name": "Тактик",
+        "winnerPlayerNames": [
+          "Вика"
+        ]
+      },
+      {
+        "name": "Пионер",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Покоритель",
+        "firstPlacePlayerNames": [
+          "Вика"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 6
+  },
+  {
+    "sheetName": "Лист1 (7)",
+    "date": "2025-04-01",
+    "gameField": "Элада",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 30,
+          "greenery": 12,
+          "cities": 18,
+          "victoryPoints": 19,
+          "resourcesOnCards": 8,
+          "conditionsOnCards": 0,
+          "politics": 0
+        },
+        "parsedTotal": 97,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 35,
+          "greenery": 6,
+          "cities": 22,
+          "victoryPoints": 15,
+          "resourcesOnCards": 6,
+          "conditionsOnCards": 5,
+          "politics": 0
+        },
+        "parsedTotal": 109,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Тактик",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      },
+      {
+        "name": "Полярник",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Энергетик",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Агроном",
+        "firstPlacePlayerNames": [
+          "Наташа"
+        ],
+        "secondPlacePlayerNames": []
+      },
+      {
+        "name": "Покоритель",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      },
+      {
+        "name": "Подрядчик",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 7
+  },
+  {
+    "sheetName": "Лист1 (8)",
+    "date": "2025-04-08",
+    "gameField": "Элизий",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Вика",
+        "color": "FF0070C0",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 38,
+          "greenery": 2,
+          "cities": 8,
+          "victoryPoints": 39,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 0,
+          "politics": 1
+        },
+        "parsedTotal": 103,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": null,
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 44,
+          "greenery": 21,
+          "cities": 23,
+          "victoryPoints": 10,
+          "resourcesOnCards": 11,
+          "conditionsOnCards": 0,
+          "politics": 2
+        },
+        "parsedTotal": 121,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Специалист",
+        "winnerPlayerNames": [
+          "Вика"
+        ]
+      },
+      {
+        "name": "Эколог",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Легенда",
+        "winnerPlayerNames": [
+          "Вика"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Энаменитость",
+        "firstPlacePlayerNames": [
+          "Вика"
+        ],
+        "secondPlacePlayerNames": []
+      },
+      {
+        "name": "Южанин",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 8
+  },
+  {
+    "sheetName": "Лист1 (9)",
+    "date": "2025-04-15",
+    "gameField": "Элизий",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 52,
+          "greenery": 8,
+          "cities": 21,
+          "victoryPoints": 13,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 0,
+          "politics": 1
+        },
+        "parsedTotal": 105,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 53,
+          "greenery": 10,
+          "cities": 12,
+          "victoryPoints": 8,
+          "resourcesOnCards": 2,
+          "conditionsOnCards": 3,
+          "politics": 3
+        },
+        "parsedTotal": 101,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Специалист",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Эколог",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      },
+      {
+        "name": "Олигарх",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Венерианец",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 9
+  },
+  {
+    "sheetName": "Лист1 (10)",
+    "date": "2025-04-22",
+    "gameField": "Фарсида",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 34,
+          "greenery": 7,
+          "cities": 12,
+          "victoryPoints": 13,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 2,
+          "politics": 2
+        },
+        "parsedTotal": 70,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 36,
+          "greenery": 6,
+          "cities": 10,
+          "victoryPoints": 18,
+          "resourcesOnCards": 3,
+          "conditionsOnCards": 4,
+          "politics": 2
+        },
+        "parsedTotal": 99,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Колонизатор",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Строитель",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Ученый",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      },
+      {
+        "name": "Шахтер",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 10
+  },
+  {
+    "sheetName": "Лист1 (11)",
+    "date": "2025-04-29",
+    "gameField": "Элизий",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 38,
+          "greenery": 13,
+          "cities": 22,
+          "victoryPoints": 15,
+          "resourcesOnCards": 4,
+          "conditionsOnCards": 0,
+          "politics": 2
+        },
+        "parsedTotal": 104,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 51,
+          "greenery": 5,
+          "cities": 11,
+          "victoryPoints": 22,
+          "resourcesOnCards": 5,
+          "conditionsOnCards": 6,
+          "politics": 4
+        },
+        "parsedTotal": 109,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Эколог",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      },
+      {
+        "name": "Олигарх",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Южанин",
+        "firstPlacePlayerNames": [
+          "Наташа"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 11
+  },
+  {
+    "sheetName": "Лист1 (12)",
+    "date": "2025-05-06",
+    "gameField": "Элада",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 22,
+          "greenery": 2,
+          "cities": 4,
+          "victoryPoints": 25,
+          "resourcesOnCards": 3,
+          "conditionsOnCards": 0,
+          "politics": 1
+        },
+        "parsedTotal": 72,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 21,
+          "greenery": 3,
+          "cities": 11,
+          "victoryPoints": 7,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 3,
+          "politics": 2
+        },
+        "parsedTotal": 52,
+        "excelTotal": null
+      },
+      {
+        "name": "Кирилл",
+        "color": "FFFFFF00",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 35,
+          "greenery": 9,
+          "cities": 8,
+          "victoryPoints": 2,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 0,
+          "politics": 2
+        },
+        "parsedTotal": 63,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Полярник",
+        "winnerPlayerNames": [
+          "Кирилл"
+        ]
+      },
+      {
+        "name": "Энергетик",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      },
+      {
+        "name": "Пионер",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Покоритель",
+        "firstPlacePlayerNames": [
+          "Наташа"
+        ],
+        "secondPlacePlayerNames": [
+          "Кирилл"
+        ]
+      },
+      {
+        "name": "Подрядчик",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 12
+  },
+  {
+    "sheetName": "Лист1 (13)",
+    "date": "2025-05-13",
+    "gameField": "Элизий",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 35,
+          "greenery": 8,
+          "cities": 14,
+          "victoryPoints": 14,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 0,
+          "politics": 1
+        },
+        "parsedTotal": 77,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFFFF00",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 25,
+          "greenery": 3,
+          "cities": 5,
+          "victoryPoints": 26,
+          "resourcesOnCards": 20,
+          "conditionsOnCards": 0,
+          "politics": 1
+        },
+        "parsedTotal": 90,
+        "excelTotal": null
+      },
+      {
+        "name": "Вика",
+        "color": null,
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 36,
+          "greenery": 7,
+          "cities": 9,
+          "victoryPoints": 6,
+          "resourcesOnCards": 11,
+          "conditionsOnCards": 10,
+          "politics": 2
+        },
+        "parsedTotal": 81,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Эколог",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Олигарх",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Южанин",
+        "firstPlacePlayerNames": [
+          "Наташа"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 13
+  },
+  {
+    "sheetName": "Лист1 (14)",
+    "date": "2025-05-20",
+    "gameField": "Элада",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": null,
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 66,
+          "greenery": 13,
+          "cities": 23,
+          "victoryPoints": 11,
+          "resourcesOnCards": 14,
+          "conditionsOnCards": 4,
+          "politics": 2
+        },
+        "parsedTotal": 148,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 23,
+          "greenery": 14,
+          "cities": 28,
+          "victoryPoints": 30,
+          "resourcesOnCards": 52,
+          "conditionsOnCards": 0,
+          "politics": 4
+        },
+        "parsedTotal": 166,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Эрудит",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      },
+      {
+        "name": "Тактик",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Полярник",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Магнат",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      },
+      {
+        "name": "Эксцентрик",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      },
+      {
+        "name": "Венерианец",
+        "firstPlacePlayerNames": [
+          "Наташа"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 14
+  },
+  {
+    "sheetName": "Лист1 (15)",
+    "date": "2025-05-27",
+    "gameField": "Элизий",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": null,
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 37,
+          "greenery": 7,
+          "cities": 15,
+          "victoryPoints": 22,
+          "resourcesOnCards": 26,
+          "conditionsOnCards": 8,
+          "politics": 1
+        },
+        "parsedTotal": 121,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 52,
+          "greenery": 14,
+          "cities": 21,
+          "victoryPoints": 37,
+          "resourcesOnCards": 7,
+          "conditionsOnCards": 2,
+          "politics": 5
+        },
+        "parsedTotal": 148,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Специалист",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Легенда",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Энаменитость",
+        "firstPlacePlayerNames": [
+          "Наташа"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 15
+  },
+  {
+    "sheetName": "Лист1 (16)",
+    "date": "2025-06-03",
+    "gameField": "Фарсида",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Вика",
+        "color": "FF0070C0",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 31,
+          "greenery": 3,
+          "cities": 5,
+          "victoryPoints": 6,
+          "resourcesOnCards": 4,
+          "conditionsOnCards": 3,
+          "politics": 1
+        },
+        "parsedTotal": 58,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 29,
+          "greenery": 3,
+          "cities": 7,
+          "victoryPoints": 1,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 2,
+          "politics": 3
+        },
+        "parsedTotal": 52,
+        "excelTotal": null
+      },
+      {
+        "name": "Кирилл",
+        "color": "FFFFFF00",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 26,
+          "greenery": 6,
+          "cities": 8,
+          "victoryPoints": 11,
+          "resourcesOnCards": 11,
+          "conditionsOnCards": 2,
+          "politics": 1
+        },
+        "parsedTotal": 77,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Садовод",
+        "winnerPlayerNames": [
+          "Кирилл"
+        ]
+      },
+      {
+        "name": "Строитель",
+        "winnerPlayerNames": [
+          "Кирилл"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Собственник",
+        "firstPlacePlayerNames": [
+          "Вика"
+        ],
+        "secondPlacePlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Теплотехник",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": [
+          "Кирилл"
+        ]
+      }
+    ],
+    "gameNumber": 16
+  },
+  {
+    "sheetName": "Лист1 (17)",
+    "date": "2025-06-10",
+    "gameField": "Элизий",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 28,
+          "greenery": 6,
+          "cities": 16,
+          "victoryPoints": 5,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 0,
+          "politics": 2
+        },
+        "parsedTotal": 57,
+        "excelTotal": null
+      },
+      {
+        "name": "Саша",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 25,
+          "greenery": 0,
+          "cities": 8,
+          "victoryPoints": 6,
+          "resourcesOnCards": 2,
+          "conditionsOnCards": 0,
+          "politics": 2
+        },
+        "parsedTotal": 43,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFFFF00",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 30,
+          "greenery": 10,
+          "cities": 3,
+          "victoryPoints": 7,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 0,
+          "politics": 1
+        },
+        "parsedTotal": 66,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Эколог",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Олигарх",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Легенда",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "awards": [],
+    "gameNumber": 17
+  },
+  {
+    "sheetName": "Лист1 (18)",
+    "date": "2025-06-17",
+    "gameField": "Элада",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FFFFFF00",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 29,
+          "greenery": 8,
+          "cities": 15,
+          "victoryPoints": 32,
+          "resourcesOnCards": 23,
+          "conditionsOnCards": 7,
+          "politics": 2
+        },
+        "parsedTotal": 131,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 52,
+          "greenery": 13,
+          "cities": 26,
+          "victoryPoints": 18,
+          "resourcesOnCards": 14,
+          "conditionsOnCards": 4,
+          "politics": 2
+        },
+        "parsedTotal": 134,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Энергетик",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      },
+      {
+        "name": "Пионер",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      },
+      {
+        "name": "Авиатор",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Эксцентрик",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 18
+  },
+  {
+    "sheetName": "Лист1 (19)",
+    "date": "2025-06-24",
+    "gameField": "Фарсида",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": null,
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 41,
+          "greenery": 5,
+          "cities": 9,
+          "victoryPoints": 12,
+          "resourcesOnCards": 1,
+          "conditionsOnCards": 0,
+          "politics": 0
+        },
+        "parsedTotal": 78,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 34,
+          "greenery": 3,
+          "cities": 6,
+          "victoryPoints": 12,
+          "resourcesOnCards": 11,
+          "conditionsOnCards": 0,
+          "politics": 0
+        },
+        "parsedTotal": 73,
+        "excelTotal": null
+      },
+      {
+        "name": "Костя",
+        "color": null,
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 32,
+          "greenery": 4,
+          "cities": 4,
+          "victoryPoints": 5,
+          "resourcesOnCards": 5,
+          "conditionsOnCards": 0,
+          "politics": 0
+        },
+        "parsedTotal": 55,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Колонизатор",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      },
+      {
+        "name": "Садовод",
+        "winnerPlayerNames": [
+          "Костя"
+        ]
+      },
+      {
+        "name": "Строитель",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Собственник",
+        "firstPlacePlayerNames": [
+          "Наташа"
+        ],
+        "secondPlacePlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "gameNumber": 19
+  },
+  {
+    "sheetName": "Лист1 (20)",
+    "date": "2025-07-01",
+    "gameField": "Элада",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Вика",
+        "color": "FF0070C0",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 40,
+          "greenery": 15,
+          "cities": 5,
+          "victoryPoints": 11,
+          "resourcesOnCards": 3,
+          "conditionsOnCards": 2,
+          "politics": 2
+        },
+        "parsedTotal": 83,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 29,
+          "greenery": 2,
+          "cities": 19,
+          "victoryPoints": 7,
+          "resourcesOnCards": 8,
+          "conditionsOnCards": 4,
+          "politics": 2
+        },
+        "parsedTotal": 81,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Тактик",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Энергетик",
+        "winnerPlayerNames": [
+          "Вика"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Агроном",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 20
+  },
+  {
+    "sheetName": "Лист1 (21)",
+    "date": "2025-07-08",
+    "gameField": "Элизий",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 51,
+          "greenery": 12,
+          "cities": 22,
+          "victoryPoints": 24,
+          "resourcesOnCards": 36,
+          "conditionsOnCards": 6,
+          "politics": 0
+        },
+        "parsedTotal": 161,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 43,
+          "greenery": 2,
+          "cities": 4,
+          "victoryPoints": 20,
+          "resourcesOnCards": 27,
+          "conditionsOnCards": 2,
+          "politics": 2
+        },
+        "parsedTotal": 115,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Специалист",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Эколог",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Энаменитость",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      },
+      {
+        "name": "Фабрикант",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      },
+      {
+        "name": "Венерианец",
+        "firstPlacePlayerNames": [
+          "Наташа"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 21
+  },
+  {
+    "sheetName": "Лист1 (22)",
+    "date": "2025-07-15",
+    "gameField": "Фарсида",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 30,
+          "greenery": 1,
+          "cities": 2,
+          "victoryPoints": 5,
+          "resourcesOnCards": 1,
+          "conditionsOnCards": 0,
+          "politics": 2
+        },
+        "parsedTotal": 51,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFF0000",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 34,
+          "greenery": 8,
+          "cities": 12,
+          "victoryPoints": 8,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 0,
+          "politics": 2
+        },
+        "parsedTotal": 66,
+        "excelTotal": null
+      },
+      {
+        "name": "Костя",
+        "color": null,
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 26,
+          "greenery": 4,
+          "cities": 2,
+          "victoryPoints": 9,
+          "resourcesOnCards": 0,
+          "conditionsOnCards": 1,
+          "politics": 1
+        },
+        "parsedTotal": 43,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Строитель",
+        "winnerPlayerNames": [
+          "Наташа"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Теплотехник",
+        "firstPlacePlayerNames": [
+          "Наташа"
+        ],
+        "secondPlacePlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "gameNumber": 22
+  },
+  {
+    "sheetName": "Лист1 (23)",
+    "date": "2025-07-22",
+    "gameField": "Элизий",
+    "generation": 0,
+    "expansions": {
+      "hasPrelude": true,
+      "hasVenus": true,
+      "hasColonies": true,
+      "hasHellasElysium": true,
+      "hasTurmoil": true
+    },
+    "players": [
+      {
+        "name": "Наташа",
+        "color": "FF00B050",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 34,
+          "greenery": 8,
+          "cities": 18,
+          "victoryPoints": 27,
+          "resourcesOnCards": 20,
+          "conditionsOnCards": 8,
+          "politics": 4
+        },
+        "parsedTotal": 119,
+        "excelTotal": null
+      },
+      {
+        "name": "Евгений",
+        "color": "FFFFFF00",
+        "corporation": "",
+        "prologue1": "",
+        "prologue2": "",
+        "score": {
+          "terraformingRating": 48,
+          "greenery": 15,
+          "cities": 17,
+          "victoryPoints": 23,
+          "resourcesOnCards": 6,
+          "conditionsOnCards": 3,
+          "politics": 1
+        },
+        "parsedTotal": 128,
+        "excelTotal": null
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Эколог",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      },
+      {
+        "name": "Олигарх",
+        "winnerPlayerNames": [
+          "Евгений"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Риэлтор",
+        "firstPlacePlayerNames": [
+          "Евгений"
+        ],
+        "secondPlacePlayerNames": []
+      }
+    ],
+    "gameNumber": 23
+  }
+]
