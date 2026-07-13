@@ -69,6 +69,22 @@ struct AddPlayerScreen: View {
     private var prologues: [String] {
         GameData.prologues
     }
+
+    /// Сохранённые профили, которые ещё не участвуют в текущей партии.
+    /// Сравниваем UUID профиля, а не имя: в приложении могут быть разные люди
+    /// с одинаковым именем.
+    private var availableSavedPlayers: [SavedPlayer] {
+        savedPlayers.filter { savedPlayer in
+            guard let profileID = savedPlayer.id else { return true }
+            return !localGame.players.contains { $0.id == profileID }
+        }
+    }
+
+    /// Профиль, выбранный в списке сохранённых игроков.
+    private var selectedSavedPlayer: SavedPlayer? {
+        guard let selectedSavedPlayerID else { return nil }
+        return savedPlayers.first { $0.objectID == selectedSavedPlayerID }
+    }
     
     var body: some View {
         NavigationStack {
@@ -78,14 +94,14 @@ struct AddPlayerScreen: View {
                         Picker("Выберите игрока", selection: $selectedSavedPlayerID) {
                             Text("Новый игрок").tag(nil as NSManagedObjectID?)
                             
-                            ForEach(savedPlayers, id: \.objectID) { savedPlayer in
+                            ForEach(availableSavedPlayers, id: \.objectID) { savedPlayer in
                                 Text(savedPlayer.name ?? UIStrings.noName)
                                     .tag(savedPlayer.objectID as NSManagedObjectID?)
                             }
                         }
                         .onChange(of: selectedSavedPlayerID) { _, newValue in
                             guard let newValue,
-                                  let savedPlayer = savedPlayers.first(where: { $0.objectID == newValue }) else {
+                                  let savedPlayer = availableSavedPlayers.first(where: { $0.objectID == newValue }) else {
                                 return
                             }
                             
@@ -97,6 +113,7 @@ struct AddPlayerScreen: View {
                 Section(header: Text("Имя игрока")) {
                     TextField("Введите имя CEO", text: $name)
                         .autocapitalization(.words)
+                        .disabled(selectedSavedPlayer != nil)
                 }
                 
                 Section(header: Text("Корпорация")) {
@@ -180,21 +197,37 @@ struct AddPlayerScreen: View {
     /// Проверяет, заполнены ли обязательные поля формы
     /// и не совпадают ли два пролога у одного игрока.
     private var isInputValid: Bool {
-        !name.isEmpty &&
+        !trimmedName.isEmpty &&
         !corporation.isEmpty &&
         !prologue1.isEmpty &&
         !prologue2.isEmpty &&
         prologue1 != prologue2
+    }
+
+    /// Имя без случайных пробелов в начале и конце.
+    private var trimmedName: String {
+        name.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     /// Создаёт нового локального игрока и добавляет его в текущую игру,
     /// если входные данные прошли валидацию.
     private func addPlayer() {
         guard validateInput() else { return }
+
+        // Для сохранённого игрока используем постоянный UUID его профиля.
+        // Это одновременно не даёт добавить профиль дважды и позволяет
+        // в будущем считать статистику по человеку, а не по тексту имени.
+        let playerID = selectedSavedPlayer?.id ?? UUID()
+
+        guard !localGame.players.contains(where: { $0.id == playerID }) else {
+            errorMessage = "Этот игрок уже добавлен в текущую партию."
+            showError = true
+            return
+        }
         
         let newPlayer = LocalPlayer(
-            id: UUID(),
-            name: name,
+            id: playerID,
+            name: trimmedName,
             color: selectedColor,
             corporation: corporation,
             prologue1: expansions.hasPrelude ? prologue1 : "",
@@ -203,11 +236,14 @@ struct AddPlayerScreen: View {
         )
         
         localGame.players.append(newPlayer)
-        SavedPlayerManager.savePlayerIfNeeded(
-            name: newPlayer.name,
-            color: newPlayer.color,
-            in: viewContext
-        )
+        if selectedSavedPlayer == nil {
+            SavedPlayerManager.savePlayerIfNeeded(
+                id: playerID,
+                name: newPlayer.name,
+                color: newPlayer.color,
+                in: viewContext
+            )
+        }
         presentationMode.wrappedValue.dismiss()
         
     }
@@ -219,6 +255,27 @@ struct AddPlayerScreen: View {
     ///
     /// - Returns: true, если данные корректны и игрок может быть добавлен
     private func validateInput() -> Bool {
+        guard !trimmedName.isEmpty else {
+            errorMessage = "Введите имя игрока."
+            showError = true
+            return false
+        }
+
+        // Новое имя должно быть уникально во всём списке сохранённых профилей.
+        // Это не даст статистике смешать двух разных людей с одним именем.
+        if selectedSavedPlayer == nil,
+           savedPlayers.contains(where: { namesMatch($0.name ?? "", trimmedName) }) {
+            errorMessage = "Игрок с таким именем уже существует. Выберите его из списка или добавьте уточнение к имени."
+            showError = true
+            return false
+        }
+
+        if localGame.players.contains(where: { namesMatch($0.name, trimmedName) }) {
+            errorMessage = "Игрок с таким именем уже добавлен в текущую партию."
+            showError = true
+            return false
+        }
+
         if localGame.players.contains(where: { $0.corporation == corporation }) {
             errorMessage = "Корпорация уже занята другим игроком."
             showError = true
@@ -238,5 +295,11 @@ struct AddPlayerScreen: View {
         }
         
         return true
+    }
+
+    /// Сравнивает имена без учёта регистра и лишних пробелов по краям.
+    private func namesMatch(_ first: String, _ second: String) -> Bool {
+        first.trimmingCharacters(in: .whitespacesAndNewlines)
+            .caseInsensitiveCompare(second.trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame
     }
 }

@@ -14,49 +14,13 @@
 //  - подсчёт очков за достижения
 //  - подсчёт очков за награды
 //  - определение победителя
-//  - отображение итоговой секции очков
-//  - генерация порядкового номера игры
 //  - преобразование строкового имени цвета в Color
 //
 
 import Foundation
 import SwiftUI
-import CoreData
 
 struct ScoreManager {
-    
-    /// Формирует UI-блок с итоговыми очками всех игроков и строкой победителя.
-    func totalScoresSection(localGame: LocalGameData) -> some View {
-        let players = localGame.players
-        
-        return Group {
-            HStack {
-                Text("Итог")
-                    .frame(width: 120, alignment: .leading)
-                    .bold()
-                
-                ForEach(players) { player in
-                    Text("\(calculateTotalScore(for: player, in: localGame))")
-                        .bold()
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .foregroundColor(isWinner(player, in: localGame) ? .green : .primary)
-                }
-            }
-            
-            let winners = players.filter { isWinner($0, in: localGame) }
-            if !winners.isEmpty {
-                HStack(alignment: .top) {
-                    Text("Победитель:")
-                        .frame(width: 120, alignment: .leading)
-                        .bold()
-                    
-                    Text(winners.map(\.name).joined(separator: ", "))
-                        .bold()
-                        .foregroundColor(.green)
-                }
-            }
-        }
-    }
 
     /// Считает базовые очки игрока без наград и достижений.
     func calculateBaseScore(for player: LocalPlayer, in localGame: LocalGameData) -> Int32 {

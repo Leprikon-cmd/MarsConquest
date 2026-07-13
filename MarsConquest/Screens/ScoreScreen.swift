@@ -19,6 +19,15 @@
 import SwiftUI
 import CoreData
 
+/// Тип списка, открываемого поверх экрана подсчёта.
+/// В каждый момент может быть открыт только один список.
+private enum SelectionSheet: String, Identifiable {
+    case achievements
+    case awards
+
+    var id: String { rawValue }
+}
+
 struct ScoreScreen: View {
     /// Контекст CoreData для сохранения результатов игры.
     @Environment(\.managedObjectContext) private var viewContext
@@ -32,11 +41,7 @@ struct ScoreScreen: View {
     /// Состояния для отображения ошибок и модальных окон выбора.
     @State private var showError = false
     @State private var errorMessage = ""
-    @State private var showAchievementsSheet = false
-    @State private var showAwardsSheet = false
-
-    /// Менеджер для расчётов итоговых очков и связанных функций.
-    private let scoreManager = ScoreManager()
+    @State private var activeSelectionSheet: SelectionSheet?
 
     /// Форматтер для числовых значений очков.
     private let numberFormatter: NumberFormatter = {
@@ -62,7 +67,7 @@ struct ScoreScreen: View {
             playersTable()
             bonusPointsSection()
             rewardsSection()
-            scoreManager.totalScoresSection(localGame: localGame)
+            ScoreSummaryView(localGame: localGame)
             saveButton()
         }
         .navigationTitle("Подсчет очков")
@@ -71,23 +76,10 @@ struct ScoreScreen: View {
         } message: {
             Text(errorMessage)
         }
-        .sheet(isPresented: $showAwardsSheet) {
-            NavigationStack {
-                AwardsListView(
-                    selectedItems: $localGame.awards,
-                    gameField: localGame.gameField,
-                    hasVenus: localGame.expansions.hasVenus
-                )
-            }
-        }
-        .sheet(isPresented: $showAchievementsSheet) {
-            NavigationStack {
-                AchievementsListView(
-                    selectedItems: $localGame.achievements,
-                    gameField: localGame.gameField,
-                    hasVenus: localGame.expansions.hasVenus
-                )
-            }
+        .sheet(item: $activeSelectionSheet) { sheet in
+            SelectionSheetContent(sheet: sheet, localGame: $localGame)
+                // Не даём SwiftUI сохранить экран предыдущего типа.
+                .id(sheet.id)
         }
     }
 
@@ -223,28 +215,34 @@ struct ScoreScreen: View {
     /// Секция кнопок открытия экранов выбора наград и достижений.
     private func rewardsSection() -> some View {
         Section(header: Text("Награды и достижения")) {
-            VStack(spacing: 12) {
+            HStack(spacing: 12) {
                 Button(action: {
-                    showAwardsSheet = true
+                    activeSelectionSheet = .achievements
                 }) {
-                    Text("Добавить награды")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.orange)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-
-                Button(action: {
-                    showAchievementsSheet = true
-                }) {
-                    Text("Добавить достижения")
+                    Text("Достижения")
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.purple)
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
+                // Form иначе может объединить обе кнопки строки в одну область тапа.
+                .buttonStyle(.borderless)
+                .contentShape(Rectangle())
+
+                Button(action: {
+                    activeSelectionSheet = .awards
+                }) {
+                    Text("Награды")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                // У наград своя независимая область нажатия.
+                .buttonStyle(.borderless)
+                .contentShape(Rectangle())
             }
             .padding(.vertical)
         }
@@ -314,6 +312,32 @@ struct ScoreScreen: View {
             print("Ошибка сохранения: \(error.localizedDescription)")
             errorMessage = "Ошибка сохранения: \(error.localizedDescription)"
             showError = true
+        }
+    }
+}
+
+/// Отдельный контейнер для содержимого модального окна.
+/// Он нужен, чтобы экраны наград и достижений не делили состояние SwiftUI.
+private struct SelectionSheetContent: View {
+    let sheet: SelectionSheet
+    @Binding var localGame: LocalGameData
+
+    var body: some View {
+        NavigationStack {
+            switch sheet {
+            case .achievements:
+                AchievementsListView(
+                    selectedItems: $localGame.achievements,
+                    gameField: localGame.gameField,
+                    hasVenus: localGame.expansions.hasVenus
+                )
+            case .awards:
+                AwardsListView(
+                    selectedItems: $localGame.awards,
+                    gameField: localGame.gameField,
+                    hasVenus: localGame.expansions.hasVenus
+                )
+            }
         }
     }
 }

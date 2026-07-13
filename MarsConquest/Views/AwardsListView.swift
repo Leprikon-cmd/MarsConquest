@@ -22,6 +22,8 @@ struct AwardsListView: View {
     @Environment(\.presentationMode) var presentationMode
     
     @Binding var selectedItems: [LocalAward]
+    /// Черновой выбор. Попадает в партию только после явного подтверждения.
+    @State private var pendingItems: [LocalAward]
     var gameField: String
     let hasVenus: Bool
     
@@ -29,6 +31,7 @@ struct AwardsListView: View {
 
     init(selectedItems: Binding<[LocalAward]>, gameField: String, hasVenus: Bool) {
         _selectedItems = selectedItems
+        _pendingItems = State(initialValue: selectedItems.wrappedValue)
         self.gameField = gameField
         self.hasVenus = hasVenus
         _awardTemplates = FetchRequest<AwardTemplate>(
@@ -64,9 +67,19 @@ struct AwardsListView: View {
             }
         }
         .navigationTitle("Награды")
+        .safeAreaInset(edge: .bottom) {
+            Button("Добавить выбранное") {
+                selectedItems = pendingItems
+                presentationMode.wrappedValue.dismiss()
+            }
+            .buttonStyle(.borderedProminent)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(.bar)
+        }
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("Закрыть") {
+                Button("Отмена") {
                     presentationMode.wrappedValue.dismiss()
                 }
             }
@@ -74,14 +87,14 @@ struct AwardsListView: View {
     }
 
     private func isSelected(_ name: String) -> Bool {
-        selectedItems.contains(where: { $0.name == name })
+        pendingItems.contains(where: { $0.name == name })
     }
 
     private func toggleSelection(for name: String) {
         if isSelected(name) {
-            selectedItems.removeAll { $0.name == name }
-        } else if selectedItems.count < GameConstants.maxAwards {
-            selectedItems.append(LocalAward(name: name))
+            pendingItems.removeAll { $0.name == name }
+        } else if pendingItems.count < GameConstants.maxAwards {
+            pendingItems.append(LocalAward(name: name))
         }
     }
 }

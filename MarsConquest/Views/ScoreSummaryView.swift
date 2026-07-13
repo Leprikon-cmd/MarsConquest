@@ -1,0 +1,83 @@
+//
+//  ScoreSummaryView.swift
+//  MarsConquest
+//
+//  Показывает итоговый рейтинг игроков перед сохранением партии.
+//
+
+import SwiftUI
+
+struct ScoreSummaryView: View {
+    let localGame: LocalGameData
+
+    private let scoreManager = ScoreManager()
+
+    var body: some View {
+        Section(header: Text("Рейтинг")) {
+            ForEach(rankedPlayers) { entry in
+                HStack(spacing: 12) {
+                    Text(placeTitle(for: entry.place))
+                        .frame(width: 88, alignment: .leading)
+
+                    Circle()
+                        .fill(Color.named(entry.player.color))
+                        .frame(width: 14, height: 14)
+
+                    Text(entry.player.name)
+                        .lineLimit(1)
+
+                    Spacer()
+
+                    Text("\(entry.score) ПО")
+                        .font(.headline)
+                        .monospacedDigit()
+                }
+                .accessibilityElement(children: .combine)
+            }
+        }
+    }
+
+    /// Игроки с одинаковым итогом делят место.
+    /// Следующее место не пропускается: 1, 1, 2, 3.
+    private var rankedPlayers: [RankedPlayer] {
+        var playersWithScores: [(index: Int, player: LocalPlayer, score: Int32)] = []
+
+        for (index, player) in localGame.players.enumerated() {
+            let score = scoreManager.calculateTotalScore(for: player, in: localGame)
+            playersWithScores.append((index: index, player: player, score: score))
+        }
+
+        playersWithScores.sort {
+            $0.score == $1.score ? $0.index < $1.index : $0.score > $1.score
+        }
+
+        var previousScore: Int32?
+        var currentPlace = 0
+
+        return playersWithScores.map { item in
+            if item.score != previousScore {
+                currentPlace += 1
+                previousScore = item.score
+            }
+
+            return RankedPlayer(player: item.player, score: item.score, place: currentPlace)
+        }
+    }
+
+    private func placeTitle(for place: Int) -> String {
+        switch place {
+        case 1: return "🥇 1 место"
+        case 2: return "🥈 2 место"
+        case 3: return "🥉 3 место"
+        default: return "\(place) место"
+        }
+    }
+}
+
+private struct RankedPlayer: Identifiable {
+    let player: LocalPlayer
+    let score: Int32
+    let place: Int
+
+    var id: UUID { player.id }
+}

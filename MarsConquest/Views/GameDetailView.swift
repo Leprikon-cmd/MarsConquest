@@ -58,12 +58,22 @@ struct GameDetailView: View {
                             
                             let base = baseScore(for: player)
                             let achievements = achievementPoints(for: player)
-                            let awards = awardPoints(for: player)
                             let total = totalScore(for: player)
+                            let playerAchievementNames = achievementNames(for: player)
+                            let playerAwardSummaries = awardSummaries(for: player)
                             
                             Text("База: \(base)")
-                            Text("Достижения: \(achievements)")
-                            Text("Награды: \(awards)")
+
+                            if !playerAchievementNames.isEmpty {
+                                Text(
+                                    "Достижения: \(playerAchievementNames.joined(separator: ", ")) (+\(achievements))"
+                                )
+                            }
+
+                            if !playerAwardSummaries.isEmpty {
+                                Text("Награды: \(playerAwardSummaries.joined(separator: ", "))")
+                            }
+
                             Text("Итог: \(total)")
                                 .bold()
 
@@ -86,6 +96,75 @@ struct GameDetailView: View {
         if game.hasTurmoil { expansions.append("Кризис") }
         
         return expansions
+    }
+
+    /// Все присуждённые достижения этой сохранённой партии.
+    private var gameAchievements: [Achievement] {
+        let request: NSFetchRequest<Achievement> = Achievement.fetchRequest()
+        request.predicate = NSPredicate(format: "game == %@", game)
+        request.sortDescriptors = [
+            NSSortDescriptor(key: "name", ascending: true),
+            NSSortDescriptor(key: "player.name", ascending: true)
+        ]
+
+        return (try? viewContext.fetch(request)) ?? []
+    }
+
+    /// Все присуждённые места по наградам этой сохранённой партии.
+    private var gameAwards: [Award] {
+        let request: NSFetchRequest<Award> = Award.fetchRequest()
+        request.predicate = NSPredicate(format: "game == %@", game)
+        request.sortDescriptors = [
+            NSSortDescriptor(key: "name", ascending: true),
+            NSSortDescriptor(key: "place", ascending: true),
+            NSSortDescriptor(key: "player.name", ascending: true)
+        ]
+
+        return (try? viewContext.fetch(request)) ?? []
+    }
+
+    /// Названия достижений, которые получил конкретный игрок.
+    private func achievementNames(for player: Player) -> [String] {
+        gameAchievements
+            .filter { $0.player == player }
+            .compactMap(\.name)
+    }
+
+    /// Краткие подписи наград игрока с местом и начисленными очками.
+    private func awardSummaries(for player: Player) -> [String] {
+        gameAwards
+            .filter { $0.player == player }
+            .map { award in
+                let placeTitle: String
+                let points: Int32
+
+                switch award.place {
+                case 1:
+                    placeTitle = "🥇 1 место"
+                    points = Int32(GameConstants.awardFirstPlacePoints)
+                case 2:
+                    placeTitle = "🥈 2 место"
+                    points = secondPlacePoints(for: award)
+                default:
+                    placeTitle = "Место \(award.place)"
+                    points = 0
+                }
+
+                let pointsTitle = points > 0 ? " +\(points)" : ""
+                return "\(award.name ?? "Без названия") — \(placeTitle)\(pointsTitle)"
+            }
+    }
+
+    /// Второе место получает очки только при единственном первом месте
+    /// и при трёх или более игроках в партии.
+    private func secondPlacePoints(for award: Award) -> Int32 {
+        let playersCount = (game.players?.allObjects as? [Player])?.count ?? 0
+        let firstPlaces = gameAwards.filter {
+            $0.name == award.name && $0.place == 1
+        }
+
+        guard playersCount >= 3, firstPlaces.count == 1 else { return 0 }
+        return Int32(GameConstants.awardSecondPlacePoints)
     }
     
     private func totalScore(for player: Player) -> Int32 {

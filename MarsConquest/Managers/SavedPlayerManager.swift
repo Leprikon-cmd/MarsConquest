@@ -13,18 +13,28 @@ import CoreData
 
 struct SavedPlayerManager {
 
-    /// Сохраняет игрока в базе, если его ещё нет.
-    static func savePlayerIfNeeded(name: String, color: String, in context: NSManagedObjectContext) {
+    /// Сохраняет новый профиль игрока.
+    /// Имя уникально: статистика использует его как понятный человеку идентификатор.
+    static func savePlayerIfNeeded(
+        id: UUID,
+        name: String,
+        color: String,
+        in context: NSManagedObjectContext
+    ) {
 
         let request: NSFetchRequest<SavedPlayer> = SavedPlayer.fetchRequest()
-        request.predicate = NSPredicate(format: "name == %@", name)
+        request.predicate = NSPredicate(
+            format: "id == %@ OR name =[c] %@",
+            id as CVarArg,
+            name.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
 
         do {
             let existing = try context.fetch(request)
 
             if existing.isEmpty {
                 let player = SavedPlayer(context: context)
-                player.id = UUID()
+                player.id = id
                 player.name = name
                 player.favoriteColor = color
                 player.isFavorite = false
