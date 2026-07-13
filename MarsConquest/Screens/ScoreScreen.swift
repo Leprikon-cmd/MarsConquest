@@ -200,17 +200,20 @@ struct ScoreScreen: View {
                     Text("2 место")
                         .frame(width: 140, alignment: .leading)
                     
-                    ForEach(players, id: \.id) { player in
-                        let isSelected = localGame.awards[index].secondPlacePlayerIDs.contains(player.id)
-                        
-                        circleButton(
-                            systemName: isSelected ? "2.circle.fill" : "2.circle",
-                            color: .orange
-                        ) {
-                            toggleAwardSecondPlace(awardIndex: index, playerID: player.id)
-                        }
-                        .frame(maxWidth: .infinity)
+                ForEach(players, id: \.id) { player in
+                    let isSelected = localGame.awards[index].secondPlacePlayerIDs.contains(player.id)
+                    let isFirstPlace = localGame.awards[index].firstPlacePlayerIDs.contains(player.id)
+                    
+                    circleButton(
+                        systemName: isSelected ? "2.circle.fill" : "2.circle",
+                        color: isFirstPlace ? .gray : .orange
+                    ) {
+                        toggleAwardSecondPlace(awardIndex: index, playerID: player.id)
                     }
+                    .disabled(isFirstPlace)
+                    .opacity(isFirstPlace ? 0.4 : 1)
+                    .frame(maxWidth: .infinity)
+                }
                 }
             }
         }
@@ -270,7 +273,6 @@ struct ScoreScreen: View {
         if localGame.awards[awardIndex].firstPlacePlayerIDs.contains(playerID) {
             localGame.awards[awardIndex].firstPlacePlayerIDs.removeAll { $0 == playerID }
         } else {
-            guard localGame.awards[awardIndex].firstPlacePlayerIDs.count < 2 else { return }
             localGame.awards[awardIndex].firstPlacePlayerIDs.append(playerID)
             // Один и тот же игрок не должен одновременно быть и на 1, и на 2 месте
             localGame.awards[awardIndex].secondPlacePlayerIDs.removeAll { $0 == playerID }
@@ -284,14 +286,12 @@ struct ScoreScreen: View {
     private func toggleAwardSecondPlace(awardIndex: Int, playerID: UUID) {
         guard players.count >= 3 else { return }
         guard localGame.awards[awardIndex].firstPlacePlayerIDs.count == 1 else { return }
+        guard !localGame.awards[awardIndex].firstPlacePlayerIDs.contains(playerID) else { return }
 
         if localGame.awards[awardIndex].secondPlacePlayerIDs.contains(playerID) {
             localGame.awards[awardIndex].secondPlacePlayerIDs.removeAll { $0 == playerID }
         } else {
-            guard localGame.awards[awardIndex].secondPlacePlayerIDs.count < 2 else { return }
             localGame.awards[awardIndex].secondPlacePlayerIDs.append(playerID)
-            // Один и тот же игрок не должен одновременно быть и на 1, и на 2 месте
-            localGame.awards[awardIndex].firstPlacePlayerIDs.removeAll { $0 == playerID }
         }
     }
 
