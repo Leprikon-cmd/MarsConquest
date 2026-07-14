@@ -184,7 +184,11 @@ struct AddPlayerScreen: View {
     /// которые ещё не выбраны другими игроками текущей партии.
     private var availableCorporations: [String] {
         let usedCorporations = localGame.players.map { $0.corporation }
-        return corporations.filter { !usedCorporations.contains($0) }
+        return corporations
+            .filter { !usedCorporations.contains($0) }
+            .sorted {
+                $0.localizedCaseInsensitiveCompare($1) == .orderedAscending
+            }
     }
     
     /// Возвращает список свободных прологов,

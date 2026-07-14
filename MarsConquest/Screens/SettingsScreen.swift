@@ -14,6 +14,7 @@ import SwiftUI
 
 struct SettingsScreen: View {
     @State private var expansions = ExpansionSettingsManager.load()
+    @AppStorage(MoxieSoundManager.isEnabledKey) private var isMoxieSoundEnabled = false
     @Environment(\.managedObjectContext) private var viewContext
     @State private var importMessage = ""
     @State private var showImportAlert = false
@@ -27,6 +28,13 @@ struct SettingsScreen: View {
                     Toggle("Колонии", isOn: binding(for: \.hasColonies))
                     Toggle("Эллада и Элизий", isOn: binding(for: \.hasHellasElysium))
                     Toggle("Кризис", isOn: binding(for: \.hasTurmoil))
+                }
+
+                Section(header: Text("Звук")) {
+                    Toggle("Звук МОКСИ", isOn: $isMoxieSoundEnabled)
+                        .onChange(of: isMoxieSoundEnabled) { _, isEnabled in
+                            MoxieSoundManager.shared.setEnabled(isEnabled)
+                        }
                 }
             }
             Section(header: Text("Импорт")) {

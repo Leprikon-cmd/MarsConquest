@@ -21,6 +21,8 @@ import CoreData
 
 @main
 struct MarsConquestApp: App {
+    @Environment(\.scenePhase) private var scenePhase
+
     // Используем shared экземпляр CoreDataManager
     private let coreDataManager = CoreDataManager.shared
     
@@ -31,6 +33,9 @@ struct MarsConquestApp: App {
         
         // Дополнительная настройка Core Data при необходимости
         configureCoreData()
+
+        // Если пользователь уже включил МОКСИ, звук начнётся при открытии приложения.
+        MoxieSoundManager.shared.startIfEnabled()
     }
     
     var body: some Scene {
@@ -42,6 +47,16 @@ struct MarsConquestApp: App {
                 .environment(\.managedObjectContextErrorHandler) { error in
                     print("Core Data error: \(error.localizedDescription)")
                 }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            switch newPhase {
+            case .active:
+                MoxieSoundManager.shared.startIfEnabled()
+            case .background:
+                MoxieSoundManager.shared.stop()
+            default:
+                break
+            }
         }
     }
     
