@@ -115,16 +115,6 @@ struct ContentView: View {
                                 .shadow(radius: 5)
                         }
 
-                        /// Скрытый переход на экран деталей игры.
-                        /// Срабатывает после получения уведомления с объектом Game.
-                        if let selectedGame = navigateToGame {
-                            NavigationLink(
-                                "",
-                                destination: GameDetailView(game: selectedGame),
-                                isActive: .constant(true)
-                            )
-                            .hidden()
-                        }
                     }
                     .padding()
                 }
@@ -159,17 +149,9 @@ struct ContentView: View {
                 gameField = GameField.farsida.rawValue
             }
             
-            /// Первичная загрузка стартовых данных в базу.
-            if !UserDefaults.standard.bool(forKey: "initialDataLoaded") {
-                generateInitialGameData(in: viewContext)
-                UserDefaults.standard.set(true, forKey: "initialDataLoaded")
-            }
-
-            /// Отладочная проверка количества корпораций в базе.
-            let fetchRequest: NSFetchRequest<Corporation> = Corporation.fetchRequest()
-            if let corporations = try? viewContext.fetch(fetchRequest) {
-                print("Корпораций в базе: \(corporations.count)")
-            }
+            /// Синхронизация встроенных справочников без создания дубликатов.
+            /// Это также добавит данные, появившиеся в следующих версиях приложения.
+            generateInitialGameData(in: viewContext)
 
             /// Подписка на уведомление для перехода к сохранённой игре.
             if !didSetupNotificationObserver {

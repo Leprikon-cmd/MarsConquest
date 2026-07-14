@@ -32,8 +32,8 @@ struct ScoreScreen: View {
     /// Контекст CoreData для сохранения результатов игры.
     @Environment(\.managedObjectContext) private var viewContext
     
-    /// Среда для закрытия текущего экрана после сохранения.
-    @Environment(\.presentationMode) var presentationMode
+    /// Современный механизм SwiftUI для закрытия текущего экрана после сохранения.
+    @Environment(\.dismiss) private var dismiss
 
     /// Текущая локальная игра, собранная в интерфейсе до сохранения в базу.
     @Binding var localGame: LocalGameData
@@ -42,6 +42,8 @@ struct ScoreScreen: View {
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var activeSelectionSheet: SelectionSheet?
+    /// Не позволяет сохранить одну и ту же партию повторным быстрым нажатием.
+    @State private var isSaving = false
 
     /// Форматтер для числовых значений очков.
     private let numberFormatter: NumberFormatter = {
@@ -250,11 +252,19 @@ struct ScoreScreen: View {
 
     /// Кнопка сохранения итогов партии.
     private func saveButton() -> some View {
-        Button("Сохранить результаты") {
+        Button(action: {
             saveGameResults()
+        }) {
+            if isSaving {
+                ProgressView()
+                Text("Сохранение...")
+            } else {
+                Text("Сохранить результаты")
+            }
         }
         .buttonStyle(.borderedProminent)
         .frame(maxWidth: .infinity)
+        .disabled(isSaving)
     }
 
     // MARK: - Логика назначения бонусов
@@ -298,17 +308,23 @@ struct ScoreScreen: View {
     /// Сохраняет игру через GameSaver и после этого отправляет пользователя
     /// к экрану статистики / сохранённой партии.
     private func saveGameResults() {
+        guard !isSaving else { return }
+        isSaving = true
+
         do {
             let savedGame = try GameSaver().save(localGame: localGame, in: viewContext)
             
             DispatchQueue.main.async {
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
                 NotificationCenter.default.post(
                     name: Notification.Name("NavigateToStatistics"),
                     object: savedGame
                 )
             }
         } catch {
+            // Не оставляем в контексте недосохранённую партию перед повторной попыткой.
+            viewContext.rollback()
+            isSaving = false
             print("Ошибка сохранения: \(error.localizedDescription)")
             errorMessage = "Ошибка сохранения: \(error.localizedDescription)"
             showError = true

@@ -19,7 +19,7 @@ import SwiftUI
 import CoreData
 
 struct AchievementsListView: View {
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
     
     @Binding var selectedItems: [LocalAchievement]
     /// Черновой выбор. Попадает в партию только после явного подтверждения.
@@ -69,7 +69,7 @@ struct AchievementsListView: View {
         .safeAreaInset(edge: .bottom) {
             Button("Добавить выбранное") {
                 selectedItems = pendingItems
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
             }
             .buttonStyle(.borderedProminent)
             .frame(maxWidth: .infinity)
@@ -79,7 +79,7 @@ struct AchievementsListView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Отмена") {
-                    presentationMode.wrappedValue.dismiss()
+                    dismiss()
                 }
             }
         }

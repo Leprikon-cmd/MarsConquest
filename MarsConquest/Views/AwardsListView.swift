@@ -19,7 +19,7 @@ import SwiftUI
 import CoreData
 
 struct AwardsListView: View {
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
     
     @Binding var selectedItems: [LocalAward]
     /// Черновой выбор. Попадает в партию только после явного подтверждения.
@@ -70,7 +70,7 @@ struct AwardsListView: View {
         .safeAreaInset(edge: .bottom) {
             Button("Добавить выбранное") {
                 selectedItems = pendingItems
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
             }
             .buttonStyle(.borderedProminent)
             .frame(maxWidth: .infinity)
@@ -80,7 +80,7 @@ struct AwardsListView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Отмена") {
-                    presentationMode.wrappedValue.dismiss()
+                    dismiss()
                 }
             }
         }

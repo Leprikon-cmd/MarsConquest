@@ -20,8 +20,8 @@ import SwiftUI
 import CoreData
 
 struct AddPlayerScreen: View {
-    /// Среда для закрытия текущего экрана после добавления игрока.
-    @Environment(\.presentationMode) var presentationMode
+    /// Современный механизм SwiftUI для закрытия текущего экрана после добавления игрока.
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         entity: SavedPlayer.entity(),
@@ -30,6 +30,14 @@ struct AddPlayerScreen: View {
             NSSortDescriptor(key: "name", ascending: true)
         ]
     ) private var savedPlayers: FetchedResults<SavedPlayer>
+    
+    /// Справочник корпораций. Его заполняет InitialDataLoader при запуске приложения.
+    @FetchRequest(entity: Corporation.entity(), sortDescriptors: [])
+    private var corporationReferences: FetchedResults<Corporation>
+    
+    /// Справочник прологов. Его заполняет InitialDataLoader при запуске приложения.
+    @FetchRequest(entity: Prologue.entity(), sortDescriptors: [])
+    private var prologueReferences: FetchedResults<Prologue>
     
     /// Цвет, заранее выбранный для нового игрока.
     let selectedColor: String
@@ -60,14 +68,18 @@ struct AddPlayerScreen: View {
     /// Допы
     @State private var expansions = ExpansionSettingsManager.load()
     
-    /// Доступный список корпораций из справочника.
+    /// Доступный список корпораций из единого справочника Core Data.
     private var corporations: [String] {
-        GameData.corporations
+        corporationReferences
+            .compactMap(\.name)
+            .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
     }
     
-    /// Доступный список прологов из справочника.
+    /// Доступный список прологов из единого справочника Core Data.
     private var prologues: [String] {
-        GameData.prologues
+        prologueReferences
+            .compactMap(\.name)
+            .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
     }
 
     /// Сохранённые профили, которые ещё не участвуют в текущей партии.
@@ -184,11 +196,7 @@ struct AddPlayerScreen: View {
     /// которые ещё не выбраны другими игроками текущей партии.
     private var availableCorporations: [String] {
         let usedCorporations = localGame.players.map { $0.corporation }
-        return corporations
-            .filter { !usedCorporations.contains($0) }
-            .sorted {
-                $0.localizedCaseInsensitiveCompare($1) == .orderedAscending
-            }
+        return corporations.filter { !usedCorporations.contains($0) }
     }
     
     /// Возвращает список свободных прологов,
@@ -248,7 +256,7 @@ struct AddPlayerScreen: View {
                 in: viewContext
             )
         }
-        presentationMode.wrappedValue.dismiss()
+        dismiss()
         
     }
     

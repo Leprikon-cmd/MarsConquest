@@ -29,6 +29,13 @@ class CoreDataManager {
     /// Загружает модель данных `GameDataModel` и создаёт хранилище SQLite.
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "GameDataModel")
+
+        // Разрешаем Core Data автоматически обновить локальную базу при смене версии модели.
+        // Например, при удалении устаревшего поля Game.duration.
+        if let storeDescription = container.persistentStoreDescriptions.first {
+            storeDescription.shouldMigrateStoreAutomatically = true
+            storeDescription.shouldInferMappingModelAutomatically = true
+        }
         
         container.loadPersistentStores { description, error in
             if let error = error {
