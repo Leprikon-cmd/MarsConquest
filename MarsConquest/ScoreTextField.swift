@@ -2,99 +2,117 @@
 //  ScoreTextField.swift
 //  Mars LogBook
 //
-//  Поле ввода очков: пустое значение считается нулём,
-//  а отрицательные числа не допускаются.
+//  Ячейка очков с двумя состояниями:
+//  отображение зафиксированного значения и его замена через цифровую клавиатуру.
 //
 
 import SwiftUI
-import UIKit
 
-/// Числовое поле, в котором повторный тап выделяет всё значение целиком.
-/// Поэтому новое число заменяет старое, а не дописывается в середину или конец.
-struct ScoreTextField: UIViewRepresentable {
+struct ScoreTextField: View {
     @Binding private var value: Int32
+
+    @State private var isEditing = false
+    @State private var draftText = ""
+    @State private var originalValue: Int32 = 0
+    @State private var hasChangedDraft = false
+    @FocusState private var inputIsFocused: Bool
 
     init(value: Binding<Int32>) {
         _value = value
     }
 
-    func makeUIView(context: Context) -> UITextField {
-        let textField = UITextField()
-        textField.borderStyle = .roundedRect
-        textField.keyboardType = .numberPad
-        textField.textAlignment = .center
-        textField.placeholder = "0"
-        textField.delegate = context.coordinator
-        textField.accessibilityLabel = "Очки"
-        context.coordinator.textField = textField
-
-        let keyboardToolbar = UIToolbar()
-        keyboardToolbar.sizeToFit()
-
-        // Точка для будущего дизайна кнопки клавиатуры.
-        // Здесь можно изменить текст, иконку или цвет, но действие
-        // doneButtonTapped должно остаться: оно закрывает клавиатуру.
-        let flexibleSpace = UIBarButtonItem(systemItem: .flexibleSpace)
-        let doneButton = UIBarButtonItem(
-            title: "Готово",
-            style: .done,
-            target: context.coordinator,
-            action: #selector(Coordinator.doneButtonTapped)
-        )
-        keyboardToolbar.items = [flexibleSpace, doneButton]
-        textField.inputAccessoryView = keyboardToolbar
-        return textField
+    var body: some View {
+        Group {
+            if isEditing {
+                editingField()
+            } else {
+                savedValueButton()
+            }
+        }
+        .frame(maxWidth: .infinity)
     }
 
-    func updateUIView(_ textField: UITextField, context: Context) {
-        // Во время ввода UIKit сам управляет содержимым поля. Внешние изменения
-        // (например, бонус за награду) отображаем сразу, когда поле не активно.
-        guard !textField.isFirstResponder else { return }
-
-        let displayedValue = value == 0 ? "" : String(value)
-        if textField.text != displayedValue {
-            textField.text = displayedValue
+    /// Зафиксированное число не является TextField: поэтому в нём нет курсора
+    /// и случайного редактирования в середине уже введённого результата.
+    private func savedValueButton() -> some View {
+        Button(action: beginEditing) {
+            Text(value == 0 ? "0" : String(value))
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, minHeight: 36)
+                .background {
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(Color(uiColor: .separator).opacity(0.45))
+                }
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Очки: \(value)")
+        .accessibilityHint("Дважды коснитесь, чтобы заменить значение")
     }
 
-    func makeCoordinator() -> Coordinator {
-        Coordinator(value: $value)
+    /// Поле появляется только после явного тапа по зафиксированному числу.
+    /// Старый результат остаётся серой подсказкой, пока пользователь не начнёт
+    /// вводить новое значение.
+    private func editingField() -> some View {
+        TextField(String(originalValue), text: $draftText)
+            .textFieldStyle(.roundedBorder)
+            .keyboardType(.numberPad)
+            .multilineTextAlignment(.center)
+            .focused($inputIsFocused)
+            // Курсор намеренно скрыт: это режим замены целого числа, а не
+            // посимвольного редактирования в его середине.
+            .tint(.clear)
+            .onAppear {
+                inputIsFocused = true
+            }
+            .onChange(of: draftText) { _, newText in
+                sanitizeDraft(newText)
+            }
+            .onChange(of: inputIsFocused) { _, isNowFocused in
+                if !isNowFocused {
+                    finishEditing()
+                }
+            }
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+
+                    // Точка для будущего дизайна кнопки клавиатуры.
+                    // Можно менять текст, иконку и цвет. Действие finishEditing()
+                    // должно остаться: оно подтверждает ввод и закрывает клавиатуру.
+                    Button("Готово") {
+                        finishEditing()
+                    }
+                }
+            }
     }
 
-    final class Coordinator: NSObject, UITextFieldDelegate {
-        private var value: Binding<Int32>
-        weak var textField: UITextField?
+    private func beginEditing() {
+        originalValue = value
+        draftText = ""
+        hasChangedDraft = false
+        isEditing = true
+    }
 
-        init(value: Binding<Int32>) {
-            self.value = value
+    private func sanitizeDraft(_ newText: String) {
+        let digitsOnly = newText.filter(\.isNumber)
+
+        if digitsOnly != newText {
+            draftText = digitsOnly
+            return
         }
 
-        func textFieldDidBeginEditing(_ textField: UITextField) {
-            // Оставляем старое число видимым, но готовым к полной замене.
-            // При выходе без ввода оно так и останется прежним.
-            textField.selectAll(nil)
+        hasChangedDraft = true
+    }
+
+    private func finishEditing() {
+        guard isEditing else { return }
+
+        if hasChangedDraft {
+            // Пустой результат после удаления введённых цифр считается нулём.
+            value = Int32(draftText) ?? (draftText.isEmpty ? 0 : Int32.max)
         }
 
-        @objc func doneButtonTapped() {
-            textField?.resignFirstResponder()
-        }
-
-        func textField(
-            _ textField: UITextField,
-            shouldChangeCharactersIn range: NSRange,
-            replacementString string: String
-        ) -> Bool {
-            let currentText = textField.text ?? ""
-            guard let swiftRange = Range(range, in: currentText) else { return false }
-
-            let proposedText = currentText.replacingCharacters(in: swiftRange, with: string)
-            let digitsOnly = proposedText.filter(\.isNumber)
-
-            // Не даём вставить знак, пробел или иной нечисловой символ.
-            guard proposedText == digitsOnly else { return false }
-
-            value.wrappedValue = Int32(digitsOnly) ?? (digitsOnly.isEmpty ? 0 : Int32.max)
-            return true
-        }
+        inputIsFocused = false
+        isEditing = false
     }
 }
