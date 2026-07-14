@@ -1,0 +1,61 @@
+# Release Notes
+
+## Mars LogBook 1.0 (2) - TestFlight
+
+Дата: 14 июля 2026
+
+Статус: готово к загрузке в TestFlight.
+
+### Что изменилось
+
+- Приложение получило пользовательское имя **Mars LogBook**.
+- Экран сохранённой партии стал компактнее: корпорация, прологи и итог видны сразу, а полная разбивка очков открывается по кнопке «Подробнее».
+- Достижения и награды показаны в подробностях конкретного игрока.
+- Улучшен ввод очков: зафиксированное число не редактируется курсором; новый ввод заменяет значение целиком.
+- Исправлено зависание при открытии некоторых сохранённых партий с наградами за второе место.
+
+## TestFlight: What to Test
+
+### Русский
+
+**Что изменилось**
+
+- Обновлён экран деталей сохранённой партии.
+- Улучшен ввод итоговых очков.
+- Исправлена стабильность при открытии партий с наградами.
+
+**Что проверить**
+
+1. Создайте партию в соло-режиме и с несколькими игроками; введите и замените значения очков, затем нажмите «Готово» над клавиатурой.
+2. Сохраните партию и откройте её из «Статистики».
+3. Проверьте, что в кратком виде игрока верны корпорация, прологи и итог.
+4. Откройте «Подробнее»: сумма категорий, достижений и наград должна совпадать с итогом.
+5. Проверьте партии с первой, второй и разделённой наградой, а также ранее сохранённые и импортированные партии.
+
+### English
+
+**What’s new**
+
+- Updated saved-game details screen.
+- Improved score entry.
+- Improved stability when opening games with awards.
+
+**What to test**
+
+1. Create a solo game and a multiplayer game. Enter and replace scores, then use the Done button above the keyboard.
+2. Save the game and open it from Statistics.
+3. Confirm that corporation, preludes, and the final score are correct in each player’s compact summary.
+4. Open Details and confirm that the score categories, milestones, and awards add up to the final score.
+5. Test games with first place, second place, and tied awards, as well as older saved or imported games.
+
+**Note:** the app interface is currently in Russian. English localization is planned for a future build.
+
+## TestFlight beta description
+
+### Русский
+
+Mars LogBook - локальный помощник для записи партий, подсчёта очков и просмотра личной статистики по настольной игре Terraforming Mars.
+
+### English
+
+Mars LogBook is a local companion app for recording games, calculating scores, and viewing personal statistics for Terraforming Mars.
