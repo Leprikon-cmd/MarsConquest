@@ -45,14 +45,6 @@ struct ScoreScreen: View {
     /// Не позволяет сохранить одну и ту же партию повторным быстрым нажатием.
     @State private var isSaving = false
 
-    /// Форматтер для числовых значений очков.
-    private let numberFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .none
-        formatter.zeroSymbol = "0"
-        return formatter
-    }()
-
     /// Упрощённый доступ к списку игроков текущей партии.
     private var players: [LocalPlayer] {
         localGame.players
@@ -90,7 +82,7 @@ struct ScoreScreen: View {
     /// Таблица очков игроков по основным категориям.
     private func playersTable() -> some View {
         Section {
-            ScoreTableView(localGame: $localGame, numberFormatter: numberFormatter)
+            ScoreTableView(localGame: $localGame)
         }
     }
 

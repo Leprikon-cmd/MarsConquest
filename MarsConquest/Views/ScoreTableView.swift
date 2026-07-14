@@ -21,9 +21,6 @@ struct ScoreTableView: View {
     /// Локальная модель текущей игры, которую пользователь заполняет до сохранения.
     @Binding var localGame: LocalGameData
     
-    /// Форматтер числовых значений для полей ввода очков.
-    let numberFormatter: NumberFormatter
-
     /// Упрощённый доступ к игрокам текущей партии.
     private var players: [LocalPlayer] {
         localGame.players
@@ -83,8 +80,7 @@ struct ScoreTableView: View {
                 .frame(width: 120, alignment: .leading)
             
             ForEach(players.indices, id: \.self) { index in
-                TextField(
-                    "",
+                ScoreTextField(
                     value: Binding<Int32>(
                         get: { localGame.players[index].score[keyPath: keyPath] },
                         set: { newValue in
@@ -92,11 +88,8 @@ struct ScoreTableView: View {
                             updatedPlayers[index].score[keyPath: keyPath] = newValue
                             localGame.players = updatedPlayers
                         }
-                    ),
-                    formatter: numberFormatter
+                    )
                 )
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .keyboardType(.numberPad)
                 .frame(maxWidth: .infinity, alignment: .center)
             }
         }
