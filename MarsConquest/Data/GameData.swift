@@ -26,16 +26,81 @@ struct GameData {
     /// Доступные цвета игроков.
     static let colors = ["Красный", "Синий", "Желтый", "Черный", "Зеленый"]
     
-    /// Справочник доступных корпораций.
-    static let corporations: [String] = [
-        "Credicor", "Ecoline", "Helion", "Mining Guild", "Interplanetary Cinematics",
-        "Inventrix", "Phobolog", "Tharsis Republic", "Thorgate", "United Nations Mars Initiative",
-        "Teractor", "Saturn Systems", "Aphrodite", "Celestic", "Manutech", "Morning Star Inc",
-        "Viron", "Cheung Shing Mars", "Point Luna", "Robinson Industries", "Valley Trust", "Vitor",
-        "Aridor", "Arklight", "Polyphemos", "Poseidon", "Storm Craft Incorporated", "Lakefront Resorts",
-        "Pristar", "Septem Tribus", "Terralabs Research", "Utopia Invest", "Factorum", "Mons Insurance",
-        "Philares", "Arcadian Communities", "Recyclon", "Splice Tactical Genomics"
+    /// Справочник корпораций с указанием набора, из которого они происходят.
+    /// Базовые корпорации доступны всегда, остальные - только при включённом
+    /// дополнении конкретной текущей партии.
+    static let corporationDefinitions: [CorporationDefinition] = [
+        // Базовая игра
+        .init("Credicor", source: .base),
+        .init("Ecoline", source: .base),
+        .init("Helion", source: .base),
+        .init("Mining Guild", source: .base),
+        .init("Interplanetary Cinematics", source: .base),
+        .init("Inventrix", source: .base),
+        .init("Phobolog", source: .base),
+        .init("Tharsis Republic", source: .base),
+        .init("Thorgate", source: .base),
+        .init("United Nations Mars Initiative", source: .base),
+        .init("Teractor", source: .base),
+        .init("Saturn Systems", source: .base),
+
+        // Венера
+        .init("Aphrodite", source: .venus),
+        .init("Celestic", source: .venus),
+        .init("Manutech", source: .venus),
+        .init("Morning Star Inc", source: .venus),
+        .init("Viron", source: .venus),
+
+        // Прологи
+        .init("Cheung Shing Mars", source: .prelude),
+        .init("Point Luna", source: .prelude),
+        .init("Robinson Industries", source: .prelude),
+        .init("Valley Trust", source: .prelude),
+        .init("Vitor", source: .prelude),
+
+        // Колонии
+        .init("Aridor", source: .colonies),
+        .init("Arklight", source: .colonies),
+        .init("Polyphemos", source: .colonies),
+        .init("Poseidon", source: .colonies),
+        .init("Storm Craft Incorporated", source: .colonies),
+        .init("Lakefront Resorts", source: .colonies),
+
+        // Кризис
+        .init("Pristar", source: .turmoil),
+        .init("Septem Tribus", source: .turmoil),
+        .init("Terralabs Research", source: .turmoil),
+        .init("Utopia Invest", source: .turmoil),
+
+        // Эллада и Элизий
+        .init("Factorum", source: .hellasElysium),
+        .init("Mons Insurance", source: .hellasElysium),
+        .init("Philares", source: .hellasElysium),
+        .init("Arcadian Communities", source: .hellasElysium),
+        .init("Recyclon", source: .hellasElysium),
+        .init("Splice Tactical Genomics", source: .hellasElysium)
     ]
+
+    /// Имена нужны загрузчику начальных данных Core Data.
+    static var corporations: [String] {
+        corporationDefinitions.map(\.name)
+    }
+
+    /// Проверяет, можно ли использовать корпорацию с набором дополнений партии.
+    /// Неизвестные будущие записи оставляем доступными, чтобы новая запись
+    /// справочника не исчезла у пользователя до обновления приложения.
+    static func isCorporationAvailable(
+        named name: String,
+        for expansions: GameExpansions
+    ) -> Bool {
+        guard let definition = corporationDefinitions.first(where: {
+            $0.name.caseInsensitiveCompare(name) == .orderedSame
+        }) else {
+            return true
+        }
+
+        return definition.source.isEnabled(in: expansions)
+    }
     
     /// Справочник доступных карт пролога.
     static let prologues: [String] = [
@@ -115,6 +180,42 @@ struct GameData {
             if attribute.attributeType != .stringAttributeType {
                 print("Предупреждение: Атрибут \(attr) должен быть строкового типа")
             }
+        }
+    }
+}
+
+struct CorporationDefinition {
+    let name: String
+    let source: CorporationSource
+
+    init(_ name: String, source: CorporationSource) {
+        self.name = name
+        self.source = source
+    }
+}
+
+enum CorporationSource {
+    case base
+    case prelude
+    case venus
+    case colonies
+    case hellasElysium
+    case turmoil
+
+    func isEnabled(in expansions: GameExpansions) -> Bool {
+        switch self {
+        case .base:
+            return true
+        case .prelude:
+            return expansions.hasPrelude
+        case .venus:
+            return expansions.hasVenus
+        case .colonies:
+            return expansions.hasColonies
+        case .hellasElysium:
+            return expansions.hasHellasElysium
+        case .turmoil:
+            return expansions.hasTurmoil
         }
     }
 }

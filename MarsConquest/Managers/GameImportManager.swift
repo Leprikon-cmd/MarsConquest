@@ -15,6 +15,8 @@ import CoreData
 struct GameImportManager {
 
     static func importFromBundle(filename: String, in context: NSManagedObjectContext) throws -> Int {
+        // Xcode собирает синхронизируемые ресурсы в корень bundle, даже если
+        // они аккуратно разложены по папкам в исходном проекте.
         guard let url = Bundle.main.url(forResource: filename, withExtension: "json") else {
             throw ImportError.fileNotFound
         }

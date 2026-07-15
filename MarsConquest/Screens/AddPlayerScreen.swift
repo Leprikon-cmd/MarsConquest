@@ -65,9 +65,6 @@ struct AddPlayerScreen: View {
     
     @State private var selectedSavedPlayerID: NSManagedObjectID?
     
-    /// Допы
-    @State private var expansions = ExpansionSettingsManager.load()
-    
     /// Доступный список корпораций из единого справочника Core Data.
     private var corporations: [String] {
         corporationReferences
@@ -137,7 +134,7 @@ struct AddPlayerScreen: View {
                     .pickerStyle(MenuPickerStyle())
                 }
                 
-                if expansions.hasPrelude {
+                if localGame.expansions.hasPrelude {
                     Section(header: Text("Первый пролог")) {
                         Picker("Выберите первый пролог", selection: $prologue1) {
                             ForEach(availablePrologues, id: \.self) { prologue in
@@ -174,11 +171,6 @@ struct AddPlayerScreen: View {
                 )
             }
             .onAppear {
-                expansions = ExpansionSettingsManager.load()
-                setInitialValues()
-            }
-            .onReceive(NotificationCenter.default.publisher(for: ExpansionSettingsManager.settingsChangedNotification)) { _ in
-                expansions = ExpansionSettingsManager.load()
                 setInitialValues()
             }
         }
@@ -196,7 +188,10 @@ struct AddPlayerScreen: View {
     /// которые ещё не выбраны другими игроками текущей партии.
     private var availableCorporations: [String] {
         let usedCorporations = localGame.players.map { $0.corporation }
-        return corporations.filter { !usedCorporations.contains($0) }
+        return corporations.filter {
+            GameData.isCorporationAvailable(named: $0, for: localGame.expansions) &&
+            !usedCorporations.contains($0)
+        }
     }
     
     /// Возвращает список свободных прологов,
@@ -242,8 +237,8 @@ struct AddPlayerScreen: View {
             name: trimmedName,
             color: selectedColor,
             corporation: corporation,
-            prologue1: expansions.hasPrelude ? prologue1 : "",
-            prologue2: expansions.hasPrelude ? prologue2 : "",
+            prologue1: localGame.expansions.hasPrelude ? prologue1 : "",
+            prologue2: localGame.expansions.hasPrelude ? prologue2 : "",
             score: LocalScore()
         )
         
