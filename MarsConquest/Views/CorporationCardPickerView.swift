@@ -70,7 +70,7 @@ struct CorporationCardPickerView: View {
     }
 }
 
-private struct CorporationCardImage: View {
+struct CorporationCardImage: View {
     let corporationName: String
 
     var body: some View {

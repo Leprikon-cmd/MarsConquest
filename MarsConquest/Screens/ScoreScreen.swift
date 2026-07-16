@@ -59,7 +59,6 @@ struct ScoreScreen: View {
             )
 
             playersTable()
-            bonusPointsSection()
             rewardsSection()
             ScoreSummaryView(localGame: localGame)
             saveButton()
@@ -86,129 +85,9 @@ struct ScoreScreen: View {
         }
     }
 
-    /// Секция назначения наград и достижений игрокам.
-    private func bonusPointsSection() -> some View {
-        Section(header: Text("Доп. очки: награды и достижения")) {
-            VStack(alignment: .leading, spacing: 12) {
-                
-                if !localGame.achievements.isEmpty {
-                    Text("Достижения")
-                        .font(.headline)
-                    
-                    ForEach(localGame.achievements.indices, id: \.self) { index in
-                        achievementRow(index: index)
-                    }
-                }
-                
-                if !localGame.awards.isEmpty {
-                    Text("Награды")
-                        .font(.headline)
-                        .padding(.top, 4)
-                    
-                    ForEach(localGame.awards.indices, id: \.self) { index in
-                        awardRow(index: index)
-                    }
-                }
-            }
-            .padding(.vertical, 4)
-        }
-    }
-
-    /// Отдельная маленькая кнопка-кружок.
-    /// Важно: fixed frame + plain style, чтобы не вся строка была кнопкой.
-    private func circleButton(
-        systemName: String,
-        color: Color,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Image(systemName: systemName)
-                .font(.system(size: 28))
-                .foregroundColor(color)
-                .frame(width: 36, height: 36)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-    }
-
-    /// Строка назначения победителей достижения.
-    private func achievementRow(index: Int) -> some View {
-        let achievement = localGame.achievements[index]
-        
-        return HStack(alignment: .center) {
-            Text(achievement.name)
-                .frame(width: 140, alignment: .leading)
-            
-            ForEach(players, id: \.id) { player in
-                let isSelected = localGame.achievements[index].winnerPlayerIDs.contains(player.id)
-                
-                circleButton(
-                    systemName: isSelected ? "checkmark.circle.fill" : "circle",
-                    color: .green
-                ) {
-                    toggleAchievementWinner(achievementIndex: index, playerID: player.id)
-                }
-                .frame(maxWidth: .infinity)
-            }
-        }
-        .padding(.vertical, 2)
-    }
-
-    /// Строка назначения первого и второго места по награде.
-    private func awardRow(index: Int) -> some View {
-        let award = localGame.awards[index]
-        let hasTieForFirst = award.firstPlacePlayerIDs.count > 1
-        
-        return VStack(alignment: .leading, spacing: 8) {
-            Text(award.name)
-                .font(.subheadline)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            HStack(alignment: .center) {
-                Text("1 место")
-                    .frame(width: 140, alignment: .leading)
-                
-                ForEach(players, id: \.id) { player in
-                    let isSelected = localGame.awards[index].firstPlacePlayerIDs.contains(player.id)
-                    
-                    circleButton(
-                        systemName: isSelected ? "1.circle.fill" : "1.circle",
-                        color: .yellow
-                    ) {
-                        toggleAwardFirstPlace(awardIndex: index, playerID: player.id)
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-            }
-            
-            if players.count >= 3 && !hasTieForFirst {
-                HStack(alignment: .center) {
-                    Text("2 место")
-                        .frame(width: 140, alignment: .leading)
-                    
-                ForEach(players, id: \.id) { player in
-                    let isSelected = localGame.awards[index].secondPlacePlayerIDs.contains(player.id)
-                    let isFirstPlace = localGame.awards[index].firstPlacePlayerIDs.contains(player.id)
-                    
-                    circleButton(
-                        systemName: isSelected ? "2.circle.fill" : "2.circle",
-                        color: isFirstPlace ? .gray : .orange
-                    ) {
-                        toggleAwardSecondPlace(awardIndex: index, playerID: player.id)
-                    }
-                    .disabled(isFirstPlace)
-                    .opacity(isFirstPlace ? 0.4 : 1)
-                    .frame(maxWidth: .infinity)
-                }
-                }
-            }
-        }
-        .padding(.vertical, 4)
-    }
-
     /// Секция кнопок открытия экранов выбора наград и достижений.
     private func rewardsSection() -> some View {
-        Section(header: Text("Награды и достижения")) {
+        Section {
             HStack(spacing: 12) {
                 Button(action: {
                     activeSelectionSheet = .achievements
@@ -238,7 +117,7 @@ struct ScoreScreen: View {
                 .buttonStyle(.borderless)
                 .contentShape(Rectangle())
             }
-            .padding(.vertical)
+            .padding(.vertical, 4)
         }
     }
 
@@ -257,42 +136,6 @@ struct ScoreScreen: View {
         .buttonStyle(.borderedProminent)
         .frame(maxWidth: .infinity)
         .disabled(isSaving)
-    }
-
-    // MARK: - Логика назначения бонусов
-
-    private func toggleAchievementWinner(achievementIndex: Int, playerID: UUID) {
-        if localGame.achievements[achievementIndex].winnerPlayerIDs.contains(playerID) {
-            localGame.achievements[achievementIndex].winnerPlayerIDs.removeAll()
-        } else {
-            localGame.achievements[achievementIndex].winnerPlayerIDs = [playerID]
-        }
-    }
-
-    private func toggleAwardFirstPlace(awardIndex: Int, playerID: UUID) {
-        if localGame.awards[awardIndex].firstPlacePlayerIDs.contains(playerID) {
-            localGame.awards[awardIndex].firstPlacePlayerIDs.removeAll { $0 == playerID }
-        } else {
-            localGame.awards[awardIndex].firstPlacePlayerIDs.append(playerID)
-            // Один и тот же игрок не должен одновременно быть и на 1, и на 2 месте
-            localGame.awards[awardIndex].secondPlacePlayerIDs.removeAll { $0 == playerID }
-        }
-
-        if localGame.awards[awardIndex].firstPlacePlayerIDs.count > 1 {
-            localGame.awards[awardIndex].secondPlacePlayerIDs.removeAll()
-        }
-    }
-
-    private func toggleAwardSecondPlace(awardIndex: Int, playerID: UUID) {
-        guard players.count >= 3 else { return }
-        guard localGame.awards[awardIndex].firstPlacePlayerIDs.count == 1 else { return }
-        guard !localGame.awards[awardIndex].firstPlacePlayerIDs.contains(playerID) else { return }
-
-        if localGame.awards[awardIndex].secondPlacePlayerIDs.contains(playerID) {
-            localGame.awards[awardIndex].secondPlacePlayerIDs.removeAll { $0 == playerID }
-        } else {
-            localGame.awards[awardIndex].secondPlacePlayerIDs.append(playerID)
-        }
     }
 
     // MARK: - Сохранение игры

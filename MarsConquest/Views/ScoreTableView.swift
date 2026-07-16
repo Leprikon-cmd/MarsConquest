@@ -12,6 +12,7 @@
 //  - показать игроков по цветам
 //  - показать основные категории очков
 //  - дать возможность вручную вводить очки по каждой категории
+//  - назначать очки за выбранные достижения и награды
 //  - обновлять localGame.players при изменении значений
 //
 
@@ -30,6 +31,7 @@ struct ScoreTableView: View {
         VStack(alignment: .leading, spacing: 10) {
             playersHeader()
             mainScoreCategories()
+            bonusScoreCategories()
         }
         .padding(.vertical, 10)
     }
@@ -66,6 +68,35 @@ struct ScoreTableView: View {
         }
     }
 
+    /// Выбранные награды и достижения продолжают основную таблицу,
+    /// чтобы все начисляемые очки были в одном месте.
+    @ViewBuilder
+    private func bonusScoreCategories() -> some View {
+        if !localGame.achievements.isEmpty || !localGame.awards.isEmpty {
+            Divider()
+                .padding(.vertical, 2)
+
+            if !localGame.achievements.isEmpty {
+                Text("Достижения")
+                    .font(.headline)
+
+                ForEach(localGame.achievements.indices, id: \.self) { index in
+                    achievementRow(index: index)
+                }
+            }
+
+            if !localGame.awards.isEmpty {
+                Text("Награды")
+                    .font(.headline)
+                    .padding(.top, localGame.achievements.isEmpty ? 0 : 4)
+
+                ForEach(localGame.awards.indices, id: \.self) { index in
+                    awardRows(index: index)
+                }
+            }
+        }
+    }
+
     /// Одна строка таблицы для конкретной категории очков.
     ///
     /// - Parameters:
@@ -92,6 +123,144 @@ struct ScoreTableView: View {
                 )
                 .frame(maxWidth: .infinity, alignment: .center)
             }
+        }
+    }
+
+    /// Кнопка назначения бонуса. До выбора показывается круг, после - число очков.
+    private func bonusValueButton(
+        points: Int,
+        isSelected: Bool,
+        color: Color,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Group {
+                if isSelected {
+                    Text("\(points)")
+                        .font(.headline)
+                        .monospacedDigit()
+                } else {
+                    Image(systemName: "circle")
+                        .font(.system(size: 28))
+                }
+            }
+            .foregroundStyle(color)
+            .frame(width: 36, height: 36)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    /// Одна строка достижения: каждый игрок может получить его только один раз.
+    private func achievementRow(index: Int) -> some View {
+        let achievement = localGame.achievements[index]
+
+        return HStack {
+            Text(achievement.name)
+                .frame(width: 120, alignment: .leading)
+
+            ForEach(players, id: \.id) { player in
+                let isSelected = achievement.winnerPlayerIDs.contains(player.id)
+
+                bonusValueButton(points: 5, isSelected: isSelected, color: .green) {
+                    toggleAchievementWinner(achievementIndex: index, playerID: player.id)
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    /// Награда содержит строку первого места и, при допустимых условиях, второго.
+    @ViewBuilder
+    private func awardRows(index: Int) -> some View {
+        let award = localGame.awards[index]
+        let hasTieForFirst = award.firstPlacePlayerIDs.count > 1
+
+        Text(award.name)
+            .font(.subheadline)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+        awardPlaceRow(
+            medal: "🥇",
+            points: 5,
+            selectedPlayerIDs: award.firstPlacePlayerIDs,
+            color: .yellow
+        ) { playerID in
+            toggleAwardFirstPlace(awardIndex: index, playerID: playerID)
+        }
+
+        if players.count >= 3 && !hasTieForFirst {
+            awardPlaceRow(
+                medal: "🥈",
+                points: 2,
+                selectedPlayerIDs: award.secondPlacePlayerIDs,
+                color: .orange,
+                disabledPlayerIDs: award.firstPlacePlayerIDs
+            ) { playerID in
+                toggleAwardSecondPlace(awardIndex: index, playerID: playerID)
+            }
+        }
+    }
+
+    private func awardPlaceRow(
+        medal: String,
+        points: Int,
+        selectedPlayerIDs: [UUID],
+        color: Color,
+        disabledPlayerIDs: [UUID] = [],
+        action: @escaping (UUID) -> Void
+    ) -> some View {
+        HStack {
+            Text(medal)
+                .frame(width: 120, alignment: .leading)
+
+            ForEach(players, id: \.id) { player in
+                let isDisabled = disabledPlayerIDs.contains(player.id)
+
+                bonusValueButton(
+                    points: points,
+                    isSelected: selectedPlayerIDs.contains(player.id),
+                    color: isDisabled ? .gray : color
+                ) {
+                    action(player.id)
+                }
+                .disabled(isDisabled)
+                .opacity(isDisabled ? 0.4 : 1)
+                .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    private func toggleAchievementWinner(achievementIndex: Int, playerID: UUID) {
+        if localGame.achievements[achievementIndex].winnerPlayerIDs.contains(playerID) {
+            localGame.achievements[achievementIndex].winnerPlayerIDs.removeAll()
+        } else {
+            localGame.achievements[achievementIndex].winnerPlayerIDs = [playerID]
+        }
+    }
+
+    private func toggleAwardFirstPlace(awardIndex: Int, playerID: UUID) {
+        if localGame.awards[awardIndex].firstPlacePlayerIDs.contains(playerID) {
+            localGame.awards[awardIndex].firstPlacePlayerIDs.removeAll { $0 == playerID }
+        } else {
+            localGame.awards[awardIndex].firstPlacePlayerIDs.append(playerID)
+            localGame.awards[awardIndex].secondPlacePlayerIDs.removeAll { $0 == playerID }
+        }
+
+        if localGame.awards[awardIndex].firstPlacePlayerIDs.count > 1 {
+            localGame.awards[awardIndex].secondPlacePlayerIDs.removeAll()
+        }
+    }
+
+    private func toggleAwardSecondPlace(awardIndex: Int, playerID: UUID) {
+        guard players.count >= 3 else { return }
+        guard localGame.awards[awardIndex].firstPlacePlayerIDs.count == 1 else { return }
+        guard !localGame.awards[awardIndex].firstPlacePlayerIDs.contains(playerID) else { return }
+
+        if localGame.awards[awardIndex].secondPlacePlayerIDs.contains(playerID) {
+            localGame.awards[awardIndex].secondPlacePlayerIDs.removeAll { $0 == playerID }
+        } else {
+            localGame.awards[awardIndex].secondPlacePlayerIDs.append(playerID)
         }
     }
 }

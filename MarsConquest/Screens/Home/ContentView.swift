@@ -43,6 +43,9 @@ struct ContentView: View {
   /// Подписываемся один раз
   @State private var didSetupNotificationObserver = false
 
+  /// Подсказка о горизонтальном свайпе нужна только при первом знакомстве с выбором поля.
+  @AppStorage("landingSiteSwipeHintSeen") private var hasSeenLandingSiteSwipeHint = false
+
   /// Доступные игровые поля.
   private var gameFields: [GameField] {
     expansions.hasHellasElysium ? GameField.allCases : [.farsida]
@@ -67,7 +70,7 @@ struct ContentView: View {
               .foregroundColor(.white)
               .padding(.top, 20)
 
-            Text("Выбор места высадки")
+            Text("Место высадки")
               .font(.title2)
               .foregroundColor(.white)
 
@@ -83,6 +86,19 @@ struct ContentView: View {
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(.white)
             )
+            .overlay(alignment: .bottom) {
+              if gameFields.count > 1 && !hasSeenLandingSiteSwipeHint {
+                Label("Листайте, чтобы выбрать место высадки", systemImage: "hand.draw.fill")
+                  .font(.subheadline.weight(.semibold))
+                  .foregroundStyle(.primary)
+                  .padding(.horizontal, 14)
+                  .padding(.vertical, 10)
+                  .background(.ultraThinMaterial, in: Capsule())
+                  .padding(.bottom, 18)
+                  .allowsHitTesting(false)
+                  .transition(.opacity)
+              }
+            }
             .gesture(
               DragGesture().onEnded { gesture in
                 let currentIndex = gameFields.firstIndex(where: { $0.rawValue == gameField }) ?? 0
@@ -91,11 +107,13 @@ struct ContentView: View {
                   withAnimation {
                     gameField = gameFields[(currentIndex + 1) % gameFields.count].rawValue
                   }
+                  hasSeenLandingSiteSwipeHint = true
                 } else if gesture.translation.width > 50 {
                   withAnimation {
                     gameField =
                       gameFields[(currentIndex - 1 + gameFields.count) % gameFields.count].rawValue
                   }
+                  hasSeenLandingSiteSwipeHint = true
                 }
               }
             )

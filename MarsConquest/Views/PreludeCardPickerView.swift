@@ -2,7 +2,7 @@
 //  PreludeCardPickerView.swift
 //  MarsConquest
 //
-//  Вертикальный выбор пролога по изображению его карты.
+//  Вертикальный выбор до двух прологов по изображениям карт.
 //
 
 import SwiftUI
@@ -12,7 +12,7 @@ struct PreludeCardPickerView: View {
     @Environment(\.dismiss) private var dismiss
 
     let prologues: [String]
-    @Binding var selection: String
+    @Binding var selections: [String]
 
     var body: some View {
         NavigationStack {
@@ -21,19 +21,18 @@ struct PreludeCardPickerView: View {
                     LazyVStack(spacing: 16) {
                         ForEach(prologues, id: \.self) { prologue in
                             Button {
-                                selection = prologue
-                                dismiss()
+                                toggleSelection(for: prologue)
                             } label: {
                                 PreludeCardImage(prologueName: prologue)
                                     .overlay {
                                         RoundedRectangle(cornerRadius: 18)
                                             .stroke(
-                                                prologue == selection ? Color.accentColor : .clear,
+                                                selections.contains(prologue) ? Color.accentColor : .clear,
                                                 lineWidth: 4
                                             )
                                     }
                                     .overlay(alignment: .topTrailing) {
-                                        if prologue == selection {
+                                        if selections.contains(prologue) {
                                             Image(systemName: "checkmark.circle.fill")
                                                 .font(.title2)
                                                 .foregroundStyle(.white, Color.accentColor)
@@ -51,9 +50,9 @@ struct PreludeCardPickerView: View {
                     .padding(.vertical, 16)
                 }
                 .onAppear {
-                    guard !selection.isEmpty else { return }
+                    guard let firstSelection = selections.first else { return }
                     DispatchQueue.main.async {
-                        scrollProxy.scrollTo(selection, anchor: .center)
+                        scrollProxy.scrollTo(firstSelection, anchor: .center)
                     }
                 }
             }
@@ -65,12 +64,29 @@ struct PreludeCardPickerView: View {
                         dismiss()
                     }
                 }
+                ToolbarItem(placement: .principal) {
+                    Text("Выбрано: \(selections.count) из 2")
+                        .font(.subheadline.weight(.semibold))
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Готово") {
+                        dismiss()
+                    }
+                }
             }
+        }
+    }
+
+    private func toggleSelection(for prologue: String) {
+        if selections.contains(prologue) {
+            selections.removeAll { $0 == prologue }
+        } else if selections.count < 2 {
+            selections.append(prologue)
         }
     }
 }
 
-private struct PreludeCardImage: View {
+struct PreludeCardImage: View {
     let prologueName: String
 
     var body: some View {

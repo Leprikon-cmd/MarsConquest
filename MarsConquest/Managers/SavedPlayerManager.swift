@@ -13,6 +13,28 @@ import CoreData
 
 struct SavedPlayerManager {
 
+    /// Обновляет существующий профиль после редактирования игрока в новой партии.
+    static func updatePlayer(
+        id: UUID,
+        name: String,
+        color: String,
+        in context: NSManagedObjectContext
+    ) {
+        let request: NSFetchRequest<SavedPlayer> = SavedPlayer.fetchRequest()
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+
+        do {
+            guard let player = try context.fetch(request).first else { return }
+            player.name = name
+            player.favoriteColor = color
+            player.updatedAt = Date()
+            try context.save()
+        } catch {
+            print("Ошибка обновления игрока: \(error.localizedDescription)")
+        }
+    }
+
     /// Сохраняет новый профиль игрока.
     /// Имя уникально: статистика использует его как понятный человеку идентификатор.
     static func savePlayerIfNeeded(

@@ -45,6 +45,10 @@ struct AddPlayerScreen: View {
   /// Локальная модель текущей создаваемой игры.
   @Binding var localGame: LocalGameData
 
+  /// При наличии значения экран редактирует существующего игрока,
+  /// а не добавляет нового.
+  let editingPlayer: LocalPlayer?
+
   /// Цвет фишки нового игрока.
   @State private var selectedColor: String = ""
 
@@ -68,8 +72,7 @@ struct AddPlayerScreen: View {
 
   @State private var selectedSavedPlayerID: NSManagedObjectID?
   @State private var showCorporationPicker = false
-  @State private var showFirstProloguePicker = false
-  @State private var showSecondProloguePicker = false
+  @State private var showPreludePicker = false
 
   /// Доступный список корпораций из единого справочника Core Data.
   private var corporations: [String] {
@@ -101,11 +104,15 @@ struct AddPlayerScreen: View {
     return savedPlayers.first { $0.objectID == selectedSavedPlayerID }
   }
 
+  private var isEditing: Bool {
+    editingPlayer != nil
+  }
+
   @ViewBuilder
   private func savedPlayersSection() -> some View {
     if !savedPlayers.isEmpty {
-      Section(header: Text("Сохранённые игроки")) {
-        Picker("Выберите игрока", selection: $selectedSavedPlayerID) {
+      Section(header: Text("Выбрать сохранённого CEO")) {
+        Picker("Сохранённый CEO", selection: $selectedSavedPlayerID) {
           Text("Новый игрок").tag(nil as NSManagedObjectID?)
 
           ForEach(availableSavedPlayers, id: \.objectID) { savedPlayer in
@@ -129,14 +136,6 @@ struct AddPlayerScreen: View {
   var body: some View {
     NavigationStack {
       Form {
-        savedPlayersSection()
-
-        Section(header: Text("Имя игрока")) {
-          TextField("Введите имя CEO", text: $name)
-            .autocapitalization(.words)
-            .disabled(selectedSavedPlayer != nil)
-        }
-
         Section(header: Text("Цвет фишки")) {
           HStack(spacing: 16) {
             Spacer(minLength: 0)
@@ -144,11 +143,13 @@ struct AddPlayerScreen: View {
               Button {
                 selectedColor = color
               } label: {
-                Circle()
-                  .fill(Color.named(color))
-                  .frame(width: 44, height: 44)
+                Image(systemName: "cube.fill")
+                  .font(.system(size: 38, weight: .medium))
+                  .symbolRenderingMode(.hierarchical)
+                  .foregroundStyle(Color.named(color))
+                  .frame(width: 48, height: 48)
                   .overlay {
-                    Circle()
+                    RoundedRectangle(cornerRadius: 10)
                       .stroke(
                         selectedColor == color ? Color.primary : Color.white.opacity(0.45),
                         lineWidth: selectedColor == color ? 3 : 1
@@ -157,8 +158,11 @@ struct AddPlayerScreen: View {
                   .overlay {
                     if selectedColor == color {
                       Image(systemName: "checkmark")
-                        .font(.headline.weight(.bold))
+                        .font(.caption.weight(.bold))
                         .foregroundStyle(color == "Желтый" ? .black : .white)
+                        .padding(3)
+                        .background(.thinMaterial, in: Circle())
+                        .offset(x: 13, y: -13)
                     }
                   }
               }
@@ -170,6 +174,16 @@ struct AddPlayerScreen: View {
           .padding(.vertical, 4)
         }
 
+        Section(header: Text("Имя игрока")) {
+          TextField("Введите имя CEO", text: $name)
+            .autocapitalization(.words)
+            .disabled(selectedSavedPlayer != nil)
+        }
+
+        if !isEditing {
+          savedPlayersSection()
+        }
+
         Section(header: Text("Корпорация")) {
           Button {
             showCorporationPicker = true
@@ -178,53 +192,50 @@ struct AddPlayerScreen: View {
               Text(corporation.isEmpty ? "Выберите корпорацию" : corporation)
                 .foregroundStyle(corporation.isEmpty ? .secondary : .primary)
               Spacer()
-              Image(systemName: "chevron.right")
-                .font(.caption.weight(.semibold))
+              Image(systemName: "rectangle.stack.fill")
+                .font(.title3)
                 .foregroundStyle(.secondary)
             }
+            .contentShape(Rectangle())
           }
           .buttonStyle(.plain)
+          .accessibilityHint("Открывает выбор корпорации")
         }
 
         if localGame.expansions.hasPrelude {
-          Section(header: Text("Первый пролог")) {
+          Section(header: Text("Прологи")) {
             Button {
-              showFirstProloguePicker = true
+              showPreludePicker = true
             } label: {
-              HStack {
-                Text(prologue1.isEmpty ? "Выберите первый пролог" : prologue1)
-                  .foregroundStyle(prologue1.isEmpty ? .secondary : .primary)
-                Spacer()
-                Image(systemName: "chevron.right")
-                  .font(.caption.weight(.semibold))
-                  .foregroundStyle(.secondary)
-              }
-            }
-            .buttonStyle(.plain)
-          }
+              HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
+                  Text(selectedPrologues.isEmpty ? "Выберите два пролога" : "Выбрано: \(selectedPrologues.count) из 2")
+                    .foregroundStyle(selectedPrologues.isEmpty ? .secondary : .primary)
 
-          Section(header: Text("Второй пролог")) {
-            Button {
-              showSecondProloguePicker = true
-            } label: {
-              HStack {
-                Text(prologue2.isEmpty ? "Выберите второй пролог" : prologue2)
-                  .foregroundStyle(prologue2.isEmpty ? .secondary : .primary)
+                  if !selectedPrologues.isEmpty {
+                    Text(selectedPrologues.joined(separator: " • "))
+                      .font(.subheadline)
+                      .foregroundStyle(.secondary)
+                      .lineLimit(2)
+                  }
+                }
                 Spacer()
-                Image(systemName: "chevron.right")
-                  .font(.caption.weight(.semibold))
+                Image(systemName: "rectangle.stack.fill")
+                  .font(.title3)
                   .foregroundStyle(.secondary)
               }
+              .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityHint("Открывает выбор прологов")
           }
         }
 
       }
       .toolbar {
         ToolbarItem(placement: .confirmationAction) {
-          Button("Добавить", systemImage: "person.badge.plus") {
-            addPlayer()
+          Button(isEditing ? "Сохранить" : "Добавить", systemImage: isEditing ? "checkmark" : "person.badge.plus") {
+            savePlayer()
           }
           .disabled(!isInputValid)
         }
@@ -242,16 +253,10 @@ struct AddPlayerScreen: View {
           selection: $corporation
         )
       }
-      .sheet(isPresented: $showFirstProloguePicker) {
+      .sheet(isPresented: $showPreludePicker) {
         PreludeCardPickerView(
-          prologues: availableFirstPrologues,
-          selection: $prologue1
-        )
-      }
-      .sheet(isPresented: $showSecondProloguePicker) {
-        PreludeCardPickerView(
-          prologues: availableSecondPrologues,
-          selection: $prologue2
+          prologues: availablePrologues,
+          selections: selectedProloguesBinding
         )
       }
       .onAppear {
@@ -263,6 +268,15 @@ struct AddPlayerScreen: View {
   /// Устанавливает стартовые значения полей выбора
   /// при первом открытии экрана.
   private func setInitialValues() {
+    if let editingPlayer {
+      selectedColor = editingPlayer.color
+      name = editingPlayer.name
+      corporation = editingPlayer.corporation
+      prologue1 = editingPlayer.prologue1
+      prologue2 = editingPlayer.prologue2
+      return
+    }
+
     if selectedColor.isEmpty {
       selectedColor = availableColors.first ?? ""
     }
@@ -282,7 +296,9 @@ struct AddPlayerScreen: View {
   /// Возвращает список свободных корпораций,
   /// которые ещё не выбраны другими игроками текущей партии.
   private var availableCorporations: [String] {
-    let usedCorporations = localGame.players.map { $0.corporation }
+    let usedCorporations = localGame.players
+      .filter { $0.id != editingPlayer?.id }
+      .map(\.corporation)
     return corporations.filter {
       GameData.isCorporationAvailable(named: $0, for: localGame.expansions)
         && !usedCorporations.contains($0)
@@ -292,16 +308,26 @@ struct AddPlayerScreen: View {
   /// Возвращает список свободных прологов,
   /// которые ещё не выбраны другими игроками текущей партии.
   private var availablePrologues: [String] {
-    let usedPrologues = localGame.players.flatMap { [$0.prologue1, $0.prologue2] }
+    let usedPrologues = localGame.players
+      .filter { $0.id != editingPlayer?.id }
+      .flatMap { [$0.prologue1, $0.prologue2] }
     return prologues.filter { !usedPrologues.contains($0) }
   }
 
-  private var availableFirstPrologues: [String] {
-    availablePrologues.filter { $0 != prologue2 }
+  /// Два выбранных пролога отображаются и редактируются как единый набор,
+  /// но сохраняются в существующие поля локальной модели.
+  private var selectedPrologues: [String] {
+    [prologue1, prologue2].filter { !$0.isEmpty }
   }
 
-  private var availableSecondPrologues: [String] {
-    availablePrologues.filter { $0 != prologue1 }
+  private var selectedProloguesBinding: Binding<[String]> {
+    Binding(
+      get: { selectedPrologues },
+      set: { newSelection in
+        prologue1 = newSelection.first ?? ""
+        prologue2 = newSelection.dropFirst().first ?? ""
+      }
+    )
   }
 
   /// Проверяет, заполнены ли обязательные поля формы
@@ -326,23 +352,13 @@ struct AddPlayerScreen: View {
     name.trimmingCharacters(in: .whitespacesAndNewlines)
   }
 
-  /// Создаёт нового локального игрока и добавляет его в текущую игру,
-  /// если входные данные прошли валидацию.
-  private func addPlayer() {
+  /// Добавляет нового игрока или сохраняет изменения открытого игрока.
+  private func savePlayer() {
     guard validateInput() else { return }
 
-    // Для сохранённого игрока используем постоянный UUID его профиля.
-    // Это одновременно не даёт добавить профиль дважды и позволяет
-    // в будущем считать статистику по человеку, а не по тексту имени.
-    let playerID = selectedSavedPlayer?.id ?? UUID()
+    let playerID = editingPlayer?.id ?? selectedSavedPlayer?.id ?? UUID()
 
-    guard !localGame.players.contains(where: { $0.id == playerID }) else {
-      errorMessage = "Этот игрок уже добавлен в текущую партию."
-      showError = true
-      return
-    }
-
-    let newPlayer = LocalPlayer(
+    let player = LocalPlayer(
       id: playerID,
       name: trimmedName,
       color: selectedColor,
@@ -352,12 +368,31 @@ struct AddPlayerScreen: View {
       score: LocalScore()
     )
 
-    localGame.players.append(newPlayer)
-    if selectedSavedPlayer == nil {
+    if let editingPlayer,
+      let index = localGame.players.firstIndex(where: { $0.id == editingPlayer.id })
+    {
+      localGame.players[index] = player
+      SavedPlayerManager.updatePlayer(
+        id: playerID,
+        name: player.name,
+        color: player.color,
+        in: viewContext
+      )
+    } else {
+      guard !localGame.players.contains(where: { $0.id == playerID }) else {
+        errorMessage = "Этот игрок уже добавлен в текущую партию."
+        showError = true
+        return
+      }
+
+      localGame.players.append(player)
+    }
+
+    if !isEditing && selectedSavedPlayer == nil {
       SavedPlayerManager.savePlayerIfNeeded(
         id: playerID,
-        name: newPlayer.name,
-        color: newPlayer.color,
+        name: player.name,
+        color: player.color,
         in: viewContext
       )
     }
@@ -379,7 +414,9 @@ struct AddPlayerScreen: View {
     // Новое имя должно быть уникально во всём списке сохранённых профилей.
     // Это не даст статистике смешать двух разных людей с одним именем.
     if selectedSavedPlayer == nil,
-      savedPlayers.contains(where: { namesMatch($0.name ?? "", trimmedName) })
+      savedPlayers.contains(where: {
+        $0.id != editingPlayer?.id && namesMatch($0.name ?? "", trimmedName)
+      })
     {
       errorMessage =
         "Игрок с таким именем уже существует. Выберите его из списка или добавьте уточнение к имени."
@@ -387,20 +424,26 @@ struct AddPlayerScreen: View {
       return false
     }
 
-    if localGame.players.contains(where: { namesMatch($0.name, trimmedName) }) {
+    if localGame.players.contains(where: {
+      $0.id != editingPlayer?.id && namesMatch($0.name, trimmedName)
+    }) {
       errorMessage = "Игрок с таким именем уже добавлен в текущую партию."
       showError = true
       return false
     }
 
-    if localGame.players.contains(where: { $0.corporation == corporation }) {
+    if localGame.players.contains(where: {
+      $0.id != editingPlayer?.id && $0.corporation == corporation
+    }) {
       errorMessage = "Корпорация уже занята другим игроком."
       showError = true
       return false
     }
 
     if localGame.expansions.hasPrelude,
-      localGame.players.contains(where: { $0.prologue1 == prologue1 || $0.prologue2 == prologue1 })
+      localGame.players.contains(where: {
+        $0.id != editingPlayer?.id && ($0.prologue1 == prologue1 || $0.prologue2 == prologue1)
+      })
     {
       errorMessage = "Первый пролог уже занят другим игроком."
       showError = true
@@ -408,7 +451,9 @@ struct AddPlayerScreen: View {
     }
 
     if localGame.expansions.hasPrelude,
-      localGame.players.contains(where: { $0.prologue1 == prologue2 || $0.prologue2 == prologue2 })
+      localGame.players.contains(where: {
+        $0.id != editingPlayer?.id && ($0.prologue1 == prologue2 || $0.prologue2 == prologue2)
+      })
     {
       errorMessage = "Второй пролог уже занят другим игроком."
       showError = true
