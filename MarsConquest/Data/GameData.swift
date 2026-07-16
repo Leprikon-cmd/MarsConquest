@@ -113,6 +113,13 @@ struct GameData {
         "Society Support", "Supplier", "Supply Drop", "UNMI Contractor", "Acquired Space Agency"
     ]
     
+    /// Справочник колоний, для которых в приложении уже подготовлены карточки.
+    /// Пока используется отдельно: интерфейс выбора колоний будет добавлен следующим этапом.
+    static let colonies: [String] = [
+        "Titan", "Pluto", "Io", "Enceladus", "Luna", "Triton",
+        "Miranda", "Europa", "Ceres", "Callisto", "Ganymede"
+    ]
+
     /// Возвращает список достижений для выбранной карты Марса.
     ///
     /// - Parameter gameField: название карты

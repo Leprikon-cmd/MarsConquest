@@ -35,6 +35,13 @@ struct GameSaver {
         game.hasColonies = localGame.expansions.hasColonies
         game.hasHellasElysium = localGame.expansions.hasHellasElysium
         game.hasTurmoil = localGame.expansions.hasTurmoil
+
+        for colonyName in localGame.colonies {
+            let colony = Colony(context: context)
+            colony.name = colonyName
+            colony.game = game
+        }
+
         var playersByID: [UUID: Player] = [:]
         
         for localPlayer in localGame.players {

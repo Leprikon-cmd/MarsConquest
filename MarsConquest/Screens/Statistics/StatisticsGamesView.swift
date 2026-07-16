@@ -65,6 +65,13 @@ struct StatisticsGamesView: View {
             Text("Поле: \(game.gameField ?? UIStrings.unknown)")
             Text("Дата: \(StatisticsCalculator.formattedDate(game.date))")
 
+            let colonies = colonyNames(for: game)
+            if !colonies.isEmpty {
+                Text("Колонии: \(colonies.joined(separator: ", "))")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+
             if let winner = StatisticsCalculator.winner(of: game) {
                 Text("Победитель: \(winner.name) — \(winner.score)")
                     .font(.subheadline)
@@ -72,5 +79,10 @@ struct StatisticsGamesView: View {
             }
         }
         .padding(.vertical, 4)
+    }
+
+    private func colonyNames(for game: Game) -> [String] {
+        guard let colonies = game.colonies?.allObjects as? [Colony] else { return [] }
+        return colonies.compactMap(\.name).sorted()
     }
 }

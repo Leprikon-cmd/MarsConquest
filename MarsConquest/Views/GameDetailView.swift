@@ -40,6 +40,10 @@ struct GameDetailView: View {
             if !expansions.isEmpty {
                 Text("Дополнения: \(expansions.joined(separator: ", "))")
             }
+
+            if !colonyNames.isEmpty {
+                Text("Колонии: \(colonyNames.joined(separator: ", "))")
+            }
         }
     }
 
@@ -197,6 +201,11 @@ struct GameDetailView: View {
         if game.hasTurmoil { expansions.append("Кризис") }
 
         return expansions
+    }
+
+    private var colonyNames: [String] {
+        guard let colonies = game.colonies?.allObjects as? [Colony] else { return [] }
+        return colonies.compactMap(\.name).sorted()
     }
 
     private var gameAchievements: [Achievement] {
