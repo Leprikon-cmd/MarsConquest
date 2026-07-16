@@ -126,7 +126,8 @@ struct ContentView: View {
         }
       }
       .tabItem {
-        Label("Главная", systemImage: "house.fill")
+        Label("Главная", systemImage: "globe.americas.fill")
+          .labelStyle(.iconOnly)
       }
 
       NavigationStack {
@@ -134,6 +135,7 @@ struct ContentView: View {
       }
       .tabItem {
         Label("Статистика", systemImage: "chart.bar.fill")
+          .labelStyle(.iconOnly)
       }
 
       NavigationStack {
@@ -141,6 +143,7 @@ struct ContentView: View {
       }
       .tabItem {
         Label("Настройки", systemImage: "gearshape.fill")
+          .labelStyle(.iconOnly)
       }
     }
     .onAppear {

@@ -220,16 +220,15 @@ struct AddPlayerScreen: View {
           }
         }
 
-        Section {
-
-          Button("Добавить") {
+      }
+      .toolbar {
+        ToolbarItem(placement: .confirmationAction) {
+          Button("Добавить", systemImage: "person.badge.plus") {
             addPlayer()
           }
-          .frame(maxWidth: .infinity)
           .disabled(!isInputValid)
         }
       }
-      .navigationTitle("Добавить игрока")
       .alert(isPresented: $showError) {
         Alert(
           title: Text("Ошибка"),
