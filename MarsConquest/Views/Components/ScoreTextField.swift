@@ -45,8 +45,8 @@ struct ScoreTextField: View {
                 }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Очки: \(value)")
-        .accessibilityHint("Дважды коснитесь, чтобы заменить значение")
+        .accessibilityLabel(String(format: String(localized: "Очки: %d"), value))
+        .accessibilityHint(String(localized: "Дважды коснитесь, чтобы заменить значение"))
     }
 
     /// Поле появляется только после явного тапа по зафиксированному числу.

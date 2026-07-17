@@ -27,22 +27,24 @@ struct GameDetailView: View {
                 playerSection(for: player)
             }
         }
-        .navigationTitle(gameNumber.map { "Игра №\($0)" } ?? "Игра")
+        .navigationTitle(gameNumber.map {
+            String(format: String(localized: "Игра №%lld"), $0)
+        } ?? String(localized: "Игра"))
     }
 
     private func gameInformationSection() -> some View {
         Section("Информация об игре") {
-            Text("Поле: \(game.gameField ?? UIStrings.unknown)")
-            Text("Дата: \(formattedDate(game.date))")
-            Text("Поколение: \(game.generation)")
+            Text(String(format: String(localized: "Поле: %@"), game.gameField ?? UIStrings.unknown))
+            Text(String(format: String(localized: "Дата: %@"), formattedDate(game.date)))
+            Text(String(format: String(localized: "Поколение: %lld"), game.generation))
 
             let expansions = expansionsList()
             if !expansions.isEmpty {
-                Text("Дополнения: \(expansions.joined(separator: ", "))")
+                Text(String(format: String(localized: "Дополнения: %@"), expansions.joined(separator: ", ")))
             }
 
             if !colonyNames.isEmpty {
-                Text("Колонии: \(colonyNames.joined(separator: ", "))")
+                Text(String(format: String(localized: "Колонии: %@"), colonyNames.joined(separator: ", ")))
             }
         }
     }
@@ -60,10 +62,14 @@ struct GameDetailView: View {
     /// Краткая часть всегда остаётся на экране: кто играл и с каким итогом.
     private func playerSummary(for player: Player) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Корпорация: \(player.corporation ?? "—")")
+            Text(String(format: String(localized: "Корпорация: %@"), player.corporation ?? "—"))
 
             if game.hasPrelude {
-                Text("Прологи: \(player.prologue1 ?? "—"), \(player.prologue2 ?? "—")")
+                Text(String(
+                    format: String(localized: "Прологи: %@, %@"),
+                    player.prologue1 ?? "—",
+                    player.prologue2 ?? "—"
+                ))
             }
 
             HStack {
@@ -179,16 +185,18 @@ struct GameDetailView: View {
 
     private func placeTitle(for player: Player) -> String {
         let place = place(for: player)
-        let medal: String
+        let name = player.name ?? String(localized: "Без имени")
 
         switch place {
-        case 1: medal = "🥇 "
-        case 2: medal = "🥈 "
-        case 3: medal = "🥉 "
-        default: medal = ""
+        case 1:
+            return String(format: String(localized: "🥇 1 место — %@"), name)
+        case 2:
+            return String(format: String(localized: "🥈 2 место — %@"), name)
+        case 3:
+            return String(format: String(localized: "🥉 3 место — %@"), name)
+        default:
+            return String(format: String(localized: "%lld место — %@"), place, name)
         }
-
-        return "\(medal)\(place) место — \(player.name ?? "Без имени")"
     }
 
     private func expansionsList() -> [String] {
@@ -241,7 +249,7 @@ struct GameDetailView: View {
             .map { award in
                 AwardSummary(
                     id: award.objectID,
-                    name: award.name ?? "Без названия",
+                    name: award.name ?? String(localized: "Без названия"),
                     medal: award.place == 1 ? "🥇" : "🥈",
                     points: award.place == 1
                         ? Int32(GameConstants.awardFirstPlacePoints)

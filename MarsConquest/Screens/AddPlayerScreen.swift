@@ -209,7 +209,7 @@ struct AddPlayerScreen: View {
             } label: {
               HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 4) {
-                  Text(selectedPrologues.isEmpty ? "Выберите два пролога" : "Выбрано: \(selectedPrologues.count) из 2")
+                  Text(selectedPrologues.isEmpty ? "Выберите прологи" : "Выбрано: \(selectedPrologues.count) из 2")
                     .foregroundStyle(selectedPrologues.isEmpty ? .secondary : .primary)
 
                   if !selectedPrologues.isEmpty {
@@ -281,7 +281,9 @@ struct AddPlayerScreen: View {
       selectedColor = availableColors.first ?? ""
     }
     if corporation.isEmpty {
-      corporation = availableCorporations.first ?? ""
+      corporation = availableCorporations.first {
+        $0 != GameData.beginnerCorporation
+      } ?? availableCorporations.first ?? ""
     }
     if localGame.expansions.hasPrelude {
       if prologue1.isEmpty {
@@ -380,7 +382,7 @@ struct AddPlayerScreen: View {
       )
     } else {
       guard !localGame.players.contains(where: { $0.id == playerID }) else {
-        errorMessage = "Этот игрок уже добавлен в текущую партию."
+        errorMessage = String(localized: "Этот игрок уже добавлен в текущую партию.")
         showError = true
         return
       }
@@ -406,7 +408,7 @@ struct AddPlayerScreen: View {
   /// - Returns: true, если данные корректны и игрок может быть добавлен
   private func validateInput() -> Bool {
     guard !trimmedName.isEmpty else {
-      errorMessage = "Введите имя игрока."
+      errorMessage = String(localized: "Введите имя игрока.")
       showError = true
       return false
     }
@@ -418,8 +420,8 @@ struct AddPlayerScreen: View {
         $0.id != editingPlayer?.id && namesMatch($0.name ?? "", trimmedName)
       })
     {
-      errorMessage =
-        "Игрок с таким именем уже существует. Выберите его из списка или добавьте уточнение к имени."
+      errorMessage = String(
+        localized: "Игрок с таким именем уже существует. Выберите его из списка или добавьте уточнение к имени.")
       showError = true
       return false
     }
@@ -427,7 +429,7 @@ struct AddPlayerScreen: View {
     if localGame.players.contains(where: {
       $0.id != editingPlayer?.id && namesMatch($0.name, trimmedName)
     }) {
-      errorMessage = "Игрок с таким именем уже добавлен в текущую партию."
+      errorMessage = String(localized: "Игрок с таким именем уже добавлен в текущую партию.")
       showError = true
       return false
     }
@@ -435,7 +437,7 @@ struct AddPlayerScreen: View {
     if localGame.players.contains(where: {
       $0.id != editingPlayer?.id && $0.corporation == corporation
     }) {
-      errorMessage = "Корпорация уже занята другим игроком."
+      errorMessage = String(localized: "Корпорация уже занята другим игроком.")
       showError = true
       return false
     }
@@ -445,7 +447,7 @@ struct AddPlayerScreen: View {
         $0.id != editingPlayer?.id && ($0.prologue1 == prologue1 || $0.prologue2 == prologue1)
       })
     {
-      errorMessage = "Первый пролог уже занят другим игроком."
+      errorMessage = String(localized: "Первый пролог уже занят другим игроком.")
       showError = true
       return false
     }
@@ -455,7 +457,7 @@ struct AddPlayerScreen: View {
         $0.id != editingPlayer?.id && ($0.prologue1 == prologue2 || $0.prologue2 == prologue2)
       })
     {
-      errorMessage = "Второй пролог уже занят другим игроком."
+      errorMessage = String(localized: "Второй пролог уже занят другим игроком.")
       showError = true
       return false
     }

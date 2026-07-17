@@ -28,7 +28,7 @@ struct ScoreSummaryView: View {
 
                     Spacer()
 
-                    Text("\(entry.score) ПО")
+                    Text("\(entry.score) \(String(localized: "ПО"))")
                         .font(.headline)
                         .monospacedDigit()
                 }
@@ -66,10 +66,10 @@ struct ScoreSummaryView: View {
 
     private func placeTitle(for place: Int) -> String {
         switch place {
-        case 1: return "🥇 1 место"
-        case 2: return "🥈 2 место"
-        case 3: return "🥉 3 место"
-        default: return "\(place) место"
+        case 1: return String(localized: "🥇 1 место")
+        case 2: return String(localized: "🥈 2 место")
+        case 3: return String(localized: "🥉 3 место")
+        default: return String(format: String(localized: "%lld место"), place)
         }
     }
 }

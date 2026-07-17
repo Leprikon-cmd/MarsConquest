@@ -22,6 +22,7 @@ import CoreData
 @main
 struct MarsConquestApp: App {
     @Environment(\.scenePhase) private var scenePhase
+    @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.automatic.rawValue
 
     // Используем shared экземпляр CoreDataManager
     private let coreDataManager = CoreDataManager.shared
@@ -41,6 +42,7 @@ struct MarsConquestApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.locale, selectedLanguage.locale)
                 // Передаем контекст в окружение
                 .environment(\.managedObjectContext, coreDataManager.viewContext)
                 // Для обработки ошибок Core Data
@@ -58,6 +60,10 @@ struct MarsConquestApp: App {
                 break
             }
         }
+    }
+
+    private var selectedLanguage: AppLanguage {
+        AppLanguage(rawValue: appLanguageRawValue) ?? .automatic
     }
     
     private func configureCoreData() {

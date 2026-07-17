@@ -22,6 +22,10 @@ import Foundation
 import CoreData
 
 struct GameData {
+    /// Базовая корпорация для начинающих игроков и безопасная замена
+    /// корпорациям отключённых дополнений.
+    static let beginnerCorporation = "Beginner Corporation"
+
     
     /// Доступные цвета игроков.
     static let colors = ["Красный", "Синий", "Желтый", "Черный", "Зеленый"]
@@ -31,54 +35,55 @@ struct GameData {
     /// дополнении конкретной текущей партии.
     static let corporationDefinitions: [CorporationDefinition] = [
         // Базовая игра
-        .init("Credicor", source: .base),
-        .init("Ecoline", source: .base),
-        .init("Helion", source: .base),
-        .init("Mining Guild", source: .base),
-        .init("Interplanetary Cinematics", source: .base),
-        .init("Inventrix", source: .base),
-        .init("Phobolog", source: .base),
-        .init("Tharsis Republic", source: .base),
-        .init("Thorgate", source: .base),
-        .init("United Nations Mars Initiative", source: .base),
-        .init("Teractor", source: .base),
-        .init("Saturn Systems", source: .base),
+        .init(id: "corporation.beginner", name: beginnerCorporation, source: .base),
+        .init(id: "corporation.credicor", name: "Credicor", source: .base),
+        .init(id: "corporation.ecoline", name: "Ecoline", source: .base),
+        .init(id: "corporation.helion", name: "Helion", source: .base),
+        .init(id: "corporation.mining_guild", name: "Mining Guild", source: .base),
+        .init(id: "corporation.interplanetary_cinematics", name: "Interplanetary Cinematics", source: .base),
+        .init(id: "corporation.inventrix", name: "Inventrix", source: .base),
+        .init(id: "corporation.phobolog", name: "Phobolog", source: .base),
+        .init(id: "corporation.tharsis_republic", name: "Tharsis Republic", source: .base),
+        .init(id: "corporation.thorgate", name: "Thorgate", source: .base),
+        .init(id: "corporation.united_nations_mars_initiative", name: "United Nations Mars Initiative", source: .base),
+        .init(id: "corporation.teractor", name: "Teractor", source: .base),
+        .init(id: "corporation.saturn_systems", name: "Saturn Systems", source: .base),
 
         // Венера
-        .init("Aphrodite", source: .venus),
-        .init("Celestic", source: .venus),
-        .init("Manutech", source: .venus),
-        .init("Morning Star Inc", source: .venus),
-        .init("Viron", source: .venus),
+        .init(id: "corporation.aphrodite", name: "Aphrodite", source: .venus),
+        .init(id: "corporation.celestic", name: "Celestic", source: .venus),
+        .init(id: "corporation.manutech", name: "Manutech", source: .venus),
+        .init(id: "corporation.morning_star_inc", name: "Morning Star Inc", source: .venus),
+        .init(id: "corporation.viron", name: "Viron", source: .venus),
 
         // Прологи
-        .init("Cheung Shing Mars", source: .prelude),
-        .init("Point Luna", source: .prelude),
-        .init("Robinson Industries", source: .prelude),
-        .init("Valley Trust", source: .prelude),
-        .init("Vitor", source: .prelude),
+        .init(id: "corporation.cheung_shing_mars", name: "Cheung Shing Mars", source: .prelude),
+        .init(id: "corporation.point_luna", name: "Point Luna", source: .prelude),
+        .init(id: "corporation.robinson_industries", name: "Robinson Industries", source: .prelude),
+        .init(id: "corporation.valley_trust", name: "Valley Trust", source: .prelude),
+        .init(id: "corporation.vitor", name: "Vitor", source: .prelude),
 
         // Колонии
-        .init("Aridor", source: .colonies),
-        .init("Arklight", source: .colonies),
-        .init("Polyphemos", source: .colonies),
-        .init("Poseidon", source: .colonies),
-        .init("Storm Craft Incorporated", source: .colonies),
-        .init("Lakefront Resorts", source: .colonies),
+        .init(id: "corporation.aridor", name: "Aridor", source: .colonies),
+        .init(id: "corporation.arklight", name: "Arklight", source: .colonies),
+        .init(id: "corporation.polyphemos", name: "Polyphemos", source: .colonies),
+        .init(id: "corporation.poseidon", name: "Poseidon", source: .colonies),
+        .init(id: "corporation.storm_craft_incorporated", name: "Storm Craft Incorporated", source: .colonies),
+        .init(id: "corporation.lakefront_resorts", name: "Lakefront Resorts", source: .colonies),
 
         // Кризис
-        .init("Pristar", source: .turmoil),
-        .init("Septem Tribus", source: .turmoil),
-        .init("Terralabs Research", source: .turmoil),
-        .init("Utopia Invest", source: .turmoil),
+        .init(id: "corporation.pristar", name: "Pristar", source: .turmoil),
+        .init(id: "corporation.septem_tribus", name: "Septem Tribus", source: .turmoil),
+        .init(id: "corporation.terralabs_research", name: "Terralabs Research", source: .turmoil),
+        .init(id: "corporation.utopia_invest", name: "Utopia Invest", source: .turmoil),
 
         // Эллада и Элизий
-        .init("Factorum", source: .hellasElysium),
-        .init("Mons Insurance", source: .hellasElysium),
-        .init("Philares", source: .hellasElysium),
-        .init("Arcadian Communities", source: .hellasElysium),
-        .init("Recyclon", source: .hellasElysium),
-        .init("Splice Tactical Genomics", source: .hellasElysium)
+        .init(id: "corporation.factorum", name: "Factorum", source: .hellasElysium),
+        .init(id: "corporation.mons_insurance", name: "Mons Insurance", source: .hellasElysium),
+        .init(id: "corporation.philares", name: "Philares", source: .hellasElysium),
+        .init(id: "corporation.arcadian_communities", name: "Arcadian Communities", source: .hellasElysium),
+        .init(id: "corporation.recyclon", name: "Recyclon", source: .hellasElysium),
+        .init(id: "corporation.splice_tactical_genomics", name: "Splice Tactical Genomics", source: .hellasElysium)
     ]
 
     /// Имена нужны загрузчику начальных данных Core Data.
@@ -101,24 +106,89 @@ struct GameData {
 
         return definition.source.isEnabled(in: expansions)
     }
+
+    /// Постоянный ключ корпорации. Пока он используется только каталогом;
+    /// в Core Data начнём сохранять его отдельной, следующей миграцией.
+    static func corporationID(named name: String) -> String? {
+        corporationDefinitions.first {
+            $0.name.caseInsensitiveCompare(name) == .orderedSame
+        }?.id
+    }
     
-    /// Справочник доступных карт пролога.
-    static let prologues: [String] = [
-        "Allied Banks", "Aquifer Turbines", "Biofuels", "Biolab", "Biosphere Support", "Business Empire",
-        "Dome Farming", "Donation", "Early Settlement", "Ecology Experts", "Excentric Sponsor",
-        "Experimental Forest", "Galilean Mining", "Great Aquifer", "Huge Asteroid", "Io Research Outpost",
-        "Loan", "Martian Industries", "Metal-rich Asteroid", "Metals Company", "Mining Operations",
-        "Mohole", "Mohole Excavation", "Nitrogen Shipment", "Orbital Construction Yard", "Polar Industries",
-        "Power Generation", "Research Network", "Self-Sufficient Settlement", "Smelting Plant",
-        "Society Support", "Supplier", "Supply Drop", "UNMI Contractor", "Acquired Space Agency"
+    /// Справочник доступных карт пролога с постоянными идентификаторами.
+    static let preludeDefinitions: [GameReference] = [
+        .init(id: "prelude.allied_banks", name: "Allied Banks"),
+        .init(id: "prelude.aquifer_turbines", name: "Aquifer Turbines"),
+        .init(id: "prelude.biofuels", name: "Biofuels"),
+        .init(id: "prelude.biolab", name: "Biolab"),
+        .init(id: "prelude.biosphere_support", name: "Biosphere Support"),
+        .init(id: "prelude.business_empire", name: "Business Empire"),
+        .init(id: "prelude.dome_farming", name: "Dome Farming"),
+        .init(id: "prelude.donation", name: "Donation"),
+        .init(id: "prelude.early_settlement", name: "Early Settlement"),
+        .init(id: "prelude.ecology_experts", name: "Ecology Experts"),
+        .init(id: "prelude.excentric_sponsor", name: "Excentric Sponsor"),
+        .init(id: "prelude.experimental_forest", name: "Experimental Forest"),
+        .init(id: "prelude.galilean_mining", name: "Galilean Mining"),
+        .init(id: "prelude.great_aquifer", name: "Great Aquifer"),
+        .init(id: "prelude.huge_asteroid", name: "Huge Asteroid"),
+        .init(id: "prelude.io_research_outpost", name: "Io Research Outpost"),
+        .init(id: "prelude.loan", name: "Loan"),
+        .init(id: "prelude.martian_industries", name: "Martian Industries"),
+        .init(id: "prelude.metal_rich_asteroid", name: "Metal-rich Asteroid"),
+        .init(id: "prelude.metals_company", name: "Metals Company"),
+        .init(id: "prelude.mining_operations", name: "Mining Operations"),
+        .init(id: "prelude.mohole", name: "Mohole"),
+        .init(id: "prelude.mohole_excavation", name: "Mohole Excavation"),
+        .init(id: "prelude.nitrogen_shipment", name: "Nitrogen Shipment"),
+        .init(id: "prelude.orbital_construction_yard", name: "Orbital Construction Yard"),
+        .init(id: "prelude.polar_industries", name: "Polar Industries"),
+        .init(id: "prelude.power_generation", name: "Power Generation"),
+        .init(id: "prelude.research_network", name: "Research Network"),
+        .init(id: "prelude.self_sufficient_settlement", name: "Self-Sufficient Settlement"),
+        .init(id: "prelude.smelting_plant", name: "Smelting Plant"),
+        .init(id: "prelude.society_support", name: "Society Support"),
+        .init(id: "prelude.supplier", name: "Supplier"),
+        .init(id: "prelude.supply_drop", name: "Supply Drop"),
+        .init(id: "prelude.unmi_contractor", name: "UNMI Contractor"),
+        .init(id: "prelude.acquired_space_agency", name: "Acquired Space Agency")
     ]
+
+    static var prologues: [String] {
+        preludeDefinitions.map(\.name)
+    }
     
     /// Справочник колоний, для которых в приложении уже подготовлены карточки.
     /// Пока используется отдельно: интерфейс выбора колоний будет добавлен следующим этапом.
-    static let colonies: [String] = [
-        "Titan", "Pluto", "Io", "Enceladus", "Luna", "Triton",
-        "Miranda", "Europa", "Ceres", "Callisto", "Ganymede"
+    static let colonyDefinitions: [GameReference] = [
+        .init(id: "colony.titan", name: "Titan"),
+        .init(id: "colony.pluto", name: "Pluto"),
+        .init(id: "colony.io", name: "Io"),
+        .init(id: "colony.enceladus", name: "Enceladus"),
+        .init(id: "colony.luna", name: "Luna"),
+        .init(id: "colony.triton", name: "Triton"),
+        .init(id: "colony.miranda", name: "Miranda"),
+        .init(id: "colony.europa", name: "Europa"),
+        .init(id: "colony.ceres", name: "Ceres"),
+        .init(id: "colony.callisto", name: "Callisto"),
+        .init(id: "colony.ganymede", name: "Ganymede")
     ]
+
+    static var colonies: [String] {
+        colonyDefinitions.map(\.name)
+    }
+
+    static func preludeID(named name: String) -> String? {
+        preludeDefinitions.first {
+            $0.name.caseInsensitiveCompare(name) == .orderedSame
+        }?.id
+    }
+
+    static func colonyID(named name: String) -> String? {
+        colonyDefinitions.first {
+            $0.name.caseInsensitiveCompare(name) == .orderedSame
+        }?.id
+    }
 
     /// Возвращает список достижений для выбранной карты Марса.
     ///
@@ -192,13 +262,20 @@ struct GameData {
 }
 
 struct CorporationDefinition {
+    let id: String
     let name: String
     let source: CorporationSource
 
-    init(_ name: String, source: CorporationSource) {
+    init(id: String, name: String, source: CorporationSource) {
+        self.id = id
         self.name = name
         self.source = source
     }
+}
+
+struct GameReference {
+    let id: String
+    let name: String
 }
 
 enum CorporationSource {

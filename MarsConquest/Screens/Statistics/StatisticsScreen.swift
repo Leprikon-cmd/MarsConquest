@@ -75,7 +75,7 @@ struct StatisticsScreen: View {
                 HStack(spacing: 4) {
                     Image(systemName: "chevron.left")
                         .font(.caption)
-                    Text(previousPage.rawValue)
+                    Text(previousPage.title)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
@@ -85,7 +85,7 @@ struct StatisticsScreen: View {
             }
             .buttonStyle(.plain)
 
-            Text(selectedPage.rawValue)
+            Text(selectedPage.title)
                 .font(.headline)
                 .bold()
                 .lineLimit(1)
@@ -96,7 +96,7 @@ struct StatisticsScreen: View {
                 selectedPage = nextPage
             } label: {
                 HStack(spacing: 4) {
-                    Text(nextPage.rawValue)
+                    Text(nextPage.title)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                     Image(systemName: "chevron.right")

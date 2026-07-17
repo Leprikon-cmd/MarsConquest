@@ -18,6 +18,7 @@ struct SettingsScreen: View {
 
   @State private var expansions = ExpansionSettingsManager.load()
   @AppStorage(MoxieSoundManager.isEnabledKey) private var isMoxieSoundEnabled = false
+  @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.automatic.rawValue
   @Environment(\.managedObjectContext) private var viewContext
   @State private var importMessage = ""
   @State private var showImportAlert = false
@@ -25,6 +26,15 @@ struct SettingsScreen: View {
   var body: some View {
     NavigationStack {
       Form {
+        Section(header: Text("Язык")) {
+          Picker("Язык интерфейса", selection: $appLanguageRawValue) {
+            ForEach(AppLanguage.allCases) { language in
+              Text(language.title)
+                .tag(language.rawValue)
+            }
+          }
+        }
+
         Section(header: Text("Дополнения по умолчанию")) {
           Toggle("Прологи", isOn: binding(for: \.hasPrelude))
           Toggle("Венера", isOn: binding(for: \.hasVenus))
@@ -39,17 +49,18 @@ struct SettingsScreen: View {
               MoxieSoundManager.shared.setEnabled(isEnabled)
             }
         }
-      }
-      Section(header: Text("Импорт")) {
-        Button("Импортировать игры из JSON") {
-          do {
-            let count = try GameImportManager.importFromBundle(
-              filename: "mars_import", in: viewContext)
-            importMessage = "Импортировано игр: \(count)"
-            showImportAlert = true
-          } catch {
-            importMessage = "Ошибка импорта: \(error.localizedDescription)"
-            showImportAlert = true
+
+        Section(header: Text("Импорт")) {
+          Button("Импортировать игры из JSON") {
+            do {
+              let count = try GameImportManager.importFromBundle(
+                filename: "mars_import", in: viewContext)
+              importMessage = "\(String(localized: "Импортировано игр:")) \(count)"
+              showImportAlert = true
+            } catch {
+              importMessage = "\(String(localized: "Ошибка импорта:")) \(error.localizedDescription)"
+              showImportAlert = true
+            }
           }
         }
       }

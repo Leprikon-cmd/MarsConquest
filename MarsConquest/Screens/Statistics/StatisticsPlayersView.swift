@@ -24,10 +24,18 @@ struct StatisticsPlayersView: View {
                             Text(player.name)
                                 .font(.headline)
 
-                            Text("Игр: \(player.games) • Побед: \(player.wins)")
+                            Text(String(
+                                format: String(localized: "Игр: %lld • Побед: %lld"),
+                                player.games,
+                                player.wins
+                            ))
                                 .font(.subheadline)
 
-                            Text("Средний счёт: \(String(format: "%.1f", player.averageScore)) • Лучший: \(player.bestScore)")
+                            Text(String(
+                                format: String(localized: "Средний счёт: %@ • Лучший: %lld"),
+                                player.averageScore.formatted(.number.precision(.fractionLength(1))),
+                                player.bestScore
+                            ))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }

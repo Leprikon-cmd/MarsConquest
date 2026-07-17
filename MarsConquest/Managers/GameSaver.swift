@@ -39,6 +39,7 @@ struct GameSaver {
         for colonyName in localGame.colonies {
             let colony = Colony(context: context)
             colony.name = colonyName
+            colony.referenceID = GameData.colonyID(named: colonyName)
             colony.game = game
         }
 
@@ -50,8 +51,11 @@ struct GameSaver {
             player.name = localPlayer.name
             player.color = localPlayer.color
             player.corporation = localPlayer.corporation
+            player.corporationID = GameData.corporationID(named: localPlayer.corporation)
             player.prologue1 = localPlayer.prologue1
+            player.prologue1ID = GameData.preludeID(named: localPlayer.prologue1)
             player.prologue2 = localPlayer.prologue2
+            player.prologue2ID = GameData.preludeID(named: localPlayer.prologue2)
 
             let score = Score(context: context)
             score.terraformingRating = localPlayer.score.terraformingRating

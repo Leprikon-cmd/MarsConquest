@@ -24,10 +24,18 @@ struct StatisticsProloguesView: View {
                             Text(prologue.name)
                                 .font(.headline)
 
-                            Text("Игр: \(prologue.games) • Побед: \(prologue.wins)")
+                            Text(String(
+                                format: String(localized: "Игр: %lld • Побед: %lld"),
+                                prologue.games,
+                                prologue.wins
+                            ))
                                 .font(.subheadline)
 
-                            Text("Средний счёт: \(String(format: "%.1f", prologue.averageScore)) • Лучший: \(prologue.bestScore)")
+                            Text(String(
+                                format: String(localized: "Средний счёт: %@ • Лучший: %lld"),
+                                prologue.averageScore.formatted(.number.precision(.fractionLength(1))),
+                                prologue.bestScore
+                            ))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }

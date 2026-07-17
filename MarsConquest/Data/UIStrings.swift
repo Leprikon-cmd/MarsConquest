@@ -30,12 +30,12 @@ enum UIStrings {
 
     // MARK: - Общие значения
 
-    static let unknown = "Неизвестно"
+    static var unknown: String { String(localized: "Неизвестно") }
     // Используется когда данные отсутствуют
     // Пример:
     // Text(game.gameField ?? UIStrings.unknown)
 
-    static let noName = "Без имени"
+    static var noName: String { String(localized: "Без имени") }
     // Используется если у игрока нет имени
     // Пример:
     // Text(player.name ?? UIStrings.noName)
@@ -43,17 +43,17 @@ enum UIStrings {
 
     // MARK: - Игровая информация
 
-    static let game = "Игра"
+    static var game: String { String(localized: "Игра") }
     // Заголовки секций
     // Пример:
     // Section(header: Text(UIStrings.game))
 
-    static let date = "Дата"
+    static var date: String { String(localized: "Дата") }
     // Отображение даты партии
     // Пример:
     // Text("\(UIStrings.date): \(date, formatter: DateFormatters.shortDate)")
 
-    static let field = "Поле"
+    static var field: String { String(localized: "Поле") }
     // Название карты Марса
     // Пример:
     // Text("\(UIStrings.field): \(game.gameField ?? UIStrings.unknown)")
@@ -61,12 +61,12 @@ enum UIStrings {
 
     // MARK: - Награды и достижения
 
-    static let achievements = "Достижения"
+    static var achievements: String { String(localized: "Достижения") }
     // Заголовок блока достижений
     // Пример:
     // Text(UIStrings.achievements)
 
-    static let awards = "Награды"
+    static var awards: String { String(localized: "Награды") }
     // Заголовок блока наград
     // Пример:
     // Text(UIStrings.awards)

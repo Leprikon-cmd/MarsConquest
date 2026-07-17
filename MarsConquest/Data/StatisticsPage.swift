@@ -4,11 +4,20 @@
 //
 //  Created by Евгений on 12.03.2026.
 //
-import Foundation
+import SwiftUI
 
-enum StatisticsPage: String, CaseIterable {
-    case games = "Игры"
-    case players = "Игроки"
-    case corporations = "Корпорации"
-    case prologues = "Прологи"
+enum StatisticsPage: CaseIterable {
+    case games
+    case players
+    case corporations
+    case prologues
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .games: "Игры"
+        case .players: "Игроки"
+        case .corporations: "Корпорации"
+        case .prologues: "Прологи"
+        }
+    }
 }

@@ -29,10 +29,18 @@ struct StatisticsCorporationsView: View {
                             Text(corp.name)
                                 .font(.headline)
 
-                            Text("Игр: \(corp.games) • Побед: \(corp.wins)")
+                            Text(String(
+                                format: String(localized: "Игр: %lld • Побед: %lld"),
+                                corp.games,
+                                corp.wins
+                            ))
                                 .font(.subheadline)
 
-                            Text("Средний счёт: \(String(format: "%.1f", corp.averageScore)) • Лучший: \(corp.bestScore)")
+                            Text(String(
+                                format: String(localized: "Средний счёт: %@ • Лучший: %lld"),
+                                corp.averageScore.formatted(.number.precision(.fractionLength(1))),
+                                corp.bestScore
+                            ))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }

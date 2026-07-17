@@ -117,7 +117,7 @@ struct AddPlayersView: View {
               named: updatedPlayer.corporation,
               for: updatedExpansions
             ) {
-              updatedPlayer.corporation = ""
+              updatedPlayer.corporation = GameData.beginnerCorporation
             }
 
             if !updatedExpansions.hasPrelude {

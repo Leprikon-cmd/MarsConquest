@@ -161,7 +161,10 @@ struct ScoreScreen: View {
             viewContext.rollback()
             isSaving = false
             print("Ошибка сохранения: \(error.localizedDescription)")
-            errorMessage = "Ошибка сохранения: \(error.localizedDescription)"
+            errorMessage = String(
+                format: String(localized: "Ошибка сохранения: %@"),
+                error.localizedDescription
+            )
             showError = true
         }
     }
