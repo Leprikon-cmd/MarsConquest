@@ -1,5 +1,40 @@
 # Release Notes
 
+## Mars LogBook 1.1 (3) - TestFlight
+
+Дата: 17 июля 2026
+
+Статус: готово к загрузке в TestFlight.
+
+### Что изменилось
+
+- Обновлён экран формирования команды экспедиции: полноэкранный фон, понятные действия и быстрый доступ к настройкам дополнений.
+- Добавлены карточные пикеры корпораций, прологов и колоний.
+- Для дополнения «Колонии» выбранные колонии сохраняются вместе с партией и отображаются в статистике.
+- Улучшены визуальная структура экранов и навигация при подготовке партии.
+
+## TestFlight 1.1: What to Test
+
+### Русский
+
+**Что проверить**
+
+1. Создайте новую партию: добавьте игроков, выберите корпорации и прологи.
+2. Включите дополнение «Колонии» в настройках партии и проверьте, что появляется кнопка выбора колоний.
+3. Выберите допустимое число колоний, начните и сохраните партию.
+4. Откройте сохранённую партию в «Статистике»: выбранные колонии должны отображаться в информации об игре.
+5. Откройте старую партию без колоний: она должна открываться без ошибок.
+
+### English
+
+**What to test**
+
+1. Create a new game, add players, and select corporations and preludes.
+2. Enable the Colonies expansion in game settings and confirm that the colony picker becomes available.
+3. Select the allowed number of colonies, start the game, and save it.
+4. Open the saved game in Statistics and confirm that the selected colonies are shown in the game information.
+5. Open an older game without colonies and confirm that it still opens correctly.
+
 ## Mars LogBook 1.0 (2) - TestFlight
 
 Дата: 14 июля 2026
