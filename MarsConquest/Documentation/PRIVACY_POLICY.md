@@ -30,4 +30,4 @@ Contact
 If you have any questions about this Privacy Policy, please contact:
 Evgeny Zotchik
 Email:
-zotchik.e.i@gmail.com
+log.book.mars@gmail.com
