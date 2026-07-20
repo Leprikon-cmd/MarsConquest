@@ -1,5 +1,39 @@
 # Release Notes
 
+## Mars LogBook 1.2 (4) - TestFlight
+
+Дата: 20 июля 2026
+
+Статус: готово к загрузке в TestFlight.
+
+### Что изменилось
+
+- Завершена русская и английская локализация интерфейса.
+- Обновлены переводы основных игровых экранов, списков выбора, статистики, настроек и сообщений приложения.
+- Сохранённые партии остаются локальными и доступны независимо от языка интерфейса.
+
+## TestFlight 1.2: What to Test
+
+### Русский
+
+**Что проверить**
+
+1. Запустите приложение с русским языком устройства и пройдите основные сценарии: новая партия, добавление игроков, выбор корпораций, прологов и колоний, подсчёт очков и статистика.
+2. Переключите язык приложения или устройства на английский, перезапустите Mars LogBook и повторите те же сценарии.
+3. Проверьте, что заголовки, кнопки, диалоги, пустые состояния и сообщения об ошибках отображаются на выбранном языке без смешения русского и английского.
+4. Сохраните партию на одном языке, затем откройте её на другом: игроки, очки, корпорации, прологи, колонии, награды и достижения не должны пропасть или измениться.
+5. Откройте несколько старых партий из статистики и убедитесь, что они по-прежнему открываются.
+
+### English
+
+**What to test**
+
+1. Run the app with Russian selected for the device and test the main flows: create a game, add players, select corporations, preludes, and colonies, enter scores, and open Statistics.
+2. Switch the app or device language to English, relaunch Mars LogBook, and repeat the same flows.
+3. Confirm that titles, buttons, dialogs, empty states, and error messages use the selected language without mixed Russian and English text.
+4. Save a game in one language and open it in the other. Players, scores, corporations, preludes, colonies, awards, and achievements must remain unchanged.
+5. Open several older games from Statistics and confirm that they still open correctly.
+
 ## Mars LogBook 1.1 (3) - TestFlight
 
 Дата: 17 июля 2026

@@ -1,27 +1,8 @@
 //
 //  UIStrings.swift
 //
-//  Зачем:
-//  Единое место хранения текстовых строк интерфейса.
-//  Позволяет избежать дублирования строк в разных файлах.
-//
-//  Почему это важно:
-//  1. Если нужно изменить текст — меняется в одном месте.
-//  2. Проще добавлять локализацию в будущем.
-//  3. Код становится чище и легче читать.
-//
-//  Как использовать:
-//  Вместо прямых строк:
-//
-//  Text("Поле: \(game.gameField ?? "Неизвестно")")
-//
-//  использовать:
-//
-//  Text("\(UIStrings.field): \(game.gameField ?? UIStrings.unknown)")
-//
-//  Кто:
-//  Евгений Зотчик — автор проекта
-//  Atlas — AI-ассистент разработки
+//  Общие динамические строки, которым нужен явный Locale.
+//  Статические подписи SwiftUI остаются литералами и локализуются каталогом.
 //
 
 import Foundation
@@ -30,45 +11,33 @@ enum UIStrings {
 
     // MARK: - Общие значения
 
-    static var unknown: String { String(localized: "Неизвестно") }
-    // Используется когда данные отсутствуют
-    // Пример:
-    // Text(game.gameField ?? UIStrings.unknown)
+    static func unknown(locale: Locale) -> String {
+        String(localized: "Неизвестно", locale: locale)
+    }
 
-    static var noName: String { String(localized: "Без имени") }
-    // Используется если у игрока нет имени
-    // Пример:
-    // Text(player.name ?? UIStrings.noName)
-
+    static func noName(locale: Locale) -> String {
+        String(localized: "Без имени", locale: locale)
+    }
 
     // MARK: - Игровая информация
 
-    static var game: String { String(localized: "Игра") }
-    // Заголовки секций
-    // Пример:
-    // Section(header: Text(UIStrings.game))
+    static func game(locale: Locale) -> String {
+        String(localized: "Игра", locale: locale)
+    }
+    static func date(locale: Locale) -> String {
+        String(localized: "Дата", locale: locale)
+    }
 
-    static var date: String { String(localized: "Дата") }
-    // Отображение даты партии
-    // Пример:
-    // Text("\(UIStrings.date): \(date, formatter: DateFormatters.shortDate)")
-
-    static var field: String { String(localized: "Поле") }
-    // Название карты Марса
-    // Пример:
-    // Text("\(UIStrings.field): \(game.gameField ?? UIStrings.unknown)")
-
+    static func field(locale: Locale) -> String {
+        String(localized: "Поле", locale: locale)
+    }
 
     // MARK: - Награды и достижения
 
-    static var achievements: String { String(localized: "Достижения") }
-    // Заголовок блока достижений
-    // Пример:
-    // Text(UIStrings.achievements)
-
-    static var awards: String { String(localized: "Награды") }
-    // Заголовок блока наград
-    // Пример:
-    // Text(UIStrings.awards)
-
+    static func achievements(locale: Locale) -> String {
+        String(localized: "Достижения", locale: locale)
+    }
+    static func awards(locale: Locale) -> String {
+        String(localized: "Награды", locale: locale)
+    }
 }

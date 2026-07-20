@@ -42,9 +42,15 @@ struct StatisticsCalculator {
     }
 
     /// Форматирует дату для отображения в статистике.
-    static func formattedDate(_ date: Date?) -> String {
-        guard let date = date else { return UIStrings.unknown }
-        return DateFormatters.shortDate.string(from: date)
+    static func formattedDate(_ date: Date?, locale: Locale = .current) -> String {
+        guard let date else {
+            return locale.identifier.lowercased().hasPrefix("en") ? "Unknown" : "Неизвестно"
+        }
+
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.dateStyle = .short
+        return formatter.string(from: date)
     }
 
     /// Считает итоговый счёт игрока по сохранённым категориям.
@@ -115,7 +121,7 @@ struct StatisticsCalculator {
     }
 
     /// Определяет победителя конкретной партии.
-    static func winner(of game: Game) -> (name: String, score: Int)? {
+    static func winner(of game: Game, locale: Locale) -> (name: String, score: Int)? {
         guard let players = game.players?.allObjects as? [Player], !players.isEmpty else {
             return nil
         }
@@ -127,13 +133,13 @@ struct StatisticsCalculator {
         guard let winner = sortedPlayers.first else { return nil }
 
         return (
-            winner.name ?? UIStrings.noName,
+            winner.name ?? UIStrings.noName(locale: locale),
             totalScore(for: winner, in: game)
         )
     }
 
     /// Сводная статистика по игрокам.
-    static func playerStats(from games: [Game]) -> [PlayerStats] {
+    static func playerStats(from games: [Game], locale: Locale) -> [PlayerStats] {
         var stats: [String: (games: Int, wins: Int, totalScore: Int, bestScore: Int)] = [:]
 
         for game in games {
@@ -144,7 +150,7 @@ struct StatisticsCalculator {
             let maxScore = players.map { totalScore(for: $0, in: game) }.max() ?? 0
 
             for player in players {
-                let name = player.name ?? UIStrings.noName
+                let name = player.name ?? UIStrings.noName(locale: locale)
                 let score = totalScore(for: player, in: game)
                 let isWinner = score == maxScore
 
@@ -179,7 +185,7 @@ struct StatisticsCalculator {
         }
     }
     /// Сводная статистика по корпорациям
-    static func corporationStats(from games: [Game]) -> [CorporationStats] {
+    static func corporationStats(from games: [Game], locale: Locale) -> [CorporationStats] {
         var stats: [String: (games: Int, wins: Int, totalScore: Int, bestScore: Int)] = [:]
 
         for game in games {
@@ -188,7 +194,7 @@ struct StatisticsCalculator {
             let maxScore = players.map { totalScore(for: $0, in: game) }.max() ?? 0
 
             for player in players {
-                let corp = player.corporation ?? UIStrings.unknown
+                let corp = player.corporation ?? UIStrings.unknown(locale: locale)
                 let score = totalScore(for: player, in: game)
                 let isWinner = score == maxScore
 

@@ -8,6 +8,8 @@ import SwiftUI
 import CoreData
 
 struct StatisticsProloguesView: View {
+    @Environment(\.locale) private var locale
+
     let games: [Game]
 
     var body: some View {
@@ -21,21 +23,13 @@ struct StatisticsProloguesView: View {
                 } else {
                     ForEach(stats) { prologue in
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(prologue.name)
+                            Text(localizedPreludeName(prologue.name))
                                 .font(.headline)
 
-                            Text(String(
-                                format: String(localized: "Игр: %lld • Побед: %lld"),
-                                prologue.games,
-                                prologue.wins
-                            ))
+                            Text("Игр: \(prologue.games) • Побед: \(prologue.wins)")
                                 .font(.subheadline)
 
-                            Text(String(
-                                format: String(localized: "Средний счёт: %@ • Лучший: %lld"),
-                                prologue.averageScore.formatted(.number.precision(.fractionLength(1))),
-                                prologue.bestScore
-                            ))
+                            Text("Средний счёт: \(prologue.averageScore.formatted(.number.precision(.fractionLength(1)))) • Лучший: \(prologue.bestScore)")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -44,5 +38,13 @@ struct StatisticsProloguesView: View {
                 }
             }
         }
+    }
+
+    private func localizedPreludeName(_ name: String) -> String {
+        GameData.localizedPreludeName(
+            persistedName: name,
+            referenceID: GameData.preludeID(named: name),
+            locale: locale
+        )
     }
 }

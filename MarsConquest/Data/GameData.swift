@@ -157,6 +157,66 @@ struct GameData {
     static var prologues: [String] {
         preludeDefinitions.map(\.name)
     }
+
+    /// Русские названия берутся с локализованных карточек. Каноническое
+    /// английское имя остаётся в данных партии и используется как ключ.
+    private static let russianPreludeNames: [String: String] = [
+        "prelude.acquired_space_agency": "Космическое агентство",
+        "prelude.allied_banks": "Подконтрольный банк",
+        "prelude.aquifer_turbines": "Гидротурбины",
+        "prelude.biofuels": "Биотопливо",
+        "prelude.biolab": "Биолаборатория",
+        "prelude.biosphere_support": "Поддержание биосферы",
+        "prelude.business_empire": "Бизнес-империя",
+        "prelude.dome_farming": "Земледелие под куполом",
+        "prelude.donation": "Субсидия",
+        "prelude.early_settlement": "Первое поселение",
+        "prelude.ecology_experts": "Эксперты-экологи",
+        "prelude.excentric_sponsor": "Эпатажный спонсор",
+        "prelude.experimental_forest": "Экспериментальный лес",
+        "prelude.galilean_mining": "Промысел на спутниках Юпитера",
+        "prelude.great_aquifer": "Огромный аквифер",
+        "prelude.huge_asteroid": "Огромный астероид",
+        "prelude.io_research_outpost": "Исследовательский аванпост на Ио",
+        "prelude.loan": "Ссуда",
+        "prelude.martian_industries": "Промышленность на Марсе",
+        "prelude.metal_rich_asteroid": "Металлический астероид",
+        "prelude.metals_company": "Металлургическая компания",
+        "prelude.mining_operations": "Горные работы",
+        "prelude.mohole": "Проект «Мохол»",
+        "prelude.mohole_excavation": "Глубокое бурение",
+        "prelude.nitrogen_shipment": "Поставка азота",
+        "prelude.orbital_construction_yard": "Орбитальная строительная база",
+        "prelude.polar_industries": "Полярная промышленность",
+        "prelude.power_generation": "Энергоснабжение",
+        "prelude.research_network": "Исследовательская сеть",
+        "prelude.self_sufficient_settlement": "Независимое поселение",
+        "prelude.smelting_plant": "Плавильный завод",
+        "prelude.society_support": "Поддержка общества",
+        "prelude.supplier": "Поставщик",
+        "prelude.supply_drop": "Поставка снабжения",
+        "prelude.unmi_contractor": "Подрядчик МИОН"
+    ]
+
+    static func preludeID(named name: String) -> String? {
+        preludeDefinitions.first {
+            $0.name.caseInsensitiveCompare(name) == .orderedSame
+        }?.id
+    }
+
+    static func localizedPreludeName(
+        persistedName: String?,
+        referenceID: String?,
+        locale: Locale
+    ) -> String {
+        let fallbackName = persistedName ?? "—"
+        guard !locale.identifier.lowercased().hasPrefix("en") else {
+            return fallbackName
+        }
+
+        let resolvedID = referenceID ?? preludeID(named: fallbackName)
+        return resolvedID.flatMap { russianPreludeNames[$0] } ?? fallbackName
+    }
     
     /// Справочник колоний, для которых в приложении уже подготовлены карточки.
     /// Пока используется отдельно: интерфейс выбора колоний будет добавлен следующим этапом.
@@ -178,11 +238,21 @@ struct GameData {
         colonyDefinitions.map(\.name)
     }
 
-    static func preludeID(named name: String) -> String? {
-        preludeDefinitions.first {
-            $0.name.caseInsensitiveCompare(name) == .orderedSame
-        }?.id
-    }
+    /// Русские названия колоний с локализованных планшетов. Английские имена
+    /// остаются каноническими для сохранения и поиска ресурсов.
+    private static let russianColonyNames: [String: String] = [
+        "colony.titan": "Титан",
+        "colony.pluto": "Плутон",
+        "colony.io": "Ио",
+        "colony.enceladus": "Энцелад",
+        "colony.luna": "Луна",
+        "colony.triton": "Тритон",
+        "colony.miranda": "Миранда",
+        "colony.europa": "Европа",
+        "colony.ceres": "Церера",
+        "colony.callisto": "Каллисто",
+        "colony.ganymede": "Ганимед"
+    ]
 
     static func colonyID(named name: String) -> String? {
         colonyDefinitions.first {
@@ -190,38 +260,164 @@ struct GameData {
         }?.id
     }
 
-    /// Возвращает список достижений для выбранной карты Марса.
-    ///
-    /// - Parameter gameField: название карты
-    /// - Returns: массив названий достижений
-    static func achievements(for gameField: String) -> [String] {
-        switch gameField {
-        case "Фарсида":
-            return ["Колонизатор", "Мэр", "Садовод", "Строитель", "Стратег", "Авиатор"]
-        case "Эллада":
-            return ["Эрудит", "Тактик", "Полярник", "Энергетик", "Пионер", "Авиатор"]
-        case "Элизий":
-            return ["Универсал", "Специалист", "Эколог", "Олигарх", "Легенда", "Авиатор"]
-        default:
-            return []
+    static func localizedColonyName(
+        persistedName: String?,
+        referenceID: String?,
+        locale: Locale
+    ) -> String {
+        let fallbackName = persistedName ?? "—"
+        guard !locale.identifier.lowercased().hasPrefix("en") else {
+            return fallbackName
         }
+
+        let resolvedID = referenceID ?? colonyID(named: fallbackName)
+        return resolvedID.flatMap { russianColonyNames[$0] } ?? fallbackName
     }
-    
-    /// Возвращает список наград для выбранной карты Марса.
-    ///
-    /// - Parameter gameField: название карты
-    /// - Returns: массив названий наград
+
+    /// Постоянный ключ игрового поля для сохранения в новых партиях.
+    static func gameFieldID(named name: String) -> String? {
+        GameField(rawValue: name)?.referenceID
+    }
+
+    /// Справочник достижений с постоянными ключами для каждого поля.
+    static let achievementDefinitions: [String: [GameReference]] = [
+        GameField.farsida.rawValue: [
+            .init(id: "achievement.tharsis.colonizer", name: "Колонизатор"),
+            .init(id: "achievement.tharsis.mayor", name: "Мэр"),
+            .init(id: "achievement.tharsis.gardener", name: "Садовод"),
+            .init(id: "achievement.tharsis.builder", name: "Строитель"),
+            .init(id: "achievement.tharsis.strategist", name: "Стратег"),
+            .init(id: "achievement.tharsis.aviator", name: "Авиатор")
+        ],
+        GameField.hellas.rawValue: [
+            .init(id: "achievement.hellas.scholar", name: "Эрудит"),
+            .init(id: "achievement.hellas.tactician", name: "Тактик"),
+            .init(id: "achievement.hellas.polar_explorer", name: "Полярник"),
+            .init(id: "achievement.hellas.energizer", name: "Энергетик"),
+            .init(id: "achievement.hellas.pioneer", name: "Пионер"),
+            .init(id: "achievement.hellas.aviator", name: "Авиатор")
+        ],
+        GameField.elysium.rawValue: [
+            .init(id: "achievement.elysium.generalist", name: "Универсал"),
+            .init(id: "achievement.elysium.specialist", name: "Специалист"),
+            .init(id: "achievement.elysium.ecologist", name: "Эколог"),
+            .init(id: "achievement.elysium.oligarch", name: "Олигарх"),
+            .init(id: "achievement.elysium.legend", name: "Легенда"),
+            .init(id: "achievement.elysium.aviator", name: "Авиатор")
+        ]
+    ]
+
+    /// Справочник наград с постоянными ключами для каждого поля.
+    static let awardDefinitions: [String: [GameReference]] = [
+        GameField.farsida.rawValue: [
+            .init(id: "award.tharsis.landlord", name: "Собственник"),
+            .init(id: "award.tharsis.banker", name: "Банкир"),
+            .init(id: "award.tharsis.scientist", name: "Ученый"),
+            .init(id: "award.tharsis.thermalist", name: "Теплотехник"),
+            .init(id: "award.tharsis.miner", name: "Шахтер"),
+            .init(id: "award.tharsis.venuphile", name: "Венерианец")
+        ],
+        GameField.hellas.rawValue: [
+            .init(id: "award.hellas.cultivator", name: "Агроном"),
+            .init(id: "award.hellas.magnate", name: "Магнат"),
+            .init(id: "award.hellas.space_baron", name: "Покоритель"),
+            .init(id: "award.hellas.eccentric", name: "Эксцентрик"),
+            .init(id: "award.hellas.contractor", name: "Подрядчик"),
+            .init(id: "award.hellas.venuphile", name: "Венерианец")
+        ],
+        GameField.elysium.rawValue: [
+            .init(id: "award.elysium.celebrity", name: "Знаменитость"),
+            .init(id: "award.elysium.industrialist", name: "Фабрикант"),
+            .init(id: "award.elysium.desert_settler", name: "Южанин"),
+            .init(id: "award.elysium.estate_dealer", name: "Риэлтор"),
+            .init(id: "award.elysium.benefactor", name: "Меценат"),
+            .init(id: "award.elysium.venuphile", name: "Венерианец")
+        ]
+    ]
+
+    /// Возвращает список достижений для выбранного поля.
+    static func achievements(for gameField: String) -> [String] {
+        achievementDefinitions[gameField, default: []].map(\.name)
+    }
+
+    /// Возвращает список наград для выбранного поля.
     static func awards(for gameField: String) -> [String] {
-        switch gameField {
-        case "Фарсида":
-            return ["Собственник", "Банкир", "Ученый", "Теплотехник", "Шахтер", "Венерианец"]
-        case "Эллада":
-            return ["Агроном", "Магнат", "Покоритель", "Эксцентрик", "Подрядчик", "Венерианец"]
-        case "Элизий":
-            return ["Знаменитость", "Фабрикант", "Южанин", "Риэлтор", "Меценат", "Венерианец"]
-        default:
-            return []
-        }
+        awardDefinitions[gameField, default: []].map(\.name)
+    }
+
+    static func achievementID(named name: String, for gameField: String) -> String? {
+        achievementDefinitions[gameField]?.first {
+            $0.name.caseInsensitiveCompare(name) == .orderedSame
+        }?.id
+    }
+
+    static func awardID(named name: String, for gameField: String) -> String? {
+        awardDefinitions[gameField]?.first {
+            $0.name.caseInsensitiveCompare(name) == .orderedSame
+        }?.id
+    }
+
+    /// Английские отображаемые названия достижений.
+    /// Русское имя остаётся в Core Data для совместимости с уже сохранёнными партиями.
+    private static let achievementEnglishNames: [String: String] = [
+        "achievement.tharsis.colonizer": "Colonizer",
+        "achievement.tharsis.mayor": "Mayor",
+        "achievement.tharsis.gardener": "Gardener",
+        "achievement.tharsis.builder": "Builder",
+        "achievement.tharsis.strategist": "Strategist",
+        "achievement.tharsis.aviator": "Aviator",
+        "achievement.hellas.scholar": "Scholar",
+        "achievement.hellas.tactician": "Tactician",
+        "achievement.hellas.polar_explorer": "Polar Explorer",
+        "achievement.hellas.energizer": "Energizer",
+        "achievement.hellas.pioneer": "Pioneer",
+        "achievement.hellas.aviator": "Aviator",
+        "achievement.elysium.generalist": "Generalist",
+        "achievement.elysium.specialist": "Specialist",
+        "achievement.elysium.ecologist": "Ecologist",
+        "achievement.elysium.oligarch": "Oligarch",
+        "achievement.elysium.legend": "Legend",
+        "achievement.elysium.aviator": "Aviator"
+    ]
+
+    /// Английские отображаемые названия наград.
+    private static let awardEnglishNames: [String: String] = [
+        "award.tharsis.landlord": "Landlord",
+        "award.tharsis.banker": "Banker",
+        "award.tharsis.scientist": "Scientist",
+        "award.tharsis.thermalist": "Thermalist",
+        "award.tharsis.miner": "Miner",
+        "award.tharsis.venuphile": "Venuphile",
+        "award.hellas.cultivator": "Cultivator",
+        "award.hellas.magnate": "Magnate",
+        "award.hellas.space_baron": "Space Baron",
+        "award.hellas.eccentric": "Eccentric",
+        "award.hellas.contractor": "Contractor",
+        "award.hellas.venuphile": "Venuphile",
+        "award.elysium.celebrity": "Celebrity",
+        "award.elysium.industrialist": "Industrialist",
+        "award.elysium.desert_settler": "Desert Settler",
+        "award.elysium.estate_dealer": "Estate Dealer",
+        "award.elysium.benefactor": "Benefactor",
+        "award.elysium.venuphile": "Venuphile"
+    ]
+
+    static func localizedAchievementName(
+        referenceID: String?,
+        fallbackName: String,
+        locale: Locale
+    ) -> String {
+        guard locale.identifier.lowercased().hasPrefix("en") else { return fallbackName }
+        return referenceID.flatMap { achievementEnglishNames[$0] } ?? fallbackName
+    }
+
+    static func localizedAwardName(
+        referenceID: String?,
+        fallbackName: String,
+        locale: Locale
+    ) -> String {
+        guard locale.identifier.lowercased().hasPrefix("en") else { return fallbackName }
+        return referenceID.flatMap { awardEnglishNames[$0] } ?? fallbackName
     }
 
     /// Проверяет, что атрибут corporation в CoreData существует

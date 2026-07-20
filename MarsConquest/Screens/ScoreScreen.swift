@@ -34,6 +34,7 @@ struct ScoreScreen: View {
     
     /// Современный механизм SwiftUI для закрытия текущего экрана после сохранения.
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
 
     /// Текущая локальная игра, собранная в интерфейсе до сохранения в базу.
     @Binding var localGame: LocalGameData
@@ -162,7 +163,8 @@ struct ScoreScreen: View {
             isSaving = false
             print("Ошибка сохранения: \(error.localizedDescription)")
             errorMessage = String(
-                format: String(localized: "Ошибка сохранения: %@"),
+                format: String(localized: "Ошибка сохранения: %@", locale: locale),
+                locale: locale,
                 error.localizedDescription
             )
             showError = true

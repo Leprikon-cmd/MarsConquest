@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct ScoreTextField: View {
+    @Environment(\.locale) private var locale
+
     @Binding private var value: Int32
 
     @State private var isEditing = false
@@ -45,8 +47,16 @@ struct ScoreTextField: View {
                 }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(String(format: String(localized: "Очки: %d"), value))
-        .accessibilityHint(String(localized: "Дважды коснитесь, чтобы заменить значение"))
+        .accessibilityLabel(
+            String(
+                format: String(localized: "Очки: %d", locale: locale),
+                locale: locale,
+                value
+            )
+        )
+        .accessibilityHint(
+            String(localized: "Дважды коснитесь, чтобы заменить значение", locale: locale)
+        )
     }
 
     /// Поле появляется только после явного тапа по зафиксированному числу.

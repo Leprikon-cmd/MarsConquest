@@ -23,6 +23,7 @@ struct AddPlayerScreen: View {
   /// Современный механизм SwiftUI для закрытия текущего экрана после добавления игрока.
   @Environment(\.dismiss) private var dismiss
   @Environment(\.managedObjectContext) private var viewContext
+  @Environment(\.locale) private var locale
   @FetchRequest(
     entity: SavedPlayer.entity(),
     sortDescriptors: [
@@ -116,7 +117,7 @@ struct AddPlayerScreen: View {
           Text("Новый игрок").tag(nil as NSManagedObjectID?)
 
           ForEach(availableSavedPlayers, id: \.objectID) { savedPlayer in
-            let displayName = savedPlayer.name ?? UIStrings.noName
+            let displayName = savedPlayer.name ?? UIStrings.noName(locale: locale)
             Text(displayName).tag(savedPlayer.objectID as NSManagedObjectID?)
           }
         }
@@ -189,7 +190,11 @@ struct AddPlayerScreen: View {
             showCorporationPicker = true
           } label: {
             HStack {
-              Text(corporation.isEmpty ? "Выберите корпорацию" : corporation)
+              Text(
+                corporation.isEmpty
+                  ? String(localized: "Выберите корпорацию", locale: locale)
+                  : corporation
+              )
                 .foregroundStyle(corporation.isEmpty ? .secondary : .primary)
               Spacer()
               Image(systemName: "rectangle.stack.fill")
@@ -209,7 +214,11 @@ struct AddPlayerScreen: View {
             } label: {
               HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 4) {
-                  Text(selectedPrologues.isEmpty ? "Выберите прологи" : "Выбрано: \(selectedPrologues.count) из 2")
+                  Text(
+                    selectedPrologues.isEmpty
+                      ? String(localized: "Выберите прологи", locale: locale)
+                      : String(localized: "Выбрано: \(selectedPrologues.count) из 2", locale: locale)
+                  )
                     .foregroundStyle(selectedPrologues.isEmpty ? .secondary : .primary)
 
                   if !selectedPrologues.isEmpty {
@@ -382,7 +391,7 @@ struct AddPlayerScreen: View {
       )
     } else {
       guard !localGame.players.contains(where: { $0.id == playerID }) else {
-        errorMessage = String(localized: "Этот игрок уже добавлен в текущую партию.")
+        errorMessage = String(localized: "Этот игрок уже добавлен в текущую партию.", locale: locale)
         showError = true
         return
       }
@@ -408,7 +417,7 @@ struct AddPlayerScreen: View {
   /// - Returns: true, если данные корректны и игрок может быть добавлен
   private func validateInput() -> Bool {
     guard !trimmedName.isEmpty else {
-      errorMessage = String(localized: "Введите имя игрока.")
+      errorMessage = String(localized: "Введите имя игрока.", locale: locale)
       showError = true
       return false
     }
@@ -421,7 +430,9 @@ struct AddPlayerScreen: View {
       })
     {
       errorMessage = String(
-        localized: "Игрок с таким именем уже существует. Выберите его из списка или добавьте уточнение к имени.")
+        localized: "Игрок с таким именем уже существует. Выберите его из списка или добавьте уточнение к имени.",
+        locale: locale
+      )
       showError = true
       return false
     }
@@ -429,7 +440,7 @@ struct AddPlayerScreen: View {
     if localGame.players.contains(where: {
       $0.id != editingPlayer?.id && namesMatch($0.name, trimmedName)
     }) {
-      errorMessage = String(localized: "Игрок с таким именем уже добавлен в текущую партию.")
+      errorMessage = String(localized: "Игрок с таким именем уже добавлен в текущую партию.", locale: locale)
       showError = true
       return false
     }
@@ -437,7 +448,7 @@ struct AddPlayerScreen: View {
     if localGame.players.contains(where: {
       $0.id != editingPlayer?.id && $0.corporation == corporation
     }) {
-      errorMessage = String(localized: "Корпорация уже занята другим игроком.")
+      errorMessage = String(localized: "Корпорация уже занята другим игроком.", locale: locale)
       showError = true
       return false
     }
@@ -447,7 +458,7 @@ struct AddPlayerScreen: View {
         $0.id != editingPlayer?.id && ($0.prologue1 == prologue1 || $0.prologue2 == prologue1)
       })
     {
-      errorMessage = String(localized: "Первый пролог уже занят другим игроком.")
+      errorMessage = String(localized: "Первый пролог уже занят другим игроком.", locale: locale)
       showError = true
       return false
     }
@@ -457,7 +468,7 @@ struct AddPlayerScreen: View {
         $0.id != editingPlayer?.id && ($0.prologue1 == prologue2 || $0.prologue2 == prologue2)
       })
     {
-      errorMessage = String(localized: "Второй пролог уже занят другим игроком.")
+      errorMessage = String(localized: "Второй пролог уже занят другим игроком.", locale: locale)
       showError = true
       return false
     }

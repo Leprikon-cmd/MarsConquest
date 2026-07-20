@@ -4,9 +4,6 @@
     "" : {
 
     },
-    "Дата" : {
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Date" } } }
-    },
     "%d" : {
 
     },
@@ -24,6 +21,7 @@
 
     },
     "%lld место" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -57,6 +55,7 @@
 
     },
     "🥇 1 место" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -77,6 +76,7 @@
       }
     },
     "🥈 2 место" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -97,6 +97,7 @@
       }
     },
     "🥉 3 место" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -117,7 +118,52 @@
       }
     },
     "English" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
+          }
+        }
+      }
+    },
+    "Game #%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game #%lld"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Игра №%lld"
+          }
+        }
+      }
+    },
+    "Generation: %d" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generation: %d"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поколение: %d"
+          }
+        }
+      }
     },
     "OK" : {
       "localizations" : {
@@ -125,6 +171,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        }
+      }
+    },
+    "Ranking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ranking"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рейтинг"
           }
         }
       }
@@ -209,6 +271,16 @@
         }
       }
     },
+    "Выберите корпорацию" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a Corporation"
+          }
+        }
+      }
+    },
     "Выберите два пролога" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -241,7 +313,14 @@
       }
     },
     "Выбрать до %lld колоний для партии" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose up to %lld colonies for the game"
+          }
+        }
+      }
     },
     "Выбрать корпорацию" : {
       "localizations" : {
@@ -314,6 +393,16 @@
         }
       }
     },
+    "Дата" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
+          }
+        }
+      }
+    },
     "Дата: %@" : {
       "localizations" : {
         "en" : {
@@ -325,7 +414,14 @@
       }
     },
     "Дважды коснитесь, чтобы заменить значение" : {
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Double-tap to replace the value" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Double-tap to replace the value"
+          }
+        }
+      }
     },
     "Добавить" : {
       "localizations" : {
@@ -504,7 +600,14 @@
       }
     },
     "Игры" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Games"
+          }
+        }
+      }
     },
     "Импорт" : {
       "localizations" : {
@@ -752,6 +855,16 @@
         }
       }
     },
+    "Неизвестно" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown"
+          }
+        }
+      }
+    },
     "Новый игрок" : {
       "localizations" : {
         "en" : {
@@ -864,7 +977,14 @@
       }
     },
     "Очки: %d" : {
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Score: %d" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score: %d"
+          }
+        }
+      }
     },
     "Ошибка" : {
       "localizations" : {
@@ -907,6 +1027,7 @@
       }
     },
     "ПО" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -975,13 +1096,34 @@
       }
     },
     "Пока нет данных по игрокам" : {
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "No player data yet" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No player data yet"
+          }
+        }
+      }
     },
     "Пока нет данных по корпорациям" : {
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "No corporation data yet" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No corporation data yet"
+          }
+        }
+      }
     },
     "Пока нет данных по прологам" : {
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "No prelude data yet" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No prelude data yet"
+          }
+        }
+      }
     },
     "Поколение:" : {
       "localizations" : {
@@ -993,7 +1135,18 @@
         }
       }
     },
+    "Поколение: %d" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generation: %d"
+          }
+        }
+      }
+    },
     "Поколение: %lld" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1013,6 +1166,16 @@
         }
       }
     },
+    "Поле" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Board"
+          }
+        }
+      }
+    },
     "Поле: %@" : {
       "localizations" : {
         "en" : {
@@ -1023,16 +1186,13 @@
         }
       }
     },
-    "Поле" : {
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Board" } } }
-    },
     "Политика" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Politics"
+            "value" : "Turmoil"
           }
         }
       }
@@ -1088,7 +1248,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ranking"
+            "value" : "Terraform Rating"
           }
         }
       }
@@ -1104,16 +1264,13 @@
         }
       }
     },
-    "Неизвестно" : {
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Unknown" } } }
-    },
     "Ресурсы" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Resources"
+            "value" : "Resources on Cards"
           }
         }
       }
@@ -1261,7 +1418,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conditions"
+            "value" : "Card Conditions"
           }
         }
       }
@@ -1272,7 +1429,18 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conditions on Cards"
+            "value" : "Card Conditions"
+          }
+        }
+      }
+    },
+    "Фарсида" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tharsis"
           }
         }
       }
@@ -1293,6 +1461,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Token Color"
+          }
+        }
+      }
+    },
+    "Элизий" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elysium"
+          }
+        }
+      }
+    },
+    "Эллада" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hellas"
           }
         }
       }

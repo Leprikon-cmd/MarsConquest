@@ -27,6 +27,7 @@ struct GameSaver {
         game.id = localGame.id
         game.date = localGame.date
         game.gameField = localGame.gameField
+        game.gameFieldID = GameData.gameFieldID(named: localGame.gameField)
         game.generation = Int32(localGame.generation)
         
         // Допы
@@ -79,6 +80,10 @@ struct GameSaver {
                 
                 let achievement = Achievement(context: context)
                 achievement.name = localAchievement.name
+                achievement.referenceID = GameData.achievementID(
+                    named: localAchievement.name,
+                    for: localGame.gameField
+                )
                 achievement.game = game
                 achievement.player = player
             }
@@ -92,6 +97,10 @@ struct GameSaver {
                 
                 let award = Award(context: context)
                 award.name = localAward.name
+                award.referenceID = GameData.awardID(
+                    named: localAward.name,
+                    for: localGame.gameField
+                )
                 award.place = 1
                 award.game = game
                 award.player = player
@@ -104,6 +113,10 @@ struct GameSaver {
                 
                 let award = Award(context: context)
                 award.name = localAward.name
+                award.referenceID = GameData.awardID(
+                    named: localAward.name,
+                    for: localGame.gameField
+                )
                 award.place = 2
                 award.game = game
                 award.player = player

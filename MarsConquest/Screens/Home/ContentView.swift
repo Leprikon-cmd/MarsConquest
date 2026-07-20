@@ -24,6 +24,7 @@ import SwiftUI
 struct ContentView: View {
   /// Контекст CoreData из окружения SwiftUI.
   @Environment(\.managedObjectContext) private var viewContext
+  @Environment(\.locale) private var locale
 
   /// Настройки
   @State private var expansions = ExpansionSettingsManager.load()
@@ -82,7 +83,7 @@ struct ContentView: View {
             .clipShape(Circle())
             .frame(width: 360, height: 360)
             .overlay(
-              Text(gameField)
+              Text(selectedGameField.localizedName(for: locale))
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(.white)
             )

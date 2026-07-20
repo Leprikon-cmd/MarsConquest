@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24512" systemVersion="25C56" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="Achievement" representedClassName="Achievement" syncable="YES" codeGenerationType="class">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="achievments" inverseEntity="Game"/>
+        <relationship name="player" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="achievements" inverseEntity="Player"/>
+    </entity>
+    <entity name="AchievementTemplate" representedClassName="AchievementTemplate" syncable="YES" codeGenerationType="class">
+        <attribute name="gameField" optional="YES" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="Award" representedClassName="Award" syncable="YES" codeGenerationType="class">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="place" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="awards" inverseEntity="Game"/>
+        <relationship name="player" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="awards" inverseEntity="Player"/>
+    </entity>
+    <entity name="AwardTemplate" representedClassName="AwardTemplate" syncable="YES" codeGenerationType="class">
+        <attribute name="gameField" optional="YES" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="Colony" representedClassName=".Colony" syncable="YES" codeGenerationType="class">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="referenceID" optional="YES" attributeType="String"/>
+        <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="colonies" inverseEntity="Game"/>
+    </entity>
+    <entity name="Corporation" representedClassName="Corporation" syncable="YES" codeGenerationType="class">
+        <attribute name="gamesPlayed" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="wins" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="Game" representedClassName=".Game" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="gameField" optional="YES" attributeType="String"/>
+        <attribute name="gameFieldID" optional="YES" attributeType="String"/>
+        <attribute name="gameNumber" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="generation" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="hasColonies" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="hasHellasElysium" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="hasPrelude" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="hasTurmoil" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="hasVenus" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="achievments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Achievement" inverseName="game" inverseEntity="Achievement"/>
+        <relationship name="awards" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Award" inverseName="game" inverseEntity="Award"/>
+        <relationship name="colonies" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Colony" inverseName="game" inverseEntity="Colony"/>
+        <relationship name="players" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Player" inverseName="game" inverseEntity="Player"/>
+    </entity>
+    <entity name="Player" representedClassName=".Player" syncable="YES" codeGenerationType="class">
+        <attribute name="color" optional="YES" attributeType="String"/>
+        <attribute name="corporation" optional="YES" attributeType="String"/>
+        <attribute name="corporationID" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="prologue1" optional="YES" attributeType="String"/>
+        <attribute name="prologue1ID" optional="YES" attributeType="String"/>
+        <attribute name="prologue2" optional="YES" attributeType="String"/>
+        <attribute name="prologue2ID" optional="YES" attributeType="String"/>
+        <relationship name="achievements" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Achievement" inverseName="player" inverseEntity="Player"/>
+        <relationship name="awards" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Award" inverseName="player" inverseEntity="Award"/>
+        <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="players" inverseEntity="Game"/>
+        <relationship name="score" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Score" inverseName="player" inverseEntity="Score"/>
+    </entity>
+    <entity name="Prologue" representedClassName="Prologue" syncable="YES" codeGenerationType="class">
+        <attribute name="gamesPlayed" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="wins" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="SavedPlayer" representedClassName="SavedPlayer" syncable="YES" codeGenerationType="class">
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="favoriteColor" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isFavorite" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="Score" representedClassName=".Score" syncable="YES" codeGenerationType="class">
+        <attribute name="cities" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="conditionsOnCards" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="greenery" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="politics" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="resourcesOnCards" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="terraformingRating" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="victoryPoints" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="player" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="score" inverseEntity="Player"/>
+    </entity>
+</model>

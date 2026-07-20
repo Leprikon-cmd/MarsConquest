@@ -20,6 +20,7 @@ import CoreData
 
 struct AwardsListView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
     
     @Binding var selectedItems: [LocalAward]
     /// Черновой выбор. Попадает в партию только после явного подтверждения.
@@ -52,9 +53,14 @@ struct AwardsListView: View {
         List {
             ForEach(filteredAwardTemplates, id: \.self) { template in
                 let name = template.name ?? "Без имени"
+                let displayName = GameData.localizedAwardName(
+                    referenceID: GameData.awardID(named: name, for: gameField),
+                    fallbackName: name,
+                    locale: locale
+                )
                 
                 HStack {
-                    Text(name)
+                    Text(displayName)
                     Spacer()
                     if isSelected(name) {
                         Image(systemName: "checkmark")

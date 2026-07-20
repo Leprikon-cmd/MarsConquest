@@ -10,6 +10,7 @@ import CoreData
 
 struct GameDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.locale) private var locale
 
     let game: Game
     let gameNumber: Int?
@@ -27,49 +28,51 @@ struct GameDetailView: View {
                 playerSection(for: player)
             }
         }
-        .navigationTitle(gameNumber.map {
-            String(format: String(localized: "Игра №%lld"), $0)
-        } ?? String(localized: "Игра"))
+        .navigationTitle(navigationTitle)
     }
 
     private func gameInformationSection() -> some View {
-        Section("Информация об игре") {
-            Text(String(format: String(localized: "Поле: %@"), game.gameField ?? UIStrings.unknown))
-            Text(String(format: String(localized: "Дата: %@"), formattedDate(game.date)))
-            Text(String(format: String(localized: "Поколение: %lld"), game.generation))
+        let localizedGameField = GameField.localizedName(
+            persistedName: game.gameField,
+            referenceID: game.gameFieldID,
+            locale: locale
+        )
+
+        return Section("Информация об игре") {
+            Text("Поле: \(localizedGameField)")
+            Text("Дата: \(formattedDate(game.date))")
+            Text(isEnglish ? "Generation: \(game.generation)" : "Поколение: \(game.generation)")
 
             let expansions = expansionsList()
             if !expansions.isEmpty {
-                Text(String(format: String(localized: "Дополнения: %@"), expansions.joined(separator: ", ")))
+                Text("Дополнения: \(expansions.joined(separator: ", "))")
             }
 
             if !colonyNames.isEmpty {
-                Text(String(format: String(localized: "Колонии: %@"), colonyNames.joined(separator: ", ")))
+                Text("Колонии: \(colonyNames.joined(separator: ", "))")
             }
         }
     }
 
     private func playerSection(for player: Player) -> some View {
-        Section(placeTitle(for: player)) {
+        Section {
             playerSummary(for: player)
 
             DisclosureGroup("Подробнее") {
                 scoreBreakdown(for: player)
             }
+        } header: {
+            placeTitle(for: player)
         }
     }
 
     /// Краткая часть всегда остаётся на экране: кто играл и с каким итогом.
     private func playerSummary(for player: Player) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(String(format: String(localized: "Корпорация: %@"), player.corporation ?? "—"))
+            Text("Корпорация: \(player.corporation ?? "—")")
 
             if game.hasPrelude {
-                Text(String(
-                    format: String(localized: "Прологи: %@, %@"),
-                    player.prologue1 ?? "—",
-                    player.prologue2 ?? "—"
-                ))
+                Text("Прологи: \(localizedPreludeName(player.prologue1, referenceID: player.prologue1ID)), \(localizedPreludeName(player.prologue2, referenceID: player.prologue2ID))")
             }
 
             HStack {
@@ -81,6 +84,14 @@ struct GameDetailView: View {
             }
         }
         .padding(.vertical, 3)
+    }
+
+    private func localizedPreludeName(_ name: String?, referenceID: String?) -> String {
+        GameData.localizedPreludeName(
+            persistedName: name,
+            referenceID: referenceID,
+            locale: locale
+        )
     }
 
     /// Детальная часть использует те же данные Score, Achievement и Award,
@@ -154,7 +165,7 @@ struct GameDetailView: View {
 
     private func detailRow(_ title: String, points: Int32) -> some View {
         HStack {
-            Text(title)
+            Text(LocalizedStringKey(title))
             Spacer()
             Text("\(points)")
                 .monospacedDigit()
@@ -183,37 +194,46 @@ struct GameDetailView: View {
         return (distinctScores.firstIndex(of: totalScore(for: player)) ?? 0) + 1
     }
 
-    private func placeTitle(for player: Player) -> String {
+    @ViewBuilder
+    private func placeTitle(for player: Player) -> some View {
         let place = place(for: player)
-        let name = player.name ?? String(localized: "Без имени")
+        let name = player.name ?? "Без имени"
 
         switch place {
         case 1:
-            return String(format: String(localized: "🥇 1 место — %@"), name)
+            Text("🥇 1 место — \(name)")
         case 2:
-            return String(format: String(localized: "🥈 2 место — %@"), name)
+            Text("🥈 2 место — \(name)")
         case 3:
-            return String(format: String(localized: "🥉 3 место — %@"), name)
+            Text("🥉 3 место — \(name)")
         default:
-            return String(format: String(localized: "%lld место — %@"), place, name)
+            Text("\(place) место — \(name)")
         }
     }
 
     private func expansionsList() -> [String] {
         var expansions: [String] = []
 
-        if game.hasPrelude { expansions.append("Прологи") }
-        if game.hasVenus { expansions.append("Венера") }
-        if game.hasColonies { expansions.append("Колонии") }
-        if game.hasHellasElysium { expansions.append("Эллада / Элизий") }
-        if game.hasTurmoil { expansions.append("Кризис") }
+        if game.hasPrelude { expansions.append(localizedExpansion(russian: "Прологи", english: "Prelude")) }
+        if game.hasVenus { expansions.append(localizedExpansion(russian: "Венера", english: "Venus Next")) }
+        if game.hasColonies { expansions.append(localizedExpansion(russian: "Колонии", english: "Colonies")) }
+        if game.hasHellasElysium { expansions.append(localizedExpansion(russian: "Эллада / Элизий", english: "Hellas & Elysium")) }
+        if game.hasTurmoil { expansions.append(localizedExpansion(russian: "Кризис", english: "Turmoil")) }
 
         return expansions
     }
 
     private var colonyNames: [String] {
         guard let colonies = game.colonies?.allObjects as? [Colony] else { return [] }
-        return colonies.compactMap(\.name).sorted()
+        return colonies
+            .map {
+                GameData.localizedColonyName(
+                    persistedName: $0.name,
+                    referenceID: $0.referenceID,
+                    locale: locale
+                )
+            }
+            .sorted()
     }
 
     private var gameAchievements: [Achievement] {
@@ -236,7 +256,14 @@ struct GameDetailView: View {
     private func achievementNames(for player: Player) -> [String] {
         gameAchievements
             .filter { $0.player == player }
-            .compactMap(\.name)
+            .compactMap { achievement in
+                guard let name = achievement.name else { return nil }
+                return GameData.localizedAchievementName(
+                    referenceID: achievement.referenceID,
+                    fallbackName: name,
+                    locale: locale
+                )
+            }
     }
 
     private func achievementPoints(for player: Player) -> Int32 {
@@ -249,7 +276,11 @@ struct GameDetailView: View {
             .map { award in
                 AwardSummary(
                     id: award.objectID,
-                    name: award.name ?? String(localized: "Без названия"),
+                    name: GameData.localizedAwardName(
+                        referenceID: award.referenceID,
+                        fallbackName: award.name ?? String(localized: "Без названия", locale: locale),
+                        locale: locale
+                    ),
                     medal: award.place == 1 ? "🥇" : "🥈",
                     points: award.place == 1
                         ? Int32(GameConstants.awardFirstPlacePoints)
@@ -300,8 +331,25 @@ struct GameDetailView: View {
     }
 
     private func formattedDate(_ date: Date?) -> String {
-        guard let date else { return UIStrings.unknown }
-        return DateFormatters.shortDate.string(from: date)
+        guard let date else { return isEnglish ? "Unknown" : "Неизвестно" }
+
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.dateStyle = .short
+        return formatter.string(from: date)
+    }
+
+    private var navigationTitle: String {
+        guard let gameNumber else { return isEnglish ? "Game" : "Игра" }
+        return isEnglish ? "Game #\(gameNumber)" : "Игра №\(gameNumber)"
+    }
+
+    private var isEnglish: Bool {
+        locale.identifier.lowercased().hasPrefix("en")
+    }
+
+    private func localizedExpansion(russian: String, english: String) -> String {
+        isEnglish ? english : russian
     }
 }
 

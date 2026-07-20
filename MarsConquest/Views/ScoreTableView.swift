@@ -19,6 +19,8 @@
 import SwiftUI
 
 struct ScoreTableView: View {
+    @Environment(\.locale) private var locale
+
     /// Локальная модель текущей игры, которую пользователь заполняет до сохранения.
     @Binding var localGame: LocalGameData
     
@@ -107,7 +109,7 @@ struct ScoreTableView: View {
     /// При изменении значения обновляется localGame.players.
     private func scoreRow(title: String, keyPath: WritableKeyPath<LocalScore, Int32>) -> some View {
         HStack {
-            Text(title)
+            Text(LocalizedStringKey(title))
                 .frame(width: 120, alignment: .leading)
             
             ForEach(players.indices, id: \.self) { index in
@@ -154,9 +156,17 @@ struct ScoreTableView: View {
     /// Одна строка достижения: каждый игрок может получить его только один раз.
     private func achievementRow(index: Int) -> some View {
         let achievement = localGame.achievements[index]
+        let displayName = GameData.localizedAchievementName(
+            referenceID: GameData.achievementID(
+                named: achievement.name,
+                for: localGame.gameField
+            ),
+            fallbackName: achievement.name,
+            locale: locale
+        )
 
         return HStack {
-            Text(achievement.name)
+            Text(displayName)
                 .frame(width: 120, alignment: .leading)
 
             ForEach(players, id: \.id) { player in
@@ -175,8 +185,13 @@ struct ScoreTableView: View {
     private func awardRows(index: Int) -> some View {
         let award = localGame.awards[index]
         let hasTieForFirst = award.firstPlacePlayerIDs.count > 1
+        let displayName = GameData.localizedAwardName(
+            referenceID: GameData.awardID(named: award.name, for: localGame.gameField),
+            fallbackName: award.name,
+            locale: locale
+        )
 
-        Text(award.name)
+        Text(displayName)
             .font(.subheadline)
             .frame(maxWidth: .infinity, alignment: .leading)
 

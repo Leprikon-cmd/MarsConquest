@@ -15,6 +15,7 @@ struct StatisticsGamesView: View {
     
     @State private var selectedGames = Set<NSManagedObjectID>()
     @Environment(\.editMode) private var editMode
+    @Environment(\.locale) private var locale
 
     var body: some View {
         List(selection: $selectedGames) {
@@ -22,7 +23,7 @@ struct StatisticsGamesView: View {
                 Text("Количество сыгранных игр: \(games.count)")
 
                 if let lastGame = games.first {
-                    Text("Последняя игра: \(StatisticsCalculator.formattedDate(lastGame.date))")
+                Text("Последняя игра: \(StatisticsCalculator.formattedDate(lastGame.date, locale: locale))")
                 }
             }
 
@@ -58,12 +59,18 @@ struct StatisticsGamesView: View {
     }
 
     private func gameRow(index: Int, game: Game) -> some View {
-        VStack(alignment: .leading) {
-            Text("Игра №\(index + 1)")
+        let localizedGameField = GameField.localizedName(
+            persistedName: game.gameField,
+            referenceID: game.gameFieldID,
+            locale: locale
+        )
+
+        return VStack(alignment: .leading) {
+            Text(isEnglish ? "Game #\(index + 1)" : "Игра №\(index + 1)")
                 .font(.headline)
 
-            Text("Поле: \(game.gameField ?? UIStrings.unknown)")
-            Text("Дата: \(StatisticsCalculator.formattedDate(game.date))")
+            Text("Поле: \(localizedGameField)")
+            Text("Дата: \(StatisticsCalculator.formattedDate(game.date, locale: locale))")
 
             let colonies = colonyNames(for: game)
             if !colonies.isEmpty {
@@ -72,7 +79,7 @@ struct StatisticsGamesView: View {
                     .foregroundColor(.secondary)
             }
 
-            if let winner = StatisticsCalculator.winner(of: game) {
+            if let winner = StatisticsCalculator.winner(of: game, locale: locale) {
                 Text("Победитель: \(winner.name) — \(winner.score)")
                     .font(.subheadline)
                     .foregroundColor(.green)
@@ -83,6 +90,18 @@ struct StatisticsGamesView: View {
 
     private func colonyNames(for game: Game) -> [String] {
         guard let colonies = game.colonies?.allObjects as? [Colony] else { return [] }
-        return colonies.compactMap(\.name).sorted()
+        return colonies
+            .map {
+                GameData.localizedColonyName(
+                    persistedName: $0.name,
+                    referenceID: $0.referenceID,
+                    locale: locale
+                )
+            }
+            .sorted()
+    }
+
+    private var isEnglish: Bool {
+        locale.identifier.lowercased().hasPrefix("en")
     }
 }

@@ -17,6 +17,8 @@
 import SwiftUI
 
 struct GameInfoView: View {
+    @Environment(\.locale) private var locale
+
     /// Дата текущей партии.
     let date: Date
     
@@ -28,9 +30,15 @@ struct GameInfoView: View {
 
     
     var body: some View {
+        let localizedGameField = GameField.localizedName(
+            persistedName: gameField,
+            referenceID: nil,
+            locale: locale
+        )
+
         Section(header: Text("Игра")) {
             Text("Дата: \(date, formatter: DateFormatters.shortDate)")
-            Text("Поле: \(gameField)")
+            Text("Поле: \(localizedGameField)")
 
             HStack {
                 Text("Поколение:")

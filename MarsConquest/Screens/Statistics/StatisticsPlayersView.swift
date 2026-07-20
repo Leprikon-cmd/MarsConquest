@@ -8,10 +8,12 @@ import SwiftUI
 import CoreData
 
 struct StatisticsPlayersView: View {
+    @Environment(\.locale) private var locale
+
     let games: [Game]
 
     var body: some View {
-        let stats = StatisticsCalculator.playerStats(from: games)
+        let stats = StatisticsCalculator.playerStats(from: games, locale: locale)
 
         return List {
             Section(header: Text("Игроки")) {
@@ -24,18 +26,10 @@ struct StatisticsPlayersView: View {
                             Text(player.name)
                                 .font(.headline)
 
-                            Text(String(
-                                format: String(localized: "Игр: %lld • Побед: %lld"),
-                                player.games,
-                                player.wins
-                            ))
+                            Text("Игр: \(player.games) • Побед: \(player.wins)")
                                 .font(.subheadline)
 
-                            Text(String(
-                                format: String(localized: "Средний счёт: %@ • Лучший: %lld"),
-                                player.averageScore.formatted(.number.precision(.fractionLength(1))),
-                                player.bestScore
-                            ))
+                            Text("Средний счёт: \(player.averageScore.formatted(.number.precision(.fractionLength(1)))) • Лучший: \(player.bestScore)")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }

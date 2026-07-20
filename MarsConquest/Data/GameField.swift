@@ -10,14 +10,55 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum GameField: String, CaseIterable {
+    /// Постоянный ключ поля, не зависящий от языка интерфейса.
+    var referenceID: String {
+        switch self {
+        case .farsida: return "board.tharsis"
+        case .hellas: return "board.hellas"
+        case .elysium: return "board.elysium"
+        }
+    }
+
     var imageName: String {
         switch self {
         case .farsida: return "farsida"
         case .hellas: return "ellada"
         case .elysium: return "elizium"
         }
+    }
+
+    /// Отображаемое название зависит только от языка интерфейса.
+    /// `rawValue` остаётся русским, потому что используется в старых записях и Core Data.
+    func localizedName(for locale: Locale) -> String {
+        guard locale.identifier.lowercased().hasPrefix("en") else {
+            return rawValue
+        }
+
+        switch self {
+        case .farsida:
+            return "Tharsis"
+        case .hellas:
+            return "Hellas"
+        case .elysium:
+            return "Elysium"
+        }
+    }
+
+    /// Находит поле по новому ключу или по сохранённому в старых партиях русскому названию.
+    static func localizedName(
+        persistedName: String?,
+        referenceID: String?,
+        locale: Locale
+    ) -> String {
+        let field = allCases.first { $0.referenceID == referenceID }
+            ?? persistedName.flatMap(GameField.init(rawValue:))
+
+        return field?.localizedName(for: locale)
+            ?? persistedName
+            ?? UIStrings.unknown(locale: locale)
     }
     
     /// Классическое поле Tharsis.

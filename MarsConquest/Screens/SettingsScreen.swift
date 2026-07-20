@@ -20,6 +20,7 @@ struct SettingsScreen: View {
   @AppStorage(MoxieSoundManager.isEnabledKey) private var isMoxieSoundEnabled = false
   @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.automatic.rawValue
   @Environment(\.managedObjectContext) private var viewContext
+  @Environment(\.locale) private var locale
   @State private var importMessage = ""
   @State private var showImportAlert = false
 
@@ -55,10 +56,10 @@ struct SettingsScreen: View {
             do {
               let count = try GameImportManager.importFromBundle(
                 filename: "mars_import", in: viewContext)
-              importMessage = "\(String(localized: "Импортировано игр:")) \(count)"
+              importMessage = "\(String(localized: "Импортировано игр:", locale: locale)) \(count)"
               showImportAlert = true
             } catch {
-              importMessage = "\(String(localized: "Ошибка импорта:")) \(error.localizedDescription)"
+              importMessage = "\(String(localized: "Ошибка импорта:", locale: locale)) \(error.localizedDescription)"
               showImportAlert = true
             }
           }

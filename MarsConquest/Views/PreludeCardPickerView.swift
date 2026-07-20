@@ -10,6 +10,7 @@ import UIKit
 
 struct PreludeCardPickerView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
 
     let prologues: [String]
     @Binding var selections: [String]
@@ -42,7 +43,7 @@ struct PreludeCardPickerView: View {
                             }
                             .buttonStyle(.plain)
                             .id(prologue)
-                            .accessibilityLabel(prologue)
+                            .accessibilityLabel(localizedPreludeName(for: prologue))
                             .accessibilityHint("Выбрать пролог")
                         }
                     }
@@ -83,6 +84,14 @@ struct PreludeCardPickerView: View {
         } else if selections.count < 2 {
             selections.append(prologue)
         }
+    }
+
+    private func localizedPreludeName(for prelude: String) -> String {
+        GameData.localizedPreludeName(
+            persistedName: prelude,
+            referenceID: GameData.preludeID(named: prelude),
+            locale: locale
+        )
     }
 }
 

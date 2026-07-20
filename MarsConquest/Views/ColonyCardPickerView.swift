@@ -10,6 +10,7 @@ import UIKit
 
 struct ColonyCardPickerView: View {
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.locale) private var locale
 
   let colonies: [String]
   @Binding var selection: [String]
@@ -41,7 +42,7 @@ struct ColonyCardPickerView: View {
                 }
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(colony)
+            .accessibilityLabel(localizedColonyName(for: colony))
             .accessibilityHint(
               isSelected(colony) ? "Убрать из партии" : "Добавить в партию"
             )
@@ -72,6 +73,14 @@ struct ColonyCardPickerView: View {
     } else if selection.count < maximumSelection {
       selection.append(colony)
     }
+  }
+
+  private func localizedColonyName(for colony: String) -> String {
+    GameData.localizedColonyName(
+      persistedName: colony,
+      referenceID: GameData.colonyID(named: colony),
+      locale: locale
+    )
   }
 }
 
