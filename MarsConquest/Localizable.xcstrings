@@ -175,6 +175,12 @@
         }
       }
     },
+    "M€ are equal. Compare cards in hand only for these players." : {
+
+    },
+    "M€ равны. Теперь сравниваются карты в руке только у этих игроков." : {
+
+    },
     "OK" : {
       "localizations" : {
         "en" : {
@@ -184,6 +190,9 @@
           }
         }
       }
+    },
+    "Players are first compared by remaining M€." : {
+
     },
     "Ranking" : {
       "localizations" : {
@@ -204,7 +213,13 @@
     "Recent expeditions" : {
 
     },
-    "Аватар владельца журнала" : {
+    "The M€ result determines the winner; cards are not needed." : {
+
+    },
+    "Tie-breaker" : {
+
+    },
+    "Tie-breaker for 1st place" : {
 
     },
     "Автоматически" : {
@@ -664,9 +679,6 @@
         }
       }
     },
-    "Игровой цвет: %@" : {
-
-    },
     "Игрок с таким именем уже добавлен в текущую партию." : {
       "localizations" : {
         "en" : {
@@ -927,6 +939,7 @@
       }
     },
     "ЛИЧНЫЙ ЖУРНАЛ" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1313,6 +1326,9 @@
         }
       }
     },
+    "Победитель определён по M€; карты не учитываются." : {
+
+    },
     "Победитель: %@ — %lld" : {
       "localizations" : {
         "en" : {
@@ -1646,6 +1662,9 @@
         }
       }
     },
+    "Сначала сравниваются оставшиеся M€ всех игроков с равными ПО." : {
+
+    },
     "Создайте журнал" : {
       "localizations" : {
         "en" : {
@@ -1773,6 +1792,12 @@
           }
         }
       }
+    },
+    "Тай-брейк" : {
+
+    },
+    "Тай-брейк за 1 место" : {
+
     },
     "Убрать из партии" : {
       "localizations" : {

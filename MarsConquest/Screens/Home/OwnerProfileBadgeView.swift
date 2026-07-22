@@ -3,6 +3,11 @@ import SwiftUI
 /// Единый бортовой бейдж владельца личного журнала.
 struct OwnerProfileBadgeView: View {
   @Environment(\.locale) private var locale
+  @Environment(\.colorScheme) private var colorScheme
+  @AppStorage(OwnerBadgeStyle.storageKey) private var badgeStyleRawValue = OwnerBadgeStyle.marsFrontier.rawValue
+  @AppStorage(OwnerAvatarStyle.storageKey) private var avatarStyleRawValue = OwnerAvatarStyle.commander.rawValue
+  @AppStorage(OwnerSelfieStore.revisionKey) private var selfieRevision = 0
+  @State private var showAvatarPicker = false
 
   let nickname: String
   let realName: String?
@@ -21,39 +26,52 @@ struct OwnerProfileBadgeView: View {
   var body: some View {
     VStack(spacing: 16) {
       HStack(alignment: .center, spacing: 14) {
-        ZStack {
-          Circle()
-            .fill(.white.opacity(0.14))
-          Circle()
-            .stroke(.white.opacity(0.36), lineWidth: 1)
-          Image(systemName: "person.fill")
-            .font(.title2.weight(.semibold))
-            .foregroundStyle(.white)
+        Button {
+          showAvatarPicker = true
+        } label: {
+          ownerAvatarImage
+            .frame(width: 64, height: 64)
+            .clipShape(Circle())
+            .overlay {
+              Circle()
+                .stroke(primaryColor.opacity(0.48), lineWidth: 1)
+            }
+            .overlay(alignment: .bottomTrailing) {
+              Image(systemName: "camera.fill")
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(.white)
+                .padding(5)
+                .background(.orange, in: Circle())
+                .overlay {
+                  Circle().stroke(.white.opacity(0.85), lineWidth: 1)
+                }
+            }
         }
-        .frame(width: 64, height: 64)
-        .accessibilityLabel("Аватар владельца журнала")
+        .buttonStyle(.plain)
+        .accessibilityLabel(ownerAvatarAccessibilityLabel)
+        .accessibilityHint(avatarPickerAccessibilityHint)
 
         VStack(alignment: .leading, spacing: 4) {
-          Text("ЛИЧНЫЙ ЖУРНАЛ")
+          Text(personalLogTitle)
             .font(.caption2.weight(.bold))
             .tracking(1.2)
-            .foregroundStyle(.white.opacity(0.65))
+            .foregroundStyle(primaryColor.opacity(0.65))
 
           HStack(spacing: 8) {
             Image(systemName: "cube.fill")
               .symbolRenderingMode(.hierarchical)
               .foregroundStyle(Color.named(colorName))
-              .accessibilityLabel("Игровой цвет: \(colorName)")
+              .accessibilityLabel(gameColorAccessibilityLabel)
 
             Text(nickname)
               .font(.title2.weight(.bold))
-              .foregroundStyle(.white)
+              .foregroundStyle(primaryColor)
           }
 
           if let realName, !realName.isEmpty, realName.caseInsensitiveCompare(nickname) != .orderedSame {
             Text(realName)
               .font(.subheadline)
-              .foregroundStyle(.white.opacity(0.78))
+              .foregroundStyle(primaryColor.opacity(0.78))
           }
         }
 
@@ -61,53 +79,53 @@ struct OwnerProfileBadgeView: View {
 
         Image(systemName: "shield.lefthalf.filled")
           .font(.title2)
-          .foregroundStyle(.white.opacity(0.72))
+          .foregroundStyle(primaryColor.opacity(0.72))
       }
 
       Rectangle()
-        .fill(.white.opacity(0.16))
+        .fill(primaryColor.opacity(0.16))
         .frame(height: 1)
 
       HStack(spacing: 0) {
-        metric(value: "\(games)", title: "СЫГРАНО ПАРТИЙ")
-        metric(value: "\(wins)", title: "ПОБЕД")
-        metric(value: "\(winRate)%", title: "ПРОЦЕНТ ПОБЕД")
+        metric(value: "\(games)", title: gamesTitle)
+        metric(value: "\(wins)", title: winsTitle)
+        metric(value: "\(winRate)%", title: winRateTitle)
       }
 
       Rectangle()
-        .fill(.white.opacity(0.12))
+        .fill(primaryColor.opacity(0.12))
         .frame(height: 1)
 
       HStack(spacing: 0) {
-        metric(value: "\(averageScore)", title: "СРЕДНИЙ РЕЗУЛЬТАТ")
-        metric(value: "\(bestScore)", title: "ЛУЧШИЙ РЕЗУЛЬТАТ")
+        metric(value: "\(averageScore)", title: averageScoreTitle)
+        metric(value: "\(bestScore)", title: bestScoreTitle)
       }
 
       Rectangle()
-        .fill(.white.opacity(0.12))
+        .fill(primaryColor.opacity(0.12))
         .frame(height: 1)
 
       HStack(spacing: 0) {
         metric(
           value: averagePlace > 0 ? "\(averagePlace)" : "—",
-          title: "СРЕДНЕЕ МЕСТО"
+          title: averagePlaceTitle
         )
         metric(
           value: maxGeneration > 0 ? "\(maxGeneration)" : "—",
-          title: "МАКС. ПОКОЛЕНИЕ"
+          title: maxGenerationTitle
         )
       }
 
       if hasPreferences {
         Rectangle()
-          .fill(.white.opacity(0.12))
+          .fill(primaryColor.opacity(0.12))
           .frame(height: 1)
 
         VStack(alignment: .leading, spacing: 10) {
           Text(preferencesTitle)
             .font(.caption2.weight(.bold))
             .tracking(1.1)
-            .foregroundStyle(.white.opacity(0.62))
+            .foregroundStyle(primaryColor.opacity(0.62))
 
           if let frequentCorporation {
             preferenceRow(
@@ -146,10 +164,32 @@ struct OwnerProfileBadgeView: View {
       }
     }
     .padding(18)
-    .background(.black.opacity(0.38), in: RoundedRectangle(cornerRadius: 16))
+    .background {
+      Image(badgeAssetName)
+        .resizable()
+        .scaledToFill()
+    }
+    .clipShape(RoundedRectangle(cornerRadius: 16))
     .overlay {
       RoundedRectangle(cornerRadius: 16)
-        .stroke(.white.opacity(0.28), lineWidth: 1)
+        .stroke(primaryColor.opacity(0.28), lineWidth: 1)
+    }
+    .sheet(isPresented: $showAvatarPicker) {
+      OwnerAvatarPickerView(selection: $avatarStyleRawValue)
+    }
+  }
+
+  @ViewBuilder
+  private var ownerAvatarImage: some View {
+    if avatarStyle == .selfie, let image = OwnerSelfieStore.load() {
+      Image(uiImage: image)
+        .resizable()
+        .scaledToFill()
+        .id(selfieRevision)
+    } else {
+      Image(avatarStyle.assetName)
+        .resizable()
+        .scaledToFill()
     }
   }
 
@@ -157,10 +197,10 @@ struct OwnerProfileBadgeView: View {
     VStack(alignment: .leading, spacing: 3) {
       Text(value)
         .font(.title3.weight(.bold))
-        .foregroundStyle(.white)
+        .foregroundStyle(primaryColor)
       Text(title)
         .font(.caption2.weight(.bold))
-        .foregroundStyle(.white.opacity(0.62))
+        .foregroundStyle(primaryColor.opacity(0.62))
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }
@@ -168,8 +208,47 @@ struct OwnerProfileBadgeView: View {
     frequentCorporation != nil || successfulField != nil || fastestWinGeneration != nil
   }
 
+  private var badgeStyle: OwnerBadgeStyle {
+    OwnerBadgeStyle(rawValue: badgeStyleRawValue) ?? .marsFrontier
+  }
+
+  private var avatarStyle: OwnerAvatarStyle {
+    OwnerAvatarStyle(rawValue: avatarStyleRawValue) ?? .commander
+  }
+
+  private var badgeAssetName: String {
+    badgeStyle.assetName(isLightMode: colorScheme == .light)
+  }
+
+  private var primaryColor: Color {
+    colorScheme == .light ? .black : .white
+  }
+
   private var isEnglish: Bool {
     locale.identifier.lowercased().hasPrefix("en")
+  }
+
+  private var personalLogTitle: String { isEnglish ? "PERSONAL LOG" : "ЛИЧНЫЙ ЖУРНАЛ" }
+  private var ownerAvatarAccessibilityLabel: String { isEnglish ? "Journal owner avatar" : "Аватар владельца журнала" }
+  private var avatarPickerAccessibilityHint: String { isEnglish ? "Opens avatar selection" : "Открывает выбор аватара" }
+  private var gameColorAccessibilityLabel: String { isEnglish ? "Game color: \(localizedColorName)" : "Игровой цвет: \(colorName)" }
+  private var gamesTitle: String { isEnglish ? "GAMES PLAYED" : "СЫГРАНО ПАРТИЙ" }
+  private var winsTitle: String { isEnglish ? "WINS" : "ПОБЕД" }
+  private var winRateTitle: String { isEnglish ? "WIN RATE" : "ПРОЦЕНТ ПОБЕД" }
+  private var averageScoreTitle: String { isEnglish ? "AVERAGE SCORE" : "СРЕДНИЙ РЕЗУЛЬТАТ" }
+  private var bestScoreTitle: String { isEnglish ? "BEST SCORE" : "ЛУЧШИЙ РЕЗУЛЬТАТ" }
+  private var averagePlaceTitle: String { isEnglish ? "AVERAGE PLACE" : "СРЕДНЕЕ МЕСТО" }
+  private var maxGenerationTitle: String { isEnglish ? "MAX GENERATION" : "МАКС. ПОКОЛЕНИЕ" }
+
+  private var localizedColorName: String {
+    switch colorName {
+    case "Красный": return "Red"
+    case "Синий": return "Blue"
+    case "Желтый": return "Yellow"
+    case "Зеленый": return "Green"
+    case "Черный": return "Black"
+    default: return colorName
+    }
   }
 
   private var preferencesTitle: String {
@@ -213,18 +292,18 @@ struct OwnerProfileBadgeView: View {
       Image(systemName: icon)
         .font(.subheadline.weight(.semibold))
         .frame(width: 20)
-        .foregroundStyle(.white.opacity(0.72))
+        .foregroundStyle(primaryColor.opacity(0.72))
 
       VStack(alignment: .leading, spacing: 2) {
         Text(title)
           .font(.caption2.weight(.bold))
-          .foregroundStyle(.white.opacity(0.62))
+          .foregroundStyle(primaryColor.opacity(0.62))
         Text(value)
           .font(.subheadline.weight(.semibold))
-          .foregroundStyle(.white)
+          .foregroundStyle(primaryColor)
         Text(detail)
           .font(.caption)
-          .foregroundStyle(.white.opacity(0.72))
+          .foregroundStyle(primaryColor.opacity(0.72))
       }
     }
   }

@@ -36,6 +36,7 @@ struct GameSaver {
         game.hasColonies = localGame.expansions.hasColonies
         game.hasHellasElysium = localGame.expansions.hasHellasElysium
         game.hasTurmoil = localGame.expansions.hasTurmoil
+        game.hasTieBreakerData = ScoreManager().hasTieForFirst(in: localGame)
 
         for colonyName in localGame.colonies {
             let colony = Colony(context: context)
@@ -58,6 +59,8 @@ struct GameSaver {
             player.prologue1ID = GameData.preludeID(named: localPlayer.prologue1)
             player.prologue2 = localPlayer.prologue2
             player.prologue2ID = GameData.preludeID(named: localPlayer.prologue2)
+            player.remainingMegaCredits = localPlayer.remainingMegaCredits
+            player.unplayedCards = localPlayer.unplayedCards
 
             let score = Score(context: context)
             score.terraformingRating = localPlayer.score.terraformingRating

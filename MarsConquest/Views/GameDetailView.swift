@@ -110,6 +110,20 @@ struct GameDetailView: View {
 
             scoreRows(for: player)
 
+            if usesTieBreaker(for: player) {
+                Divider()
+                Text(isEnglish ? "Tie-breaker" : "Тай-брейк")
+                    .font(.subheadline.weight(.semibold))
+                tieBreakerRow(
+                    title: isEnglish ? "Remaining M€" : "Остаток M€",
+                    value: player.remainingMegaCredits
+                )
+                tieBreakerRow(
+                    title: isEnglish ? "Cards in hand" : "Карты в руке",
+                    value: player.unplayedCards
+                )
+            }
+
             let achievements = achievementNames(for: player)
             if !achievements.isEmpty {
                 Divider()
@@ -180,26 +194,31 @@ struct GameDetailView: View {
         .foregroundStyle(.secondary)
     }
 
-    private var sortedPlayers: [Player] {
-        guard let players = game.players?.allObjects as? [Player] else { return [] }
+    private func tieBreakerRow(title: String, value: Int32) -> some View {
+        HStack {
+            Text(title)
+            Spacer()
+            Text("\(value)")
+                .monospacedDigit()
+        }
+        .foregroundStyle(.secondary)
+    }
 
-        return players.sorted {
-            let leftScore = totalScore(for: $0)
-            let rightScore = totalScore(for: $1)
-
-            if leftScore != rightScore {
-                return leftScore > rightScore
-            }
-
-            return ($0.name ?? "").localizedCaseInsensitiveCompare($1.name ?? "") == .orderedAscending
+    private func usesTieBreaker(for player: Player) -> Bool {
+        guard game.hasTieBreakerData else { return false }
+        return StatisticsCalculator.leadersTiedOnPoints(in: game).contains {
+            $0.objectID == player.objectID
         }
     }
 
-    /// Места плотные: 1, 1, 2, 3, а не 1, 1, 3, 4.
-    private func place(for player: Player) -> Int {
-        let distinctScores = Array(Set(sortedPlayers.map { totalScore(for: $0) })).sorted(by: >)
-        return (distinctScores.firstIndex(of: totalScore(for: player)) ?? 0) + 1
-    }
+private var sortedPlayers: [Player] {
+    StatisticsCalculator.ranking(for: game).map(\.player)
+}
+
+/// Места плотные; для равенства за первое место применяется сохранённый тай-брейк.
+private func place(for player: Player) -> Int {
+    StatisticsCalculator.place(of: player, in: game)
+}
 
     @ViewBuilder
     private func placeTitle(for player: Player) -> some View {

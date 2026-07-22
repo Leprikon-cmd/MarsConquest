@@ -13,6 +13,83 @@ import Foundation
 import CoreData
 
 struct StatisticsCalculator {
+    struct GameRankingEntry {
+        let player: Player
+        let score: Int
+        let place: Int
+    }
+
+    /// Участники, разделившие первое место по ПО до применения тай-брейка.
+    static func leadersTiedOnPoints(in game: Game) -> [Player] {
+        guard let players = game.players?.allObjects as? [Player], !players.isEmpty,
+              let topScore = players.map({ totalScore(for: $0, in: game) }).max()
+        else {
+            return []
+        }
+
+        let leaders = players.filter { totalScore(for: $0, in: game) == topScore }
+        return leaders.count > 1 ? leaders : []
+    }
+
+    /// Плотный рейтинг сохранённой партии. Тай-брейк применяется только к
+    /// равенству за 1-е место и только если партия сохранена с этими данными.
+    static func ranking(for game: Game) -> [GameRankingEntry] {
+        guard let players = game.players?.allObjects as? [Player] else { return [] }
+
+        let scoredPlayers = players.map {
+            (player: $0, score: totalScore(for: $0, in: game))
+        }
+        let groupedByScore = Dictionary(grouping: scoredPlayers, by: \.score)
+        let scores = groupedByScore.keys.sorted(by: >)
+
+        var result: [GameRankingEntry] = []
+        var currentPlace = 0
+
+        for (scoreIndex, score) in scores.enumerated() {
+            let group = (groupedByScore[score] ?? []).sorted(by: playerNameOrder)
+
+            if scoreIndex == 0, group.count > 1, game.hasTieBreakerData {
+                let tieSorted = group.sorted {
+                    if $0.player.remainingMegaCredits != $1.player.remainingMegaCredits {
+                        return $0.player.remainingMegaCredits > $1.player.remainingMegaCredits
+                    }
+                    if $0.player.unplayedCards != $1.player.unplayedCards {
+                        return $0.player.unplayedCards > $1.player.unplayedCards
+                    }
+                    return playerNameOrder($0, $1)
+                }
+
+                var previousCredits: Int32?
+                var previousCards: Int32?
+
+                for item in tieSorted {
+                    if previousCredits != item.player.remainingMegaCredits ||
+                        previousCards != item.player.unplayedCards {
+                        currentPlace += 1
+                        previousCredits = item.player.remainingMegaCredits
+                        previousCards = item.player.unplayedCards
+                    }
+                    result.append(GameRankingEntry(player: item.player, score: item.score, place: currentPlace))
+                }
+            } else {
+                currentPlace += 1
+                result.append(contentsOf: group.map {
+                    GameRankingEntry(player: $0.player, score: $0.score, place: currentPlace)
+                })
+            }
+        }
+
+        return result
+    }
+
+    private static func playerNameOrder(
+        _ left: (player: Player, score: Int),
+        _ right: (player: Player, score: Int)
+    ) -> Bool {
+        let leftName = left.player.name ?? ""
+        let rightName = right.player.name ?? ""
+        return leftName.localizedCaseInsensitiveCompare(rightName) == .orderedAscending
+    }
 struct OwnerJournalStats {
     struct CorporationPreference {
         let name: String
@@ -159,32 +236,23 @@ struct OwnerJournalStats {
         return points
     }
 
-    /// Определяет победителя конкретной партии.
-    static func winner(of game: Game, locale: Locale) -> (name: String, score: Int)? {
-        guard let players = game.players?.allObjects as? [Player], !players.isEmpty else {
-            return nil
-        }
+/// Определяет победителя конкретной партии. При полной ничьей возвращает всех победителей.
+static func winner(of game: Game, locale: Locale) -> (name: String, score: Int)? {
+    let ranking = ranking(for: game)
+    guard let winningScore = ranking.first?.score else { return nil }
 
-        let sortedPlayers = players.sorted {
-            totalScore(for: $0, in: game) > totalScore(for: $1, in: game)
-        }
+    let winnerNames = ranking
+        .filter { $0.place == 1 }
+        .map { $0.player.name ?? UIStrings.noName(locale: locale) }
 
-        guard let winner = sortedPlayers.first else { return nil }
+    return (winnerNames.joined(separator: ", "), winningScore)
+}
 
-        return (
-            winner.name ?? UIStrings.noName(locale: locale),
-            totalScore(for: winner, in: game)
-        )
-    }
-
-    /// Плотное место игрока: 1, 1, 2, 3 при равенстве очков.
-    static func place(of player: Player, in game: Game) -> Int {
-        guard let players = game.players?.allObjects as? [Player] else { return 1 }
-
-        let distinctScores = Array(Set(players.map { totalScore(for: $0, in: game) }))
-            .sorted(by: >)
-        return (distinctScores.firstIndex(of: totalScore(for: player, in: game)) ?? 0) + 1
-    }
+/// Плотное место игрока. Для равенства за первое место используются M€ и карты на руке,
+/// если эти значения были записаны вместе с партией.
+static func place(of player: Player, in game: Game) -> Int {
+    ranking(for: game).first { $0.player == player }?.place ?? 1
+}
 
 
 /// Личные показатели владельца по стабильному UUID в сохранённых партиях.
@@ -317,12 +385,10 @@ static func ownerJournalStats(ownerID: UUID, from games: [Game]) -> OwnerJournal
                 continue
             }
 
-            let maxScore = players.map { totalScore(for: $0, in: game) }.max() ?? 0
-
             for player in players {
                 let name = player.name ?? UIStrings.noName(locale: locale)
                 let score = totalScore(for: player, in: game)
-                let isWinner = score == maxScore
+                let isWinner = place(of: player, in: game) == 1
 
                 if stats[name] == nil {
                     stats[name] = (games: 0, wins: 0, totalScore: 0, bestScore: 0)
@@ -361,12 +427,10 @@ static func ownerJournalStats(ownerID: UUID, from games: [Game]) -> OwnerJournal
         for game in games {
             guard let players = game.players?.allObjects as? [Player], !players.isEmpty else { continue }
 
-            let maxScore = players.map { totalScore(for: $0, in: game) }.max() ?? 0
-
             for player in players {
                 let corp = player.corporation ?? UIStrings.unknown(locale: locale)
                 let score = totalScore(for: player, in: game)
-                let isWinner = score == maxScore
+                let isWinner = place(of: player, in: game) == 1
 
                 if stats[corp] == nil {
                     stats[corp] = (games: 0, wins: 0, totalScore: 0, bestScore: 0)
@@ -405,11 +469,9 @@ static func ownerJournalStats(ownerID: UUID, from games: [Game]) -> OwnerJournal
             guard game.hasPrelude else { continue }
             guard let players = game.players?.allObjects as? [Player], !players.isEmpty else { continue }
 
-            let maxScore = players.map { totalScore(for: $0, in: game) }.max() ?? 0
-
             for player in players {
                 let score = totalScore(for: player, in: game)
-                let isWinner = score == maxScore
+                let isWinner = place(of: player, in: game) == 1
 
                 let playerPrologues = [player.prologue1, player.prologue2]
                     .compactMap { $0 }

@@ -1,5 +1,43 @@
 # Release Notes
 
+## Mars LogBook 1.3 (5) - TestFlight
+
+Дата: 22 июля 2026
+
+Статус: подготовлено к архивации и загрузке в TestFlight.
+
+### Что изменилось
+
+- Развит личный бортовой журнал: добавлены игровые предпочтения, рекорды и расширенная статистика владельца.
+- Добавлен выбор персонального фона бортового бейджа и встроенного аватара; также можно сделать селфи, которое хранится только на устройстве.
+- Добавлен тай-брейк при равенстве итоговых очков: сначала сравниваются оставшиеся M€, затем неразыгранные карты; при полном равенстве сохраняется ничья.
+- Улучшено отображение результатов, мест и деталей сохранённых партий.
+- Исправлено объединение исторического написания поля «Элада» с «Элладой» в статистике.
+
+## TestFlight 1.3: What to Test
+
+### Русский
+
+**Что проверить**
+
+1. Откройте бортовой журнал владельца и проверьте статистику, игровые предпочтения, рекорды и последние экспедиции.
+2. В настройках выберите разные фоны бейджа и встроенные аватары; проверьте их в светлом и тёмном режиме.
+3. Сделайте селфи для аватара, перезапустите приложение и убедитесь, что оно сохранилось. Затем замените его другим аватаром.
+4. Завершите партию с равными итоговыми очками: проверьте определение победителя сначала по оставшимся M€, затем по неразыгранным картам и сохранение ничьей при полном равенстве.
+5. Откройте новые и старые партии в статистике и проверьте места, итоговые очки и переход к подробностям.
+6. Если в истории есть поле «Элада», убедитесь, что оно учитывается вместе с «Элладой».
+
+### English
+
+**What to test**
+
+1. Open the owner logbook and check its statistics, game preferences, records, and recent expeditions.
+2. Select different badge backgrounds and built-in avatars in Settings; verify them in Light and Dark Mode.
+3. Take a selfie for the avatar, relaunch the app, and confirm that it persists. Then replace it with another avatar.
+4. Finish a game with tied final scores. Verify the tie-break by remaining M€ first, then unplayed cards, and confirm that a complete tie is preserved.
+5. Open new and older games in Statistics and verify places, final scores, and navigation to game details.
+6. If the history contains the legacy board spelling `Элада`, confirm that it is grouped with `Эллада`.
+
 ## Mars LogBook 1.2 (4) - TestFlight
 
 Дата: 20 июля 2026

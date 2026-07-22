@@ -19,6 +19,8 @@ struct SettingsScreen: View {
   @State private var expansions = ExpansionSettingsManager.load()
   @AppStorage(MoxieSoundManager.isEnabledKey) private var isMoxieSoundEnabled = false
   @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.automatic.rawValue
+  @AppStorage(OwnerBadgeStyle.storageKey) private var ownerBadgeStyleRawValue = OwnerBadgeStyle.marsFrontier.rawValue
+  @AppStorage(OwnerAvatarStyle.storageKey) private var ownerAvatarStyleRawValue = OwnerAvatarStyle.commander.rawValue
   @Environment(\.managedObjectContext) private var viewContext
   @Environment(\.locale) private var locale
   @State private var importMessage = ""
@@ -32,6 +34,24 @@ struct SettingsScreen: View {
             ForEach(AppLanguage.allCases) { language in
               Text(language.title)
                 .tag(language.rawValue)
+            }
+          }
+        }
+
+        Section(header: Text(badgeStyleSectionTitle)) {
+          Picker(badgeStylePickerTitle, selection: $ownerBadgeStyleRawValue) {
+            ForEach(OwnerBadgeStyle.allCases) { style in
+              Text(style.title)
+                .tag(style.rawValue)
+            }
+          }
+        }
+
+        Section(header: Text(avatarStyleSectionTitle)) {
+          Picker(avatarStylePickerTitle, selection: $ownerAvatarStyleRawValue) {
+            ForEach(OwnerAvatarStyle.builtInCases) { style in
+              Text(style.title)
+                .tag(style.rawValue)
             }
           }
         }
@@ -83,5 +103,25 @@ struct SettingsScreen: View {
         onExpansionsChanged?(expansions)
       }
     )
+  }
+
+  private var isEnglish: Bool {
+    locale.identifier.lowercased().hasPrefix("en")
+  }
+
+  private var badgeStyleSectionTitle: String {
+    isEnglish ? "Personal badge style" : "Стиль личного бейджа"
+  }
+
+  private var badgeStylePickerTitle: String {
+    isEnglish ? "Style" : "Стиль"
+  }
+
+  private var avatarStyleSectionTitle: String {
+    isEnglish ? "Personal avatar" : "Аватар пользователя"
+  }
+
+  private var avatarStylePickerTitle: String {
+    isEnglish ? "Avatar" : "Аватар"
   }
 }

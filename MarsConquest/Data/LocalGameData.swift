@@ -57,6 +57,10 @@ struct LocalPlayer: Identifiable {
   var prologue1: String
   var prologue2: String
   var score: LocalScore
+  /// Оставшиеся M€: первый критерий разрешения ничьей за первое место.
+  var remainingMegaCredits: Int32 = 0
+  /// Неразыгранные карты на руке: второй критерий разрешения ничьей.
+  var unplayedCards: Int32 = 0
 }
 
 /// Локальная модель очков игрока.

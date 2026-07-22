@@ -62,6 +62,7 @@ struct ScoreScreen: View {
             playersTable()
             rewardsSection()
             ScoreSummaryView(localGame: localGame)
+            TieBreakerSectionView(localGame: $localGame)
             saveButton()
         }
         .navigationTitle("Подсчет очков")
