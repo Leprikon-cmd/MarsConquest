@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AddPlayersView: View {
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
   /// Локальная модель текущей создаваемой игры.
   @Binding var localGame: LocalGameData
@@ -54,6 +55,8 @@ struct AddPlayersView: View {
           addPlayerButton
           playersListView
         }
+        .frame(maxWidth: teamContentMaxWidth)
+        .frame(maxWidth: .infinity)
 
         VStack {
           Spacer()
@@ -162,25 +165,28 @@ struct AddPlayersView: View {
       showAddPlayer = true
     } label: {
       Label("Добавить игрока", systemImage: "person.badge.plus")
-        .font(.headline)
-        .foregroundStyle(.white)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 20)
-        .background(
-          Image("button8")
-            .resizable()
-            .scaledToFill()
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .gameFieldButtonStyle(for: localGame.gameField)
     }
     .buttonStyle(.plain)
     .disabled(availableColors.isEmpty)
     .opacity(availableColors.isEmpty ? 0.55 : 1)
     .padding(.horizontal, 20)
-    .padding(.top, 25)
+    .padding(.top, addPlayerTopPadding)
     .padding(.bottom, 8)
     .accessibilityHint(
       availableColors.isEmpty ? "Свободных цветов не осталось" : "Открыть форму нового игрока")
+  }
+
+  /// На iPad навигационная панель выше, поэтому кнопке нужен дополнительный зазор.
+  private var addPlayerTopPadding: CGFloat {
+    horizontalSizeClass == .regular ? 80 : 25
+  }
+
+  /// Не растягиваем список команды на всю ширину планшета.
+  private var teamContentMaxWidth: CGFloat {
+    horizontalSizeClass == .regular ? 720 : .infinity
   }
 
   private var playersListView: some View {
@@ -224,16 +230,9 @@ struct AddPlayersView: View {
       navigateToScoreScreen = true
     } label: {
       Text("Начать партию")
-        .font(.headline)
-        .foregroundStyle(.white)
-        .frame(maxWidth: .infinity, minHeight: 52)
+        .frame(maxWidth: .infinity, minHeight: 64)
         .padding(.horizontal, 16)
-        .background(
-          Image("button8")
-            .resizable()
-            .scaledToFill()
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .gameFieldButtonStyle(for: localGame.gameField)
     }
     .buttonStyle(.plain)
     .contentShape(RoundedRectangle(cornerRadius: 8))
@@ -274,16 +273,9 @@ struct AddPlayersView: View {
         Text("\(localGame.colonies.count)/\(colonyLimit)")
           .monospacedDigit()
       }
-      .font(.headline)
-      .foregroundStyle(.white)
-      .frame(maxWidth: .infinity, minHeight: 52)
+      .frame(maxWidth: .infinity, minHeight: 64)
       .padding(.horizontal, 16)
-      .background(
-        Image("button8")
-          .resizable()
-          .scaledToFill()
-      )
-      .clipShape(RoundedRectangle(cornerRadius: 8))
+      .gameFieldButtonStyle(for: localGame.gameField)
     }
     .buttonStyle(.plain)
     .contentShape(RoundedRectangle(cornerRadius: 8))

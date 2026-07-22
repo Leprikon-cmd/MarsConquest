@@ -58,9 +58,16 @@ struct GameDetailView: View {
         Section {
             playerSummary(for: player)
 
-            DisclosureGroup("Подробнее") {
+            DisclosureGroup {
                 scoreBreakdown(for: player)
+            } label: {
+                Text("Подробнее")
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 18)
+                    .padding(.horizontal, 10)
+                    .gameFieldButtonStyle(for: game.gameField)
             }
+            .tint(.black)
         } header: {
             placeTitle(for: player)
         }

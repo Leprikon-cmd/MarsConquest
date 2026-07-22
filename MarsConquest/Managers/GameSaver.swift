@@ -49,6 +49,7 @@ struct GameSaver {
         for localPlayer in localGame.players {
             let player = Player(context: context)
             player.id = localPlayer.id
+            player.savedPlayerID = localPlayer.id
             player.name = localPlayer.name
             player.color = localPlayer.color
             player.corporation = localPlayer.corporation

@@ -95,10 +95,9 @@ struct ScoreScreen: View {
                 }) {
                     Text("Достижения")
                         .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.purple)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+                        .padding(.vertical)
+                        .padding(.horizontal, 10)
+                        .gameFieldButtonStyle(for: localGame.gameField)
                 }
                 // Form иначе может объединить обе кнопки строки в одну область тапа.
                 .buttonStyle(.borderless)
@@ -109,10 +108,9 @@ struct ScoreScreen: View {
                 }) {
                     Text("Награды")
                         .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.orange)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+                        .padding(.vertical)
+                        .padding(.horizontal, 10)
+                        .gameFieldButtonStyle(for: localGame.gameField)
                 }
                 // У наград своя независимая область нажатия.
                 .buttonStyle(.borderless)
@@ -127,15 +125,19 @@ struct ScoreScreen: View {
         Button(action: {
             saveGameResults()
         }) {
-            if isSaving {
-                ProgressView()
-                Text("Сохранение...")
-            } else {
-                Text("Сохранить результаты")
+            HStack(spacing: 8) {
+                if isSaving {
+                    ProgressView()
+                        .tint(.black)
+                }
+                Text(isSaving ? "Сохранение..." : "Сохранить результаты")
             }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 18)
+            .padding(.horizontal, 10)
+            .gameFieldButtonStyle(for: localGame.gameField)
         }
-        .buttonStyle(.borderedProminent)
-        .frame(maxWidth: .infinity)
+        .buttonStyle(.plain)
         .disabled(isSaving)
     }
 

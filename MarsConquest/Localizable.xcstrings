@@ -4,6 +4,16 @@
     "" : {
 
     },
+    "%@ · %lld %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$lld %3$@"
+          }
+        }
+      }
+    },
     "%d" : {
 
     },
@@ -191,12 +201,28 @@
         }
       }
     },
+    "Recent expeditions" : {
+
+    },
+    "Аватар владельца журнала" : {
+
+    },
     "Автоматически" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Automatic"
+          }
+        }
+      }
+    },
+    "Базовая игра" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Base game"
           }
         }
       }
@@ -220,6 +246,9 @@
           }
         }
       }
+    },
+    "Бортовой журнал" : {
+
     },
     "Введите имя CEO" : {
       "localizations" : {
@@ -251,6 +280,19 @@
         }
       }
     },
+    "Все доступные записи уже проверены." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All available records have been reviewed."
+          }
+        }
+      }
+    },
+    "Все старые записи с этим именем перестанут учитываться в личном журнале." : {
+
+    },
     "Всего" : {
       "localizations" : {
         "en" : {
@@ -271,16 +313,6 @@
         }
       }
     },
-    "Выберите корпорацию" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a Corporation"
-          }
-        }
-      }
-    },
     "Выберите два пролога" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -292,12 +324,32 @@
         }
       }
     },
+    "Выберите корпорацию" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a Corporation"
+          }
+        }
+      }
+    },
     "Выберите прологи" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose Preludes"
+          }
+        }
+      }
+    },
+    "Выберите сохранённого игрока или создайте новый профиль владельца." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a saved player or create a new owner profile."
           }
         }
       }
@@ -363,6 +415,7 @@
       }
     },
     "Главная" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -483,6 +536,16 @@
         }
       }
     },
+    "Дополнения" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expansions"
+          }
+        }
+      }
+    },
     "Дополнения по умолчанию" : {
       "localizations" : {
         "en" : {
@@ -509,6 +572,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Achievements"
+          }
+        }
+      }
+    },
+    "Журнал" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logbook"
+          }
+        }
+      }
+    },
+    "Журнал экспедиций" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expedition Log"
+          }
+        }
+      }
+    },
+    "Закрыть" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
           }
         }
       }
@@ -609,6 +704,9 @@
         }
       }
     },
+    "Имена из прошлых партий" : {
+
+    },
     "Импорт" : {
       "localizations" : {
         "en" : {
@@ -645,6 +743,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import Games from JSON"
+          }
+        }
+      }
+    },
+    "Имя (необязательно)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name (optional)"
           }
         }
       }
@@ -805,12 +913,64 @@
         }
       }
     },
+    "Личный журнал" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personal Log"
+          }
+        }
+      }
+    },
+    "ЛИЧНЫЙ ЖУРНАЛ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PERSONAL LOG"
+          }
+        }
+      }
+    },
+    "Лучший результат" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best Score"
+          }
+        }
+      }
+    },
     "Место высадки" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Landing Site"
+          }
+        }
+      }
+    },
+    "Моя коллекция" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My collection"
+          }
+        }
+      }
+    },
+    "Моя статистика" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My Statistics"
           }
         }
       }
@@ -855,6 +1015,16 @@
         }
       }
     },
+    "Не удалось создать журнал:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not create the log:"
+          }
+        }
+      }
+    },
     "Неизвестно" : {
       "localizations" : {
         "en" : {
@@ -865,12 +1035,62 @@
         }
       }
     },
+    "Нет записей для привязки" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Records to Link"
+          }
+        }
+      }
+    },
+    "Ник" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nickname"
+          }
+        }
+      }
+    },
+    "Новая экспедиция" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Expedition"
+          }
+        }
+      }
+    },
+    "Новые партии, где вы участвуете, появятся здесь после сохранения результата." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New games you take part in will appear here after the results are saved."
+          }
+        }
+      }
+    },
     "Новый игрок" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "New Player"
+          }
+        }
+      }
+    },
+    "Новый профиль" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New profile"
           }
         }
       }
@@ -906,6 +1126,16 @@
         }
       }
     },
+    "Отвязать" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlink"
+          }
+        }
+      }
+    },
     "Открывает выбор корпорации" : {
       "localizations" : {
         "en" : {
@@ -922,6 +1152,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opens prelude selection"
+          }
+        }
+      }
+    },
+    "Открыть общую статистику" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Overall Statistics"
           }
         }
       }
@@ -1016,6 +1256,17 @@
         }
       }
     },
+    "ПАРТИЙ" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GAMES"
+          }
+        }
+      }
+    },
     "Первый пролог уже занят другим игроком." : {
       "localizations" : {
         "en" : {
@@ -1033,6 +1284,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "VP"
+          }
+        }
+      }
+    },
+    "Побед" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wins"
+          }
+        }
+      }
+    },
+    "ПОБЕД" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WINS"
           }
         }
       }
@@ -1091,6 +1364,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scoring"
+          }
+        }
+      }
+    },
+    "Поиск по имени" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search by Name"
           }
         }
       }
@@ -1157,6 +1440,7 @@
       }
     },
     "Покорение Марса" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1197,12 +1481,35 @@
         }
       }
     },
+    "Последние экспедиции" : {
+
+    },
     "Последняя игра: %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Last game: %@"
+          }
+        }
+      }
+    },
+    "Привязать" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link"
+          }
+        }
+      }
+    },
+    "Проверить прошлые партии" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review Past Games"
           }
         }
       }
@@ -1239,6 +1546,26 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Прологи: %1$@, %2$@"
+          }
+        }
+      }
+    },
+    "Профиль с таким ником и именем уже существует." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A profile with this nickname and name already exists."
+          }
+        }
+      }
+    },
+    "Прошлые партии" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Past Games"
           }
         }
       }
@@ -1316,6 +1643,26 @@
         }
       }
     },
+    "Создайте журнал" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create your log"
+          }
+        }
+      }
+    },
+    "Создать журнал" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create log"
+          }
+        }
+      }
+    },
     "Сохранение..." : {
       "localizations" : {
         "en" : {
@@ -1332,6 +1679,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saved CEO"
+          }
+        }
+      }
+    },
+    "Сохранённый игрок" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved player"
           }
         }
       }
@@ -1366,6 +1723,17 @@
         }
       }
     },
+    "Средний результат" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Average Score"
+          }
+        }
+      }
+    },
     "Средний счёт: %@ • Лучший: %lld" : {
       "localizations" : {
         "en" : {
@@ -1392,12 +1760,33 @@
         }
       }
     },
+    "Сыграно партий" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Games Played"
+          }
+        }
+      }
+    },
     "Убрать из партии" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remove from Game"
+          }
+        }
+      }
+    },
+    "Убрать связь?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Link?"
           }
         }
       }
@@ -1411,6 +1800,20 @@
           }
         }
       }
+    },
+    "Уже отмеченные участия" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linked Participations"
+          }
+        }
+      }
+    },
+    "Уже связанные имена" : {
+
     },
     "Условия" : {
       "extractionState" : "stale",
@@ -1493,6 +1896,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hellas & Elysium"
+          }
+        }
+      }
+    },
+    "Эта запись перестанет учитываться в личном журнале." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This record will no longer be included in your personal log."
           }
         }
       }

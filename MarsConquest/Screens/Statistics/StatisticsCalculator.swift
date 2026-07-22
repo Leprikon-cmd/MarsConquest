@@ -138,6 +138,15 @@ struct StatisticsCalculator {
         )
     }
 
+    /// Плотное место игрока: 1, 1, 2, 3 при равенстве очков.
+    static func place(of player: Player, in game: Game) -> Int {
+        guard let players = game.players?.allObjects as? [Player] else { return 1 }
+
+        let distinctScores = Array(Set(players.map { totalScore(for: $0, in: game) }))
+            .sorted(by: >)
+        return (distinctScores.firstIndex(of: totalScore(for: player, in: game)) ?? 0) + 1
+    }
+
     /// Сводная статистика по игрокам.
     static func playerStats(from games: [Game], locale: Locale) -> [PlayerStats] {
         var stats: [String: (games: Int, wins: Int, totalScore: Int, bestScore: Int)] = [:]

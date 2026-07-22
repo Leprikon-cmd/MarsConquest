@@ -34,9 +34,22 @@
 		777EC524300E3E1200BBC364 /* PRIVACY_POLICY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRIVACY_POLICY.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		777EC527300E3E1800BBC364 /* Exceptions for "MarsConquest" folder in "MarsConquest" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 27F94A3F2D7A0DCD0089E4A4 /* MarsConquest */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		27F94A422D7A0DCD0089E4A4 /* MarsConquest */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				777EC527300E3E1800BBC364 /* Exceptions for "MarsConquest" folder in "MarsConquest" target */,
+			);
 			path = MarsConquest;
 			sourceTree = "<group>";
 		};
@@ -407,6 +420,7 @@
 				DEVELOPMENT_TEAM = 73P89VLQ3W;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MarsConquest/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mars LogBook";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.board-games";
@@ -439,6 +453,7 @@
 				DEVELOPMENT_TEAM = 73P89VLQ3W;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MarsConquest/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mars LogBook";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.board-games";

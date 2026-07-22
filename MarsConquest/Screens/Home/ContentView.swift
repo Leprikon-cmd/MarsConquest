@@ -1,216 +1,189 @@
-//
-//  ContentView.swift
-//
-//  Зачем:
-//  Главный экран приложения MarsConquest.
-//  Отсюда пользователь выбирает игровое поле, начинает новую игру
-//  и переходит к основным разделам приложения.
-//
-//  Кто:
-//  Евгений Зотчик — автор проекта
-//  Atlas — AI-ассистент разработки
-//
-//  Назначение файла:
-//  - отображение главного экрана
-//  - выбор карты Марса
-//  - запуск новой игры
-//  - открытие экрана добавления игроков
-//  - переход к статистике
-//
-
 import CoreData
 import SwiftUI
 
+/// Главный экран личного журнала владельца.
 struct ContentView: View {
-  /// Контекст CoreData из окружения SwiftUI.
   @Environment(\.managedObjectContext) private var viewContext
-  @Environment(\.locale) private var locale
 
-  /// Настройки
-  @State private var expansions = ExpansionSettingsManager.load()
-
-  /// Текущая выбранная карта Марса.
-  @State private var gameField = GameField.farsida.rawValue
-
-  /// Флаг открытия окна настройки новой игры.
-  @State private var showGameSetup = false
-
-  /// Выбранная игра для перехода на экран деталей.
-  @State private var navigateToGame: Game? = nil
-
-  /// Локальная модель новой игры, которая заполняется до сохранения в CoreData.
-  @State private var localGame = LocalGameData.empty(field: GameField.farsida.rawValue)
-
-  /// Подписываемся один раз
-  @State private var didSetupNotificationObserver = false
-
-  /// Подсказка о горизонтальном свайпе нужна только при первом знакомстве с выбором поля.
-  @AppStorage("landingSiteSwipeHintSeen") private var hasSeenLandingSiteSwipeHint = false
-
-  /// Доступные игровые поля.
-  private var gameFields: [GameField] {
-    expansions.hasHellasElysium ? GameField.allCases : [.farsida]
-  }
-  private var selectedGameField: GameField {
-    GameField(rawValue: gameField) ?? .farsida
-  }
+  let ownerProfile: OwnerProfile
 
   var body: some View {
     TabView {
-      NavigationStack {
-        ZStack {
-          Image("fon")
-            .resizable()
-            .scaledToFill()
-            .edgesIgnoringSafeArea(.all)
-
-          VStack(spacing: 16) {
-            Text("Покорение Марса")
-              .font(.largeTitle)
-              .bold()
-              .foregroundColor(.white)
-              .padding(.top, 20)
-
-            Text("Место высадки")
-              .font(.title2)
-              .foregroundColor(.white)
-
-            ZStack {
-              Image(selectedGameField.imageName)
-                .resizable()
-                .scaledToFill()
-            }
-            .clipShape(Circle())
-            .frame(width: 360, height: 360)
-            .overlay(
-              Text(selectedGameField.localizedName(for: locale))
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(.white)
-            )
-            .overlay(alignment: .bottom) {
-              if gameFields.count > 1 && !hasSeenLandingSiteSwipeHint {
-                Label("Листайте, чтобы выбрать место высадки", systemImage: "hand.draw.fill")
-                  .font(.subheadline.weight(.semibold))
-                  .foregroundStyle(.primary)
-                  .padding(.horizontal, 14)
-                  .padding(.vertical, 10)
-                  .background(.ultraThinMaterial, in: Capsule())
-                  .padding(.bottom, 18)
-                  .allowsHitTesting(false)
-                  .transition(.opacity)
-              }
-            }
-            .gesture(
-              DragGesture().onEnded { gesture in
-                let currentIndex = gameFields.firstIndex(where: { $0.rawValue == gameField }) ?? 0
-
-                if gesture.translation.width < -50 {
-                  withAnimation {
-                    gameField = gameFields[(currentIndex + 1) % gameFields.count].rawValue
-                  }
-                  hasSeenLandingSiteSwipeHint = true
-                } else if gesture.translation.width > 50 {
-                  withAnimation {
-                    gameField =
-                      gameFields[(currentIndex - 1 + gameFields.count) % gameFields.count].rawValue
-                  }
-                  hasSeenLandingSiteSwipeHint = true
-                }
-              }
-            )
-            .padding(.vertical, 20)
-
-            Button(action: startNewGame) {
-              Text("Высадка!")
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding()
-                .frame(maxWidth: 300)
-                .background(
-                  Image("button7")
-                    .resizable()
-                    .scaledToFill()
-                )
-                .cornerRadius(10)
-                .shadow(radius: 5)
-            }
-
-          }
-          .padding()
+      OwnerDashboardView(ownerProfile: ownerProfile)
+        .tabItem {
+          Label("Бортовой журнал", systemImage: "person.text.rectangle.fill")
         }
-        .navigationTitle("Главная")
-        .navigationBarHidden(true)
-        .navigationDestination(item: $navigateToGame) { game in
-          GameDetailView(game: game)
-        }
-      }
-      .tabItem {
-        Label("Главная", systemImage: "globe.americas.fill")
-          .labelStyle(.iconOnly)
-      }
-
-      NavigationStack {
-        StatisticsScreen()
-      }
-      .tabItem {
-        Label("Статистика", systemImage: "chart.bar.fill")
-          .labelStyle(.iconOnly)
-      }
 
       NavigationStack {
         SettingsScreen()
       }
       .tabItem {
         Label("Настройки", systemImage: "gearshape.fill")
-          .labelStyle(.iconOnly)
       }
     }
+    .tabViewStyle(.tabBarOnly)
     .onAppear {
-      expansions = ExpansionSettingsManager.load()
-
-      if !gameFields.contains(where: { $0.rawValue == gameField }) {
-        gameField = GameField.farsida.rawValue
-      }
-
-      /// Синхронизация встроенных справочников без создания дубликатов.
-      /// Это также добавит данные, появившиеся в следующих версиях приложения.
       generateInitialGameData(in: viewContext)
-
-      /// Подписка на уведомление для перехода к сохранённой игре.
-      if !didSetupNotificationObserver {
-        NotificationCenter.default.addObserver(
-          forName: Notification.Name("NavigateToStatistics"),
-          object: nil,
-          queue: .main
-        ) { notification in
-          if let game = notification.object as? Game {
-            self.navigateToGame = game
-            self.showGameSetup = false
-          }
-        }
-
-        didSetupNotificationObserver = true
-      }
     }
-    .onReceive(
-      NotificationCenter.default.publisher(
-        for: ExpansionSettingsManager.settingsChangedNotification)
-    ) { _ in
-      expansions = ExpansionSettingsManager.load()
+  }
+}
 
-      if !gameFields.contains(where: { $0.rawValue == gameField }) {
-        gameField = GameField.farsida.rawValue
-      }
-    }
+private struct OwnerDashboardView: View {
+  @Environment(\.managedObjectContext) private var viewContext
 
-    .fullScreenCover(isPresented: $showGameSetup) {
-      AddPlayersView(localGame: $localGame)
+  let ownerProfile: OwnerProfile
+
+  @FetchRequest(
+    entity: Game.entity(),
+    sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
+  ) private var games: FetchedResults<Game>
+
+  @State private var showNewExpedition = false
+
+private func isOwner(_ player: Player) -> Bool {
+  guard let ownerID = ownerProfile.savedPlayerID else { return false }
+  return player.savedPlayerID == ownerID || player.id == ownerID
+}
+
+private var owner: SavedPlayer? {
+
+    guard let ownerID = ownerProfile.savedPlayerID else { return nil }
+    return OwnerProfileManager.fetchSavedPlayer(with: ownerID, in: viewContext)
+  }
+
+  private var ownerGames: [Game] {
+    guard ownerProfile.savedPlayerID != nil else { return [] }
+
+    return games.filter { game in
+      let players = game.players?.allObjects as? [Player] ?? []
+      return players.contains { isOwner($0) }
     }
   }
 
-  /// Создаёт новую локальную игру и открывает экран добавления игроков.
-  private func startNewGame() {
-    self.localGame = LocalGameData.empty(field: gameField)
-    self.showGameSetup = true
+  private var wins: Int {
+    ownerGames.reduce(into: 0) { result, game in
+      let players = game.players?.allObjects as? [Player] ?? []
+      guard let ownerPlayer = players.first(where: isOwner) else {
+        return
+      }
+
+      let ownerScore = StatisticsCalculator.totalScore(for: ownerPlayer, in: game)
+      let bestScore = players.map { StatisticsCalculator.totalScore(for: $0, in: game) }.max()
+      if ownerScore == bestScore {
+        result += 1
+      }
+    }
+  }
+
+  private var winRate: Int {
+    guard !ownerGames.isEmpty else { return 0 }
+    return Int((Double(wins) / Double(ownerGames.count) * 100).rounded())
+  }
+
+  private var averageScore: Int {
+    let scores = ownerScores
+    guard !scores.isEmpty else { return 0 }
+    return Int((Double(scores.reduce(0, +)) / Double(scores.count)).rounded())
+  }
+
+  private var bestScore: Int {
+    ownerScores.max() ?? 0
+  }
+
+  private var ownerScores: [Int] {
+    ownerGames.compactMap { game in
+      guard let ownerPlayer = (game.players?.allObjects as? [Player])?.first(where: isOwner) else {
+        return nil
+      }
+
+      return StatisticsCalculator.totalScore(for: ownerPlayer, in: game)
+    }
+  }
+
+  private var hasHistoricalParticipationsToReview: Bool {
+    guard let ownerID = ownerProfile.savedPlayerID else { return false }
+
+    return games.contains { game in
+      let players = game.players?.allObjects as? [Player] ?? []
+      return players.contains {
+        ($0.savedPlayerID == nil || $0.savedPlayerID == ownerID) && $0.id != ownerID
+      }
+    }
+  }
+  var body: some View {
+    NavigationStack {
+      ZStack {
+        Image("fon")
+          .resizable()
+          .scaledToFill()
+          .ignoresSafeArea()
+
+        ScrollView(showsIndicators: false) {
+          VStack(alignment: .leading, spacing: 18) {
+            OwnerProfileBadgeView(
+              nickname: owner?.nickname ?? owner?.name ?? "Личный журнал",
+              realName: owner?.realName,
+              colorName: owner?.favoriteColor ?? "Синий",
+              games: ownerGames.count,
+              wins: wins,
+              winRate: winRate,
+              averageScore: averageScore,
+              bestScore: bestScore
+            )
+
+            if ownerGames.isEmpty {
+              Text("Новые партии, где вы участвуете, появятся здесь после сохранения результата.")
+                .font(.footnote)
+                .foregroundStyle(.white.opacity(0.78))
+                .padding(.vertical, 4)
+            } else if let ownerID = ownerProfile.savedPlayerID {
+              RecentExpeditionsView(
+                games: Array(ownerGames.prefix(5)),
+                ownerID: ownerID
+              )
+            }
+
+            Button {
+              showNewExpedition = true
+            } label: {
+              Label("Новая экспедиция", systemImage: "rocket.fill")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 15)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.orange)
+
+            NavigationLink {
+              StatisticsScreen()
+            } label: {
+              Label("Открыть общую статистику", systemImage: "chart.bar.xaxis")
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 13)
+            }
+            .buttonStyle(.bordered)
+            .tint(.white)
+
+            if hasHistoricalParticipationsToReview {
+              NavigationLink {
+                HistoricalParticipationLinkView(ownerProfile: ownerProfile)
+              } label: {
+                Label("Проверить прошлые партии", systemImage: "person.text.rectangle")
+                  .frame(maxWidth: .infinity)
+                  .padding(.vertical, 13)
+              }
+              .buttonStyle(.bordered)
+              .tint(.white)
+            }
+          }
+          .padding()
+        }
+      }
+      .navigationTitle("Бортовой журнал")
+      .navigationBarTitleDisplayMode(.inline)
+    }
+    .fullScreenCover(isPresented: $showNewExpedition) {
+      NewExpeditionView()
+    }
   }
 }

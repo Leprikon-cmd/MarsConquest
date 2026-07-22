@@ -41,7 +41,7 @@ struct MarsConquestApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            OwnerProfileGateView()
                 .environment(\.locale, selectedLanguage.locale)
                 // Передаем контекст в окружение
                 .environment(\.managedObjectContext, coreDataManager.viewContext)
