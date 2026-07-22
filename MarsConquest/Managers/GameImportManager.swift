@@ -34,6 +34,7 @@ struct GameImportManager {
             game.id = UUID()
             game.date = formatter.date(from: importedGame.date) ?? Date()
             game.gameField = importedGame.gameField
+            game.gameFieldID = GameData.gameFieldID(named: importedGame.gameField)
             game.generation = Int32(importedGame.generation)
 
             game.hasPrelude = importedGame.expansions.hasPrelude

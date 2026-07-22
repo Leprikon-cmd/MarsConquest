@@ -13,6 +13,45 @@ import Foundation
 import CoreData
 
 struct StatisticsCalculator {
+struct OwnerJournalStats {
+    struct CorporationPreference {
+        let name: String
+        let games: Int
+        let wins: Int
+    }
+
+    struct FieldPreference {
+        let persistedName: String
+        let referenceID: String?
+        let games: Int
+        let wins: Int
+    }
+
+    let games: Int
+    let wins: Int
+    let averageScore: Int
+    let bestScore: Int
+    let averagePlace: Int
+    let maxGeneration: Int
+    let favoriteColor: String?
+    let frequentCorporation: CorporationPreference?
+    let successfulField: FieldPreference?
+    let fastestWinGeneration: Int?
+
+    static let empty = OwnerJournalStats(
+        games: 0,
+        wins: 0,
+        averageScore: 0,
+        bestScore: 0,
+        averagePlace: 0,
+        maxGeneration: 0,
+        favoriteColor: nil,
+        frequentCorporation: nil,
+        successfulField: nil,
+        fastestWinGeneration: nil
+    )
+}
+
 
     struct PlayerStats: Identifiable {
         let id = UUID()
@@ -146,6 +185,128 @@ struct StatisticsCalculator {
             .sorted(by: >)
         return (distinctScores.firstIndex(of: totalScore(for: player, in: game)) ?? 0) + 1
     }
+
+
+/// Личные показатели владельца по стабильному UUID в сохранённых партиях.
+static func ownerJournalStats(ownerID: UUID, from games: [Game]) -> OwnerJournalStats {
+    var scores: [Int] = []
+    var places: [Int] = []
+    var wins = 0
+    var maxGeneration = 0
+    var fastestWinGeneration: Int?
+    var colorUsage: [String: (count: Int, lastPlayed: Date)] = [:]
+    var corporationUsage: [String: (games: Int, wins: Int, lastPlayed: Date)] = [:]
+    var fieldUsage: [String: (persistedName: String, referenceID: String?, games: Int, wins: Int, lastPlayed: Date)] = [:]
+
+    for game in games {
+        guard let players = game.players?.allObjects as? [Player],
+              let owner = players.first(where: { $0.savedPlayerID == ownerID || $0.id == ownerID })
+        else {
+            continue
+        }
+
+        let score = totalScore(for: owner, in: game)
+        let ownerPlace = place(of: owner, in: game)
+        scores.append(score)
+        places.append(ownerPlace)
+        maxGeneration = max(maxGeneration, Int(game.generation))
+
+        if let color = owner.color, !color.isEmpty {
+            var usage = colorUsage[color] ?? (count: 0, lastPlayed: .distantPast)
+            usage.count += 1
+            usage.lastPlayed = max(usage.lastPlayed, game.date ?? .distantPast)
+            colorUsage[color] = usage
+        }
+
+        let playedAt = game.date ?? .distantPast
+        if let corporation = owner.corporation, !corporation.isEmpty {
+            var usage = corporationUsage[corporation] ?? (games: 0, wins: 0, lastPlayed: .distantPast)
+            usage.games += 1
+            usage.lastPlayed = max(usage.lastPlayed, playedAt)
+            if ownerPlace == 1 { usage.wins += 1 }
+            corporationUsage[corporation] = usage
+        }
+
+        if let persistedName = game.gameField, !persistedName.isEmpty {
+            let field = GameField.resolve(
+                persistedName: persistedName,
+                referenceID: game.gameFieldID
+            )
+            let fieldKey = field?.referenceID ?? persistedName
+            var usage = fieldUsage[fieldKey] ?? (
+                persistedName: field?.rawValue ?? persistedName,
+                referenceID: field?.referenceID ?? game.gameFieldID,
+                games: 0,
+                wins: 0,
+                lastPlayed: .distantPast
+            )
+            usage.games += 1
+            usage.lastPlayed = max(usage.lastPlayed, playedAt)
+            if ownerPlace == 1 { usage.wins += 1 }
+            fieldUsage[fieldKey] = usage
+        }
+
+        if ownerPlace == 1 {
+            wins += 1
+            if game.generation > 0 {
+                fastestWinGeneration = min(fastestWinGeneration ?? Int.max, Int(game.generation))
+            }
+        }
+    }
+
+    guard !scores.isEmpty else { return .empty }
+
+    let favoriteColor = colorUsage.max {
+        if $0.value.count != $1.value.count {
+            return $0.value.count < $1.value.count
+        }
+        return $0.value.lastPlayed < $1.value.lastPlayed
+    }?.key
+
+    let frequentCorporation = corporationUsage
+        .filter { $0.value.games >= 3 }
+        .max {
+        if $0.value.games != $1.value.games { return $0.value.games < $1.value.games }
+        return $0.value.lastPlayed < $1.value.lastPlayed
+    }.map {
+        OwnerJournalStats.CorporationPreference(
+            name: $0.key,
+            games: $0.value.games,
+            wins: $0.value.wins
+        )
+    }
+
+    let successfulField = fieldUsage
+        .filter { $0.value.games >= 3 }
+        .max {
+            let leftRate = Double($0.value.wins) / Double($0.value.games)
+            let rightRate = Double($1.value.wins) / Double($1.value.games)
+            if leftRate != rightRate { return leftRate < rightRate }
+            if $0.value.games != $1.value.games { return $0.value.games < $1.value.games }
+            return $0.value.lastPlayed < $1.value.lastPlayed
+        }
+        .map {
+            OwnerJournalStats.FieldPreference(
+                persistedName: $0.value.persistedName,
+                referenceID: $0.value.referenceID,
+                games: $0.value.games,
+                wins: $0.value.wins
+            )
+        }
+
+    return OwnerJournalStats(
+        games: scores.count,
+        wins: wins,
+        averageScore: Int((Double(scores.reduce(0, +)) / Double(scores.count)).rounded()),
+        bestScore: scores.max() ?? 0,
+        averagePlace: Int((Double(places.reduce(0, +)) / Double(places.count)).rounded()),
+        maxGeneration: maxGeneration,
+        favoriteColor: favoriteColor,
+        frequentCorporation: frequentCorporation,
+        successfulField: successfulField,
+        fastestWinGeneration: fastestWinGeneration
+    )
+}
 
     /// Сводная статистика по игрокам.
     static func playerStats(from games: [Game], locale: Locale) -> [PlayerStats] {

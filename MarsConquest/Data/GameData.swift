@@ -276,7 +276,7 @@ struct GameData {
 
     /// Постоянный ключ игрового поля для сохранения в новых партиях.
     static func gameFieldID(named name: String) -> String? {
-        GameField(rawValue: name)?.referenceID
+        GameField.resolve(persistedName: name, referenceID: nil)?.referenceID
     }
 
     /// Справочник достижений с постоянными ключами для каждого поля.

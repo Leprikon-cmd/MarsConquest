@@ -60,45 +60,11 @@ private var owner: SavedPlayer? {
     }
   }
 
-  private var wins: Int {
-    ownerGames.reduce(into: 0) { result, game in
-      let players = game.players?.allObjects as? [Player] ?? []
-      guard let ownerPlayer = players.first(where: isOwner) else {
-        return
-      }
+private var journalStats: StatisticsCalculator.OwnerJournalStats {
+  guard let ownerID = ownerProfile.savedPlayerID else { return .empty }
+  return StatisticsCalculator.ownerJournalStats(ownerID: ownerID, from: ownerGames)
+}
 
-      let ownerScore = StatisticsCalculator.totalScore(for: ownerPlayer, in: game)
-      let bestScore = players.map { StatisticsCalculator.totalScore(for: $0, in: game) }.max()
-      if ownerScore == bestScore {
-        result += 1
-      }
-    }
-  }
-
-  private var winRate: Int {
-    guard !ownerGames.isEmpty else { return 0 }
-    return Int((Double(wins) / Double(ownerGames.count) * 100).rounded())
-  }
-
-  private var averageScore: Int {
-    let scores = ownerScores
-    guard !scores.isEmpty else { return 0 }
-    return Int((Double(scores.reduce(0, +)) / Double(scores.count)).rounded())
-  }
-
-  private var bestScore: Int {
-    ownerScores.max() ?? 0
-  }
-
-  private var ownerScores: [Int] {
-    ownerGames.compactMap { game in
-      guard let ownerPlayer = (game.players?.allObjects as? [Player])?.first(where: isOwner) else {
-        return nil
-      }
-
-      return StatisticsCalculator.totalScore(for: ownerPlayer, in: game)
-    }
-  }
 
   private var hasHistoricalParticipationsToReview: Bool {
     guard let ownerID = ownerProfile.savedPlayerID else { return false }
@@ -120,16 +86,23 @@ private var owner: SavedPlayer? {
 
         ScrollView(showsIndicators: false) {
           VStack(alignment: .leading, spacing: 18) {
-            OwnerProfileBadgeView(
-              nickname: owner?.nickname ?? owner?.name ?? "Личный журнал",
-              realName: owner?.realName,
-              colorName: owner?.favoriteColor ?? "Синий",
-              games: ownerGames.count,
-              wins: wins,
-              winRate: winRate,
-              averageScore: averageScore,
-              bestScore: bestScore
-            )
+OwnerProfileBadgeView(
+  nickname: owner?.nickname ?? owner?.name ?? "Личный журнал",
+  realName: owner?.realName,
+  colorName: journalStats.favoriteColor ?? owner?.favoriteColor ?? "Синий",
+  games: journalStats.games,
+  wins: journalStats.wins,
+  winRate: journalStats.games > 0
+    ? Int((Double(journalStats.wins) / Double(journalStats.games) * 100).rounded())
+    : 0,
+  averageScore: journalStats.averageScore,
+  bestScore: journalStats.bestScore,
+  averagePlace: journalStats.averagePlace,
+  maxGeneration: journalStats.maxGeneration,
+  frequentCorporation: journalStats.frequentCorporation,
+  successfulField: journalStats.successfulField,
+  fastestWinGeneration: journalStats.fastestWinGeneration
+)
 
             if ownerGames.isEmpty {
               Text("Новые партии, где вы участвуете, появятся здесь после сохранения результата.")

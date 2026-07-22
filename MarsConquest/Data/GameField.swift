@@ -53,12 +53,33 @@ enum GameField: String, CaseIterable {
         referenceID: String?,
         locale: Locale
     ) -> String {
-        let field = allCases.first { $0.referenceID == referenceID }
-            ?? persistedName.flatMap(GameField.init(rawValue:))
+        let field = resolve(persistedName: persistedName, referenceID: referenceID)
 
         return field?.localizedName(for: locale)
             ?? persistedName
             ?? UIStrings.unknown(locale: locale)
+    }
+
+    /// Распознаёт постоянный ключ, текущее и старые написания названий поля.
+    static func resolve(persistedName: String?, referenceID: String?) -> GameField? {
+        if let referenceID, let field = allCases.first(where: { $0.referenceID == referenceID }) {
+            return field
+        }
+
+        let normalizedName = persistedName?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+
+        switch normalizedName {
+        case farsida.rawValue.lowercased(), "tharsis":
+            return .farsida
+        case hellas.rawValue.lowercased(), "элада", "hellas":
+            return .hellas
+        case elysium.rawValue.lowercased(), "elysium":
+            return .elysium
+        default:
+            return nil
+        }
     }
     
     /// Классическое поле Tharsis.
