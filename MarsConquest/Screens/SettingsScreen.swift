@@ -19,8 +19,8 @@ struct SettingsScreen: View {
   @State private var expansions = ExpansionSettingsManager.load()
   @AppStorage(MoxieSoundManager.isEnabledKey) private var isMoxieSoundEnabled = false
   @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.automatic.rawValue
-  @AppStorage(OwnerBadgeStyle.storageKey) private var ownerBadgeStyleRawValue = OwnerBadgeStyle.marsFrontier.rawValue
   @AppStorage(OwnerAvatarStyle.storageKey) private var ownerAvatarStyleRawValue = OwnerAvatarStyle.commander.rawValue
+  @AppStorage(TestModeSettings.isEnabledKey) private var isTestModeEnabled = false
   @Environment(\.managedObjectContext) private var viewContext
   @Environment(\.locale) private var locale
   @State private var importMessage = ""
@@ -34,15 +34,6 @@ struct SettingsScreen: View {
             ForEach(AppLanguage.allCases) { language in
               Text(language.title)
                 .tag(language.rawValue)
-            }
-          }
-        }
-
-        Section(header: Text(badgeStyleSectionTitle)) {
-          Picker(badgeStylePickerTitle, selection: $ownerBadgeStyleRawValue) {
-            ForEach(OwnerBadgeStyle.allCases) { style in
-              Text(style.title)
-                .tag(style.rawValue)
             }
           }
         }
@@ -62,6 +53,13 @@ struct SettingsScreen: View {
           Toggle("Колонии", isOn: binding(for: \.hasColonies))
           Toggle("Эллада и Элизий", isOn: binding(for: \.hasHellasElysium))
           Toggle("Кризис", isOn: binding(for: \.hasTurmoil))
+        }
+
+        Section(header: Text(testModeSectionTitle)) {
+          Toggle(testModeToggleTitle, isOn: $isTestModeEnabled)
+          Text(testModeDescription)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
         }
 
         Section(header: Text("Звук")) {
@@ -109,19 +107,25 @@ struct SettingsScreen: View {
     locale.identifier.lowercased().hasPrefix("en")
   }
 
-  private var badgeStyleSectionTitle: String {
-    isEnglish ? "Personal badge style" : "Стиль личного бейджа"
-  }
-
-  private var badgeStylePickerTitle: String {
-    isEnglish ? "Style" : "Стиль"
-  }
-
   private var avatarStyleSectionTitle: String {
     isEnglish ? "Personal avatar" : "Аватар пользователя"
   }
 
   private var avatarStylePickerTitle: String {
     isEnglish ? "Avatar" : "Аватар"
+  }
+
+  private var testModeSectionTitle: String {
+    isEnglish ? "Testing" : "Тестирование"
+  }
+
+  private var testModeToggleTitle: String {
+    isEnglish ? "Test mode" : "Тестовый режим"
+  }
+
+  private var testModeDescription: String {
+    isEnglish
+      ? "Automatically fills a color, corporation, and two preludes when adding players."
+      : "Автоматически подставляет цвет, корпорацию и два пролога при добавлении игроков."
   }
 }

@@ -53,16 +53,19 @@ struct OwnerProfileManager {
 
     let name = savedPlayer.nickname ?? savedPlayer.name ?? "Владелец"
     let preferredColor = savedPlayer.favoriteColor ?? ""
-    let color = GameData.colors.contains(preferredColor)
+    let preferredOrDefaultColor = GameData.colors.contains(preferredColor)
       ? preferredColor
       : GameData.colors.first ?? "Красный"
-    let preludeChoices = expansions.hasPrelude ? Array(GameData.prologues.prefix(2)) : []
+    let color = TestModeSettings.isEnabled ? preferredOrDefaultColor : ""
+    let preludeChoices = TestModeSettings.isEnabled && expansions.hasPrelude
+      ? Array(GameData.prologues.prefix(2))
+      : []
 
     return LocalPlayer(
       id: ownerID,
       name: name,
       color: color,
-      corporation: GameData.beginnerCorporation,
+      corporation: TestModeSettings.isEnabled ? GameData.beginnerCorporation : "",
       prologue1: preludeChoices.first ?? "",
       prologue2: preludeChoices.dropFirst().first ?? "",
       score: LocalScore()

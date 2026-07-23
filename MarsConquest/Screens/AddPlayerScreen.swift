@@ -24,6 +24,7 @@ struct AddPlayerScreen: View {
   @Environment(\.dismiss) private var dismiss
   @Environment(\.managedObjectContext) private var viewContext
   @Environment(\.locale) private var locale
+  @AppStorage(TestModeSettings.isEnabledKey) private var isTestModeEnabled = false
   @FetchRequest(
     entity: SavedPlayer.entity(),
     sortDescriptors: [
@@ -286,15 +287,15 @@ struct AddPlayerScreen: View {
       return
     }
 
-    if selectedColor.isEmpty {
+    if isTestModeEnabled, selectedColor.isEmpty {
       selectedColor = availableColors.first ?? ""
     }
-    if corporation.isEmpty {
+    if isTestModeEnabled, corporation.isEmpty {
       corporation = availableCorporations.first {
         $0 != GameData.beginnerCorporation
       } ?? availableCorporations.first ?? ""
     }
-    if localGame.expansions.hasPrelude {
+    if isTestModeEnabled, localGame.expansions.hasPrelude {
       if prologue1.isEmpty {
         prologue1 = availablePrologues.first ?? ""
       }

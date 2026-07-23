@@ -120,7 +120,9 @@ struct AddPlayersView: View {
               named: updatedPlayer.corporation,
               for: updatedExpansions
             ) {
-              updatedPlayer.corporation = GameData.beginnerCorporation
+              updatedPlayer.corporation = TestModeSettings.isEnabled
+                ? GameData.beginnerCorporation
+                : ""
             }
 
             if !updatedExpansions.hasPrelude {

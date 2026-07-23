@@ -7,12 +7,33 @@ struct ContentView: View {
 
   let ownerProfile: OwnerProfile
 
+  @FetchRequest(
+    entity: Game.entity(),
+    sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
+  ) private var games: FetchedResults<Game>
+
+  private var hasRegalia: Bool {
+    guard let ownerID = ownerProfile.savedPlayerID else { return false }
+    let ownerGames = games.filter { game in
+      let players = game.players?.allObjects as? [Player] ?? []
+      return players.contains { $0.savedPlayerID == ownerID || $0.id == ownerID }
+    }
+    return !CareerProgressCalculator().regalia(ownerID: ownerID, from: ownerGames).isEmpty
+  }
+
   var body: some View {
     TabView {
       OwnerDashboardView(ownerProfile: ownerProfile)
         .tabItem {
           Label("Бортовой журнал", systemImage: "person.text.rectangle.fill")
         }
+
+      if hasRegalia {
+        RegaliaView(ownerProfile: ownerProfile)
+          .tabItem {
+            Label("Регалии", systemImage: "medal.star.fill")
+          }
+      }
 
       NavigationStack {
         SettingsScreen()
@@ -65,6 +86,11 @@ private var journalStats: StatisticsCalculator.OwnerJournalStats {
   return StatisticsCalculator.ownerJournalStats(ownerID: ownerID, from: ownerGames)
 }
 
+private var careerLevel: Int {
+  guard let ownerID = ownerProfile.savedPlayerID else { return 0 }
+  let calculator = CareerProgressCalculator()
+  return calculator.level(for: calculator.calculate(ownerID: ownerID, from: ownerGames))
+}
 
   private var hasHistoricalParticipationsToReview: Bool {
     guard let ownerID = ownerProfile.savedPlayerID else { return false }
@@ -90,6 +116,7 @@ OwnerProfileBadgeView(
   nickname: owner?.nickname ?? owner?.name ?? "Личный журнал",
   realName: owner?.realName,
   colorName: journalStats.favoriteColor ?? owner?.favoriteColor ?? "Синий",
+  careerLevel: careerLevel,
   games: journalStats.games,
   wins: journalStats.wins,
   winRate: journalStats.games > 0
