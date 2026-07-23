@@ -38,9 +38,8 @@ h2 { margin-bottom: 44px; font-size: clamp(2.4rem, 5vw, 4.2rem); line-height: 1.
 .app-preview span { color: var(--muted); font-size: .9rem; }
 .screenshots, .features { padding: 115px 0; border-top: 1px solid var(--line); }
 .section-heading { max-width: 760px; }
-.screenshot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 3vw, 32px); align-items: end; }
+.screenshot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(42px, 5vw, 72px) clamp(16px, 3vw, 32px); align-items: start; }
 .screenshot-grid figure { margin: 0; }
-.screenshot-grid figure:nth-child(2) { transform: translateY(-28px); }
 .screenshot-grid img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 34px; box-shadow: 0 24px 60px rgba(40,35,28,.12); }
 .screenshot-grid figcaption { display: flex; flex-direction: column; gap: 3px; padding: 18px 8px 0; }
 .screenshot-grid figcaption strong { font-size: 1rem; }
@@ -71,7 +70,7 @@ footer p { margin: 0; }
 @media (max-width: 800px) {
   .hero { grid-template-columns: 1fr; padding-top: 70px; }
   .app-preview { min-height: 340px; }
-  .screenshot-grid { gap: 12px; }
+  .screenshot-grid { grid-template-columns: repeat(2, 1fr); gap: 48px 18px; }
   .privacy-card { grid-template-columns: 1fr; align-items: start; }
   .policy-layout { grid-template-columns: 1fr; }
   .policy-heading { position: static; }
@@ -89,7 +88,6 @@ footer p { margin: 0; }
   .button { width: 100%; }
   .screenshot-grid { grid-template-columns: 1fr; gap: 22px; }
   .screenshot-grid figure { width: min(100%, 280px); margin-inline: auto; }
-  .screenshot-grid figure:nth-child(2) { transform: none; }
   .feature-list li { grid-template-columns: 42px 1fr; }
   .feature-list p { grid-column: 2; }
 }
