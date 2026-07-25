@@ -140,9 +140,11 @@ struct NewExpeditionView: View {
   /// Телефонная композиция: название в верхней безопасной зоне, планета по
   /// центру экрана, а кнопка ниже неё с исходной пропорцией фоновой картинки.
   private func phoneExpeditionControls(in size: CGSize) -> some View {
-    let availableWidth = max(size.width - 36, 0)
+    let screenWidth = validDimension(size.width)
+    let screenHeight = validDimension(size.height)
+    let availableWidth = max(screenWidth - 36, 0)
     let planetSize = min(availableWidth, 350)
-    let planetTopOffset = max(142, size.height / 2 - planetSize / 2)
+    let planetTopOffset = max(142, screenHeight / 2 - planetSize / 2)
 
     return ZStack(alignment: .top) {
       VStack(spacing: 0) {
@@ -175,10 +177,12 @@ struct NewExpeditionView: View {
   }
 
   private func landingSiteTitleFrame(width: CGFloat = 350) -> some View {
-    Image(selectedGameFieldFrameName)
+    let safeWidth = validDimension(width)
+
+    return Image(selectedGameFieldFrameName)
       .resizable()
       .scaledToFill()
-      .frame(width: width, height: 72)
+      .frame(width: safeWidth, height: 72)
       .clipped()
       .overlay {
         VStack(spacing: 1) {
@@ -195,19 +199,21 @@ struct NewExpeditionView: View {
             .minimumScaleFactor(0.55)
         }
         .foregroundStyle(.black)
-        .frame(width: max(width - 108, 0), height: 58, alignment: .center)
+        .frame(width: max(safeWidth - 108, 0), height: 58, alignment: .center)
       }
       .accessibilityHidden(true)
   }
 
   private func landingSiteSelector(size: CGFloat = 330) -> some View {
-    ZStack {
+    let safeSize = validDimension(size)
+
+    return ZStack {
       Image(selectedGameField.imageName)
         .resizable()
         .scaledToFill()
     }
     .clipShape(Circle())
-    .frame(width: size, height: size)
+    .frame(width: safeSize, height: safeSize)
     .overlay(alignment: .bottom) {
       if gameFields.count > 1 && !hasSeenLandingSiteSwipeHint {
         Label("Листайте, чтобы выбрать место высадки", systemImage: "hand.draw.fill")
@@ -239,6 +245,12 @@ struct NewExpeditionView: View {
       }
     )
     .accessibilityIdentifier("landing-site-selector")
+  }
+
+  /// GeometryReader может кратковременно передавать нечисловой размер во время
+  /// перестройки представления. SwiftUI не принимает такой размер для frame.
+  private func validDimension(_ value: CGFloat) -> CGFloat {
+    value.isFinite ? max(value, 0) : 0
   }
 
   private func selectGameField(_ field: GameField) {

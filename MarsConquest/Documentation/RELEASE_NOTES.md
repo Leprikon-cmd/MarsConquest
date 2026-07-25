@@ -1,5 +1,49 @@
 # Release Notes
 
+## Mars LogBook 1.4 (6) - TestFlight
+
+Дата: 25 июля 2026
+
+Статус: подготовлено к архивации и загрузке в TestFlight.
+
+### Что изменилось
+
+- Обновлён визуальный стиль бортового журнала, новой экспедиции, состава игроков и экрана подсчёта очков.
+- Добавлены новые изображения игровых полей, фоны экспедиций, навигационные кнопки и цветные кубы игроков.
+- Улучшены выбор и редактирование игрока, цвета, корпорации и прологов.
+- Добавлено сохранение итоговой шкалы терраформирования Венеры от 0% до 30% с шагом 2%.
+- Итоговые поколение и шкала Венеры теперь запрашиваются перед внесением завершённой партии в журнал.
+- Улучшены отображение сохранённых партий, статистика и работа интерфейса на разных размерах iPhone.
+- Исправлено распознавание исторических названий игровых полей и защита интерфейса от некорректных размеров при перестроении экрана.
+
+## TestFlight 1.4: What to Test
+
+### English
+
+1. Create a new expedition and verify the updated landing-site selector, backgrounds, navigation buttons, and player controls.
+2. Add and edit players. Verify names, colors, avatars, corporations, and preludes.
+3. Complete and save games on Tharsis, Hellas, and Elysium. Confirm that the correct board image and name are displayed throughout the app.
+4. Enable Venus Next and complete a game. Verify that the app requires a Venus terraforming value from 0% to 30% in 2% increments before the game can be saved.
+5. Verify that the selected generation and Venus terraforming value are preserved in the saved game details.
+6. Open previously saved games and confirm that scores, players, boards, expansions, awards, achievements, and statistics remain correct.
+7. Check the main screens on different iPhone sizes. Report clipped content, overlapping controls, invalid layouts, or navigation problems.
+8. Test the app in Russian and English. Report untranslated, mixed-language, truncated, or incorrectly formatted text.
+
+Please report any crashes, incorrect calculations, missing data, migration failures, localization issues, or visual defects.
+
+### Русский перевод
+
+1. Создайте новую экспедицию и проверьте обновлённый выбор места высадки, фоны, навигационные кнопки и элементы управления игроками.
+2. Добавьте и отредактируйте игроков. Проверьте имена, цвета, аватары, корпорации и прологи.
+3. Завершите и сохраните партии на Тарсисе, Элладе и Элизии. Убедитесь, что во всех разделах приложения отображаются правильные изображение и название поля.
+4. Включите дополнение «Венера» и завершите партию. Убедитесь, что перед сохранением приложение требует выбрать шкалу терраформирования Венеры от 0% до 30% с шагом 2%.
+5. Проверьте, что выбранные поколение и шкала Венеры сохраняются и отображаются в подробностях партии.
+6. Откройте ранее сохранённые партии и убедитесь, что очки, игроки, поля, дополнения, награды, достижения и статистика остались правильными.
+7. Проверьте основные экраны на iPhone разных размеров. Сообщайте об обрезанном содержимом, наложении элементов, неправильной компоновке и проблемах навигации.
+8. Проверьте приложение на русском и английском языках. Сообщайте о непереведённом, смешанном, обрезанном или неправильно оформленном тексте.
+
+Просьба сообщать о сбоях, неправильных расчётах, пропавших данных, ошибках миграции, проблемах локализации и визуальных дефектах.
+
 ## Mars LogBook 1.3 (5) - TestFlight
 
 Дата: 22 июля 2026

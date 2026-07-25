@@ -6,7 +6,7 @@ private struct GameFieldButtonStyle: ViewModifier {
     let fontSize: CGFloat
 
     private var imageName: String {
-        switch GameField(rawValue: gameField ?? "") {
+        switch GameField.resolve(persistedName: gameField, referenceID: nil) {
         case .hellas:
             return "button-for-hellas"
         case .elysium:
@@ -36,7 +36,7 @@ private struct CompactGameFieldButtonStyle: ViewModifier {
     let fontSize: CGFloat
 
     private var imageName: String {
-        switch GameField(rawValue: gameField ?? "") {
+        switch GameField.resolve(persistedName: gameField, referenceID: nil) {
         case .hellas:
             return "compact-button-hellas"
         case .elysium:
