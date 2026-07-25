@@ -3,6 +3,7 @@ import SwiftUI
 /// Оформляет действие фоном выбранного игрового поля.
 private struct GameFieldButtonStyle: ViewModifier {
     let gameField: String?
+    let fontSize: CGFloat
 
     private var imageName: String {
         switch GameField(rawValue: gameField ?? "") {
@@ -17,7 +18,7 @@ private struct GameFieldButtonStyle: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .font(.custom("Play", size: 20))
+            .font(AppFont.fixed(fontSize))
             .foregroundStyle(.black)
             .background {
                 Image(imageName)
@@ -29,9 +30,51 @@ private struct GameFieldButtonStyle: ViewModifier {
     }
 }
 
+/// Компактная версия для двух соседних кнопок: показывает рамку целиком без обрезки.
+private struct CompactGameFieldButtonStyle: ViewModifier {
+    let gameField: String?
+    let fontSize: CGFloat
+
+    private var imageName: String {
+        switch GameField(rawValue: gameField ?? "") {
+        case .hellas:
+            return "compact-button-hellas"
+        case .elysium:
+            return "compact-button-elysium"
+        case .farsida, .none:
+            return "compact-button-farsida"
+        }
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .font(AppFont.fixed(fontSize))
+            .foregroundStyle(.black)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFit()
+            }
+            .contentShape(RoundedRectangle(cornerRadius: 8))
+    }
+}
+
 extension View {
     /// Применяет единый стиль кнопок, зависящий от игрового поля.
-    func gameFieldButtonStyle(for gameField: String?) -> some View {
-        modifier(GameFieldButtonStyle(gameField: gameField))
+    func gameFieldButtonStyle(
+        for gameField: String?,
+        fontSize: CGFloat = 20
+    ) -> some View {
+        modifier(GameFieldButtonStyle(gameField: gameField, fontSize: fontSize))
+    }
+
+    /// Применяет фон, подготовленный для двух кнопок в одной строке.
+    func compactGameFieldButtonStyle(
+        for gameField: String?,
+        fontSize: CGFloat = 20
+    ) -> some View {
+        modifier(CompactGameFieldButtonStyle(gameField: gameField, fontSize: fontSize))
     }
 }

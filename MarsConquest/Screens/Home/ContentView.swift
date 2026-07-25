@@ -1,5 +1,6 @@
 import CoreData
 import SwiftUI
+import UIKit
 
 /// Главный экран личного журнала владельца.
 struct ContentView: View {
@@ -12,41 +13,119 @@ struct ContentView: View {
     sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
   ) private var games: FetchedResults<Game>
 
-  private var hasRegalia: Bool {
+  @State private var selectedSection: JournalSection = .journal
+
+  var body: some View {
+    ZStack {
+      switch selectedSection {
+      case .journal:
+        OwnerDashboardView(ownerProfile: ownerProfile)
+      case .newGame:
+        NewExpeditionView()
+      case .regalia:
+        RegaliaView(ownerProfile: ownerProfile)
+      case .statistics:
+        StatisticsScreen()
+      case .settings:
+        SettingsScreen(ownerProfile: ownerProfile)
+      }
+    }
+    .safeAreaInset(edge: .bottom, spacing: 0) {
+      journalNavigation
+    }
+    .onAppear {
+      generateInitialGameData(in: viewContext)
+    }
+  }
+
+  private var journalNavigation: some View {
+    HStack(spacing: 8) {
+      navigationButton(
+        title: "Бортовой журнал",
+        imageName: "journal",
+        section: .journal
+      )
+
+      newExpeditionButton
+
+      navigationButton(title: "Статистика", imageName: "statistics", section: .statistics)
+
+      if hasVisibleRegalia {
+        navigationButton(title: "Регалии", imageName: "achievements", section: .regalia)
+      }
+      navigationButton(title: "Настройки", imageName: "settings", section: .settings)
+    }
+    .padding(8)
+    .background(.ultraThinMaterial, in: Capsule(style: .continuous))
+    .overlay {
+      Capsule(style: .continuous)
+        .strokeBorder(.white.opacity(0.32), lineWidth: 1)
+    }
+    .shadow(color: .black.opacity(0.28), radius: 18, y: 8)
+    .padding(.horizontal, 14)
+    .padding(.bottom, 6)
+    .accessibilityIdentifier("root-navigation")
+  }
+
+  private var hasVisibleRegalia: Bool {
     guard let ownerID = ownerProfile.savedPlayerID else { return false }
     let ownerGames = games.filter { game in
       let players = game.players?.allObjects as? [Player] ?? []
       return players.contains { $0.savedPlayerID == ownerID || $0.id == ownerID }
     }
-    return !CareerProgressCalculator().regalia(ownerID: ownerID, from: ownerGames).isEmpty
+    let calculator = CareerProgressCalculator()
+    let progress = calculator.calculate(ownerID: ownerID, from: ownerGames)
+    return calculator.hasVisibleRegalia(for: progress)
+      || !calculator.professionalTitles(ownerID: ownerID, from: ownerGames).isEmpty
   }
 
-  var body: some View {
-    TabView {
-      OwnerDashboardView(ownerProfile: ownerProfile)
-        .tabItem {
-          Label("Бортовой журнал", systemImage: "person.text.rectangle.fill")
-        }
-
-      if hasRegalia {
-        RegaliaView(ownerProfile: ownerProfile)
-          .tabItem {
-            Label("Регалии", systemImage: "medal.star.fill")
-          }
-      }
-
-      NavigationStack {
-        SettingsScreen()
-      }
-      .tabItem {
-        Label("Настройки", systemImage: "gearshape.fill")
-      }
+  private func navigationButton(
+    title: String,
+    imageName: String,
+    section: JournalSection
+  ) -> some View {
+    Button {
+      selectedSection = section
+    } label: {
+      Image(imageName)
+        .resizable()
+        .scaledToFit()
+        .frame(width: 42, height: 42)
+        .frame(maxWidth: .infinity, minHeight: 42)
+        .opacity(selectedSection == section ? 1 : 0.72)
+        .background(selectedSection == section ? .white.opacity(0.16) : .clear)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
-    .tabViewStyle(.tabBarOnly)
-    .onAppear {
-      generateInitialGameData(in: viewContext)
-    }
+    .buttonStyle(.plain)
+    .accessibilityLabel(title)
+    .accessibilityIdentifier("root-navigation-\(section.rawValue)")
   }
+
+  private var newExpeditionButton: some View {
+    Button {
+      selectedSection = .newGame
+    } label: {
+      Image("new-game")
+        .resizable()
+        .scaledToFit()
+        .frame(width: 42, height: 42)
+        .frame(maxWidth: .infinity, minHeight: 42)
+        .opacity(selectedSection == .newGame ? 1 : 0.72)
+        .background(selectedSection == .newGame ? .white.opacity(0.16) : .clear)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+    .buttonStyle(.plain)
+    .accessibilityLabel("Новая игра")
+    .accessibilityIdentifier("root-navigation-new-game")
+  }
+}
+
+private enum JournalSection: String {
+  case journal
+  case newGame
+  case regalia
+  case statistics
+  case settings
 }
 
 private struct OwnerDashboardView: View {
@@ -59,7 +138,9 @@ private struct OwnerDashboardView: View {
     sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
   ) private var games: FetchedResults<Game>
 
-  @State private var showNewExpedition = false
+  private var journalNavigationClearance: CGFloat {
+    UIDevice.current.userInterfaceIdiom == .phone ? 84 : 0
+  }
 
 private func isOwner(_ player: Player) -> Bool {
   guard let ownerID = ownerProfile.savedPlayerID else { return false }
@@ -92,16 +173,6 @@ private var careerLevel: Int {
   return calculator.level(for: calculator.calculate(ownerID: ownerID, from: ownerGames))
 }
 
-  private var hasHistoricalParticipationsToReview: Bool {
-    guard let ownerID = ownerProfile.savedPlayerID else { return false }
-
-    return games.contains { game in
-      let players = game.players?.allObjects as? [Player] ?? []
-      return players.contains {
-        ($0.savedPlayerID == nil || $0.savedPlayerID == ownerID) && $0.id != ownerID
-      }
-    }
-  }
   var body: some View {
     NavigationStack {
       ZStack {
@@ -133,7 +204,7 @@ OwnerProfileBadgeView(
 
             if ownerGames.isEmpty {
               Text("Новые партии, где вы участвуете, появятся здесь после сохранения результата.")
-                .font(.footnote)
+                .font(AppFont.font(.footnote))
                 .foregroundStyle(.white.opacity(0.78))
                 .padding(.vertical, 4)
             } else if let ownerID = ownerProfile.savedPlayerID {
@@ -143,47 +214,17 @@ OwnerProfileBadgeView(
               )
             }
 
-            Button {
-              showNewExpedition = true
-            } label: {
-              Label("Новая экспедиция", systemImage: "rocket.fill")
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 15)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.orange)
-
-            NavigationLink {
-              StatisticsScreen()
-            } label: {
-              Label("Открыть общую статистику", systemImage: "chart.bar.xaxis")
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 13)
-            }
-            .buttonStyle(.bordered)
-            .tint(.white)
-
-            if hasHistoricalParticipationsToReview {
-              NavigationLink {
-                HistoricalParticipationLinkView(ownerProfile: ownerProfile)
-              } label: {
-                Label("Проверить прошлые партии", systemImage: "person.text.rectangle")
-                  .frame(maxWidth: .infinity)
-                  .padding(.vertical, 13)
-              }
-              .buttonStyle(.bordered)
-              .tint(.white)
-            }
           }
-          .padding()
+          .padding(.horizontal)
+          // Нижняя навигация накладывается поверх корневого экрана. На iPhone
+          // оставляем запас, чтобы последние действия журнала можно было
+          // полностью прокрутить выше неё.
+          .padding(.bottom, 16 + journalNavigationClearance)
+          .padding(.top, 56)
+          .adaptiveContentWidth(560)
         }
+        .accessibilityIdentifier("owner-dashboard")
       }
-      .navigationTitle("Бортовой журнал")
-      .navigationBarTitleDisplayMode(.inline)
-    }
-    .fullScreenCover(isPresented: $showNewExpedition) {
-      NewExpeditionView()
     }
   }
 }

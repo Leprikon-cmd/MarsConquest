@@ -28,7 +28,8 @@ struct GameSaver {
         game.date = localGame.date
         game.gameField = localGame.gameField
         game.gameFieldID = GameData.gameFieldID(named: localGame.gameField)
-        game.generation = Int32(localGame.generation)
+        game.generation = Int32(localGame.generation ?? 0)
+        game.venusTerraformingScale = Int32(localGame.venusTerraformingScale ?? 0)
         
         // Допы
         game.hasPrelude = localGame.expansions.hasPrelude

@@ -11,7 +11,7 @@ struct RecentExpeditionsView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 10) {
       Text(isEnglish ? "Recent expeditions" : "Последние экспедиции")
-        .font(.title3.weight(.bold))
+        .font(AppFont.font(.title3))
         .foregroundStyle(.white)
 
       ForEach(games, id: \.objectID) { game in
@@ -33,13 +33,13 @@ struct RecentExpeditionsView: View {
     return VStack(alignment: .leading, spacing: 6) {
       HStack(alignment: .firstTextBaseline) {
         Text(StatisticsCalculator.formattedDate(game.date, locale: locale))
-          .font(.headline)
+          .font(AppFont.font(.headline))
 
         Spacer()
 
         if let place, let score {
           Text("\(placeTitle(place)) · \(score) \(pointsLabel)")
-            .font(.subheadline.weight(.semibold))
+            .font(AppFont.font(.subheadline))
         }
       }
 
@@ -48,7 +48,7 @@ struct RecentExpeditionsView: View {
         referenceID: game.gameFieldID,
         locale: locale
       ))
-      .font(.subheadline)
+      .font(AppFont.font(.subheadline))
       .foregroundStyle(.secondary)
 
       HStack(spacing: 6) {
@@ -56,7 +56,7 @@ struct RecentExpeditionsView: View {
         Spacer()
         Text(participantsText(for: game))
       }
-      .font(.footnote)
+      .font(AppFont.font(.footnote))
       .foregroundStyle(.secondary)
     }
     .padding(12)

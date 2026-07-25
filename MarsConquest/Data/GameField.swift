@@ -24,9 +24,9 @@ enum GameField: String, CaseIterable {
 
     var imageName: String {
         switch self {
-        case .farsida: return "farsida"
-        case .hellas: return "ellada"
-        case .elysium: return "elizium"
+        case .farsida: return "field-tharsis"
+        case .hellas: return "field-hellas"
+        case .elysium: return "field-elysium"
         }
     }
 
@@ -44,6 +44,20 @@ enum GameField: String, CaseIterable {
             return "Hellas"
         case .elysium:
             return "Elysium"
+        }
+    }
+
+    /// Короткое географическое описание для рамки выбора места высадки.
+    func localizedSubtitle(for locale: Locale) -> String {
+        let isEnglish = locale.identifier.lowercased().hasPrefix("en")
+
+        switch self {
+        case .farsida:
+            return isEnglish ? "VOLCANIC PLATEAU" : "ВУЛКАНИЧЕСКОЕ НАГОРЬЕ"
+        case .hellas:
+            return isEnglish ? "SOUTHERN HEMISPHERE" : "ЮЖНОЕ ПОЛУШАРИЕ"
+        case .elysium:
+            return isEnglish ? "THE OTHER SIDE OF MARS" : "ОБРАТНАЯ СТОРОНА МАРСА"
         }
     }
 

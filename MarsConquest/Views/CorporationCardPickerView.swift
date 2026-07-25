@@ -35,7 +35,7 @@ struct CorporationCardPickerView: View {
                                     .overlay(alignment: .topTrailing) {
                                         if corporation == selection {
                                             Image(systemName: "checkmark.circle.fill")
-                                                .font(.title2)
+                                                .font(AppFont.font(.title2))
                                                 .foregroundStyle(.white, Color.accentColor)
                                                 .padding(10)
                                         }
@@ -82,7 +82,7 @@ struct CorporationCardImage: View {
             } else {
                 VStack(spacing: 8) {
                     Image(systemName: "photo")
-                        .font(.title2)
+                        .font(AppFont.font(.title2))
                     Text(corporationName)
                         .multilineTextAlignment(.center)
                 }

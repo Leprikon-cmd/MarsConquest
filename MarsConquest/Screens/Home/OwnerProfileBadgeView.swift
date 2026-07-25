@@ -36,7 +36,7 @@ struct OwnerProfileBadgeView: View {
 
       VStack(spacing: 9) {
         Text(ceoDossierTitle)
-          .font(.caption2.weight(.black))
+          .font(AppFont.font(.caption2))
           .tracking(1.5)
           .foregroundStyle(.black.opacity(0.58))
           .frame(maxWidth: .infinity, alignment: .leading)
@@ -93,7 +93,7 @@ struct OwnerProfileBadgeView: View {
 
         VStack(alignment: .leading, spacing: 10) {
           Text(preferencesTitle)
-            .font(.caption2.weight(.bold))
+            .font(AppFont.font(.caption2))
             .tracking(1.1)
             .foregroundStyle(primaryColor.opacity(0.62))
 
@@ -138,7 +138,7 @@ struct OwnerProfileBadgeView: View {
         .frame(height: 1)
 
       Text(corporateDemandPhrase)
-        .font(.caption.italic())
+        .font(AppFont.font(.caption))
         .foregroundStyle(.black.opacity(0.68))
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
@@ -213,7 +213,7 @@ struct OwnerProfileBadgeView: View {
   private var cardTitleBand: some View {
     VStack(spacing: 2) {
       Text(nickname.uppercased(with: locale))
-        .font(.custom("Play-Bold", size: 22))
+        .font(AppFont.fixed(22))
         .lineLimit(1)
         .minimumScaleFactor(0.72)
       HStack(spacing: 6) {
@@ -224,7 +224,7 @@ struct OwnerProfileBadgeView: View {
             .lineLimit(1)
         }
       }
-      .font(.custom("Play-Bold", size: 11))
+      .font(AppFont.fixed(11))
       .tracking(0.7)
       .foregroundStyle(.white.opacity(0.7))
     }
@@ -259,7 +259,7 @@ struct OwnerProfileBadgeView: View {
   private var technicalRail: some View {
     HStack(spacing: 8) {
       Text("CEO // ID 01")
-        .font(.system(size: 8, weight: .black, design: .monospaced))
+        .font(AppFont.fixed(8))
         .tracking(0.8)
       Spacer()
       ForEach(0..<7, id: \.self) { index in
@@ -279,7 +279,7 @@ struct OwnerProfileBadgeView: View {
         .scaledToFit()
 
       Text("\(careerLevel)")
-        .font(.system(size: 29, weight: .black, design: .rounded))
+        .font(AppFont.fixed(29))
         .monospacedDigit()
         .foregroundStyle(.black.opacity(0.9))
         .shadow(color: .white.opacity(0.7), radius: 0.5, y: -0.5)
@@ -304,7 +304,7 @@ struct OwnerProfileBadgeView: View {
         }
         .overlay(alignment: .bottomTrailing) {
           Image(systemName: "camera.fill")
-            .font(.system(size: 11, weight: .bold))
+            .font(AppFont.fixed(11))
             .foregroundStyle(.black.opacity(0.88))
             .padding(8)
             .background(
@@ -343,10 +343,10 @@ struct OwnerProfileBadgeView: View {
   private func metric(value: String, title: String) -> some View {
     VStack(alignment: .leading, spacing: 2) {
       Text(value)
-        .font(.headline.weight(.bold))
+        .font(AppFont.font(.headline))
         .foregroundStyle(primaryColor)
       Text(title)
-        .font(.system(size: 9, weight: .bold))
+        .font(AppFont.fixed(9))
         .foregroundStyle(primaryColor.opacity(0.62))
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -464,19 +464,19 @@ struct OwnerProfileBadgeView: View {
   ) -> some View {
     HStack(alignment: .top, spacing: 10) {
       Image(systemName: icon)
-        .font(.subheadline.weight(.semibold))
+        .font(AppFont.font(.subheadline))
         .frame(width: 20)
         .foregroundStyle(primaryColor.opacity(0.72))
 
       VStack(alignment: .leading, spacing: 2) {
         Text(title)
-          .font(.caption2.weight(.bold))
+          .font(AppFont.font(.caption2))
           .foregroundStyle(primaryColor.opacity(0.62))
         Text(value)
-          .font(.subheadline.weight(.semibold))
+          .font(AppFont.font(.subheadline))
           .foregroundStyle(primaryColor)
         Text(detail)
-          .font(.caption)
+          .font(AppFont.font(.caption))
           .foregroundStyle(primaryColor.opacity(0.72))
       }
     }

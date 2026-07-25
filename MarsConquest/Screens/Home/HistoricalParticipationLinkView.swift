@@ -128,10 +128,10 @@ struct HistoricalParticipationLinkView: View {
     HStack(spacing: 12) {
       Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
         .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
-        .font(.title3)
+        .font(AppFont.font(.title3))
 
       Text(name.displayName)
-        .font(.body.weight(.semibold))
+        .font(AppFont.font(.body))
 
       Spacer()
     }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreData
+import UIKit
 
 struct StatisticsGamesView: View {
     let games: [Game]
@@ -56,6 +57,11 @@ struct StatisticsGamesView: View {
                 }
             }
         }
+        .safeAreaPadding(.bottom, journalNavigationClearance)
+    }
+
+    private var journalNavigationClearance: CGFloat {
+        UIDevice.current.userInterfaceIdiom == .phone ? 84 : 0
     }
 
     private func gameRow(index: Int, game: Game) -> some View {
@@ -67,7 +73,7 @@ struct StatisticsGamesView: View {
 
         return VStack(alignment: .leading) {
             Text(isEnglish ? "Game #\(index + 1)" : "Игра №\(index + 1)")
-                .font(.headline)
+                .font(AppFont.font(.headline))
 
             Text("Поле: \(localizedGameField)")
             Text("Дата: \(StatisticsCalculator.formattedDate(game.date, locale: locale))")
@@ -75,13 +81,13 @@ struct StatisticsGamesView: View {
             let colonies = colonyNames(for: game)
             if !colonies.isEmpty {
                 Text("Колонии: \(colonies.joined(separator: ", "))")
-                    .font(.subheadline)
+                    .font(AppFont.font(.subheadline))
                     .foregroundColor(.secondary)
             }
 
             if let winner = StatisticsCalculator.winner(of: game, locale: locale) {
                 Text("Победитель: \(winner.name) — \(winner.score)")
-                    .font(.subheadline)
+                    .font(AppFont.font(.subheadline))
                     .foregroundColor(.green)
             }
         }

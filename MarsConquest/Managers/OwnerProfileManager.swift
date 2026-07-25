@@ -1,5 +1,6 @@
 import CoreData
 import Foundation
+import UIKit
 
 struct OwnerCollectionSettings {
   var hasBaseGame: Bool
@@ -60,11 +61,18 @@ struct OwnerProfileManager {
     let preludeChoices = TestModeSettings.isEnabled && expansions.hasPrelude
       ? Array(GameData.prologues.prefix(2))
       : []
+    let avatarStyle = UserDefaults.standard.string(forKey: OwnerAvatarStyle.storageKey)
+      ?? OwnerAvatarStyle.commander.rawValue
+    let avatarImageData = avatarStyle == OwnerAvatarStyle.selfie.rawValue
+      ? OwnerSelfieStore.load()?.jpegData(compressionQuality: 0.9)
+      : nil
 
     return LocalPlayer(
       id: ownerID,
       name: name,
       color: color,
+      avatarStyle: avatarStyle,
+      avatarImageData: avatarImageData,
       corporation: TestModeSettings.isEnabled ? GameData.beginnerCorporation : "",
       prologue1: preludeChoices.first ?? "",
       prologue2: preludeChoices.dropFirst().first ?? "",

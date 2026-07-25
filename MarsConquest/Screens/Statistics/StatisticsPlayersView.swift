@@ -6,6 +6,7 @@
 //
 import SwiftUI
 import CoreData
+import UIKit
 
 struct StatisticsPlayersView: View {
     @Environment(\.locale) private var locale
@@ -24,13 +25,13 @@ struct StatisticsPlayersView: View {
                     ForEach(stats) { player in
                         VStack(alignment: .leading, spacing: 4) {
                             Text(player.name)
-                                .font(.headline)
+                                .font(AppFont.font(.headline))
 
                             Text("Игр: \(player.games) • Побед: \(player.wins)")
-                                .font(.subheadline)
+                                .font(AppFont.font(.subheadline))
 
                             Text("Средний счёт: \(player.averageScore.formatted(.number.precision(.fractionLength(1)))) • Лучший: \(player.bestScore)")
-                                .font(.caption)
+                                .font(AppFont.font(.caption))
                                 .foregroundColor(.secondary)
                         }
                         .padding(.vertical, 4)
@@ -38,5 +39,10 @@ struct StatisticsPlayersView: View {
                 }
             }
         }
+        .safeAreaPadding(.bottom, journalNavigationClearance)
+    }
+
+    private var journalNavigationClearance: CGFloat {
+        UIDevice.current.userInterfaceIdiom == .phone ? 84 : 0
     }
 }

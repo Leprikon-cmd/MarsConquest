@@ -35,7 +35,7 @@ struct ColonyCardPickerView: View {
                 .overlay(alignment: .topTrailing) {
                   if isSelected(colony) {
                     Image(systemName: "checkmark.circle.fill")
-                      .font(.title2)
+                      .font(AppFont.font(.title2))
                       .foregroundStyle(.white, Color.accentColor)
                       .padding(10)
                   }
@@ -96,7 +96,7 @@ private struct ColonyCardImage: View {
       } else {
         VStack(spacing: 8) {
           Image(systemName: "globe.americas.fill")
-            .font(.title2)
+            .font(AppFont.font(.title2))
           Text(colonyName)
             .multilineTextAlignment(.center)
         }

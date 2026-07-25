@@ -6,6 +6,7 @@
 //
 import SwiftUI
 import CoreData
+import UIKit
 
 struct StatisticsProloguesView: View {
     @Environment(\.locale) private var locale
@@ -24,13 +25,13 @@ struct StatisticsProloguesView: View {
                     ForEach(stats) { prologue in
                         VStack(alignment: .leading, spacing: 4) {
                             Text(localizedPreludeName(prologue.name))
-                                .font(.headline)
+                                .font(AppFont.font(.headline))
 
                             Text("Игр: \(prologue.games) • Побед: \(prologue.wins)")
-                                .font(.subheadline)
+                                .font(AppFont.font(.subheadline))
 
                             Text("Средний счёт: \(prologue.averageScore.formatted(.number.precision(.fractionLength(1)))) • Лучший: \(prologue.bestScore)")
-                                .font(.caption)
+                                .font(AppFont.font(.caption))
                                 .foregroundColor(.secondary)
                         }
                         .padding(.vertical, 4)
@@ -38,6 +39,11 @@ struct StatisticsProloguesView: View {
                 }
             }
         }
+        .safeAreaPadding(.bottom, journalNavigationClearance)
+    }
+
+    private var journalNavigationClearance: CGFloat {
+        UIDevice.current.userInterfaceIdiom == .phone ? 84 : 0
     }
 
     private func localizedPreludeName(_ name: String) -> String {

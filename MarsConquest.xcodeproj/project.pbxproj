@@ -38,17 +38,29 @@
 		777EC527300E3E1800BBC364 /* Exceptions for "MarsConquest" folder in "MarsConquest" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Documentation/APP_PERSONALITY.md,
 				Info.plist,
 			);
 			target = 27F94A3F2D7A0DCD0089E4A4 /* MarsConquest */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		772E0CA23013BCC600C0D69E /* Exceptions for "MarsConquest" folder in "Compile Sources" phase from "MarsConquest" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 27F94A3C2D7A0DCD0089E4A4 /* Sources */;
+			membershipExceptions = (
+				Documentation/APP_PERSONALITY.md,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		27F94A422D7A0DCD0089E4A4 /* MarsConquest */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				777EC527300E3E1800BBC364 /* Exceptions for "MarsConquest" folder in "MarsConquest" target */,
+				772E0CA23013BCC600C0D69E /* Exceptions for "MarsConquest" folder in "Compile Sources" phase from "MarsConquest" target */,
 			);
 			path = MarsConquest;
 			sourceTree = "<group>";
@@ -428,7 +440,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -461,7 +473,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -14,14 +14,17 @@ struct AddPlayersView: View {
   /// Локальная модель текущей создаваемой игры.
   @Binding var localGame: LocalGameData
 
-  /// Выбранный фон команды. Новый создаётся при каждом новом входе в настройку партии.
-  @State private var backgroundImageName = "bg_Mars\(Int.random(in: 1...11))"
-
   /// Показывает форму добавления нового игрока.
   @State private var showAddPlayer = false
 
   /// Игрок, которого пользователь открыл для редактирования.
   @State private var playerToEdit: LocalPlayer?
+  @State private var showPlayerEditor = false
+
+  /// В сценарии новой экспедиции сразу открываем карточку первого игрока.
+  let opensFirstPlayerOnAppear: Bool
+
+  @State private var didPresentInitialPlayer = false
 
   /// Показывает настройки дополнений для текущей незавершённой партии.
   @State private var showSettings = false
@@ -46,7 +49,7 @@ struct AddPlayersView: View {
   var body: some View {
     NavigationStack {
       ZStack {
-        Image(backgroundImageName)
+        Image(localGame.backgroundImageName)
           .resizable()
           .scaledToFill()
           .ignoresSafeArea()
@@ -54,25 +57,26 @@ struct AddPlayersView: View {
         VStack(spacing: 0) {
           addPlayerButton
           playersListView
+            .frame(maxHeight: .infinity)
+          bottomControls
+            .padding(.top, 10)
+            .padding(.bottom, 12)
         }
         .frame(maxWidth: teamContentMaxWidth)
-        .frame(maxWidth: .infinity)
-
-        VStack {
-          Spacer()
-          bottomControls
-        }
-        .padding(.bottom, 12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
+      .accessibilityIdentifier("expedition-team-screen")
       .navigationTitle("Команда экспедиции")
       .navigationBarTitleDisplayMode(.inline)
+      .toolbarBackground(.visible, for: .navigationBar)
+      .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
       .toolbar {
         ToolbarItem(placement: .topBarLeading) {
           Button {
             discardGame()
           } label: {
             Image(systemName: "xmark")
-              .font(.body.weight(.semibold))
+              .font(AppFont.font(.body))
               .frame(width: 36, height: 36)
               .background(.ultraThinMaterial, in: Circle())
           }
@@ -84,30 +88,31 @@ struct AddPlayersView: View {
             showSettings = true
           } label: {
             Image(systemName: "gearshape.fill")
-              .font(.body.weight(.semibold))
+              .font(AppFont.font(.body))
               .frame(width: 36, height: 36)
               .background(.ultraThinMaterial, in: Circle())
           }
           .accessibilityLabel("Настройки дополнений")
         }
       }
-      .sheet(isPresented: $showAddPlayer) {
+      .navigationDestination(isPresented: $showAddPlayer) {
         AddPlayerScreen(
           availableColors: availableColors,
           localGame: $localGame,
           editingPlayer: nil
         )
-        .presentationDetents([.large])
-        .presentationDragIndicator(.visible)
       }
-      .sheet(item: $playerToEdit) { player in
-        AddPlayerScreen(
-          availableColors: availableColors(for: player),
-          localGame: $localGame,
-          editingPlayer: player
-        )
-        .presentationDetents([.large])
-        .presentationDragIndicator(.visible)
+      .navigationDestination(isPresented: $showPlayerEditor) {
+        if let player = playerToEdit {
+          AddPlayerScreen(
+            availableColors: availableColors(for: player),
+            localGame: $localGame,
+            editingPlayer: player
+          )
+          .onDisappear {
+            playerToEdit = nil
+          }
+        }
       }
       .sheet(isPresented: $showSettings) {
         SettingsScreen { updatedExpansions in
@@ -156,10 +161,21 @@ struct AddPlayersView: View {
       .navigationDestination(isPresented: $navigateToScoreScreen) {
         ScoreScreen(localGame: $localGame)
       }
+      // `AddPlayersView` появляется внутри fullScreenCover. Открываем карточку
+      // после завершения анимации этого перехода — иначе iOS игнорирует второй
+      // запрос на модальное представление.
+      .task(id: opensFirstPlayerOnAppear) {
+        guard opensFirstPlayerOnAppear else { return }
+
+        try? await Task.sleep(for: .milliseconds(500))
+        guard !Task.isCancelled else { return }
+        presentInitialPlayerIfNeeded()
+      }
       .onChange(of: localGame.players.count) { _, _ in
         localGame.colonies = Array(localGame.colonies.prefix(colonyLimit))
       }
     }
+    .ignoresSafeArea(.keyboard)
   }
 
   private var addPlayerButton: some View {
@@ -179,11 +195,12 @@ struct AddPlayersView: View {
     .padding(.bottom, 8)
     .accessibilityHint(
       availableColors.isEmpty ? "Свободных цветов не осталось" : "Открыть форму нового игрока")
+    .accessibilityIdentifier("add-player-button")
   }
 
-  /// На iPad навигационная панель выше, поэтому кнопке нужен дополнительный зазор.
+  /// Навигационная панель занимает собственную безопасную зону на всех устройствах.
   private var addPlayerTopPadding: CGFloat {
-    horizontalSizeClass == .regular ? 80 : 25
+    25
   }
 
   /// Не растягиваем список команды на всю ширину планшета.
@@ -196,6 +213,7 @@ struct AddPlayersView: View {
       ForEach(localGame.players) { player in
         Button {
           playerToEdit = player
+          showPlayerEditor = true
         } label: {
           playerRowView(player: player)
         }
@@ -208,7 +226,6 @@ struct AddPlayersView: View {
     }
     .listStyle(.plain)
     .scrollContentBackground(.hidden)
-    .contentMargins(.bottom, bottomControlsHeight, for: .scrollContent)
   }
 
   private var bottomControls: some View {
@@ -220,11 +237,6 @@ struct AddPlayersView: View {
       startGameButton
     }
     .padding(.horizontal, 20)
-  }
-
-  /// Высота нижнего слоя: список прокручивается выше кнопок, но экран не сжимается.
-  private var bottomControlsHeight: CGFloat {
-    localGame.expansions.hasColonies ? 126 : 64
   }
 
   private var startGameButton: some View {
@@ -240,6 +252,7 @@ struct AddPlayersView: View {
     .contentShape(RoundedRectangle(cornerRadius: 8))
     .disabled(localGame.players.isEmpty)
     .opacity(localGame.players.isEmpty ? 0.55 : 1)
+    .accessibilityIdentifier("start-game-button")
   }
 
   private var colonyLimit: Int {
@@ -292,15 +305,12 @@ struct AddPlayersView: View {
 
   private func playerRowView(player: LocalPlayer) -> some View {
     HStack(spacing: 10) {
-      Image(systemName: "cube.fill")
-        .font(.title2)
-        .symbolRenderingMode(.hierarchical)
-        .foregroundStyle(Color.named(player.color))
-        .frame(width: 30)
+      PlayerCubeImage(colorName: player.color)
+        .frame(width: 30, height: 30)
         .accessibilityLabel("Фишка: \(player.color)")
 
       Text(player.name)
-        .font(.headline)
+        .font(AppFont.font(.headline))
         .foregroundStyle(.primary)
         .lineLimit(2)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -339,6 +349,17 @@ struct AddPlayersView: View {
 
   private func deletePlayer(at offsets: IndexSet) {
     localGame.players.remove(atOffsets: offsets)
+  }
+
+  private func presentInitialPlayerIfNeeded() {
+    guard !didPresentInitialPlayer,
+          let owner = localGame.players.first
+    else {
+      return
+    }
+    didPresentInitialPlayer = true
+    playerToEdit = owner
+    showPlayerEditor = true
   }
 
   private func discardGame() {

@@ -23,12 +23,60 @@ final class MarsConquestUITests: XCTestCase {
     }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
+    func testJournalNavigationFitsInsideApplicationWindow() throws {
+        let app = launchJournal()
+
+        let navigation = app.otherElements["root-navigation"]
+        XCTAssertTrue(navigation.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["root-navigation-journal"].exists)
+        XCTAssertTrue(app.buttons["root-navigation-settings"].exists)
+        XCTAssertGreaterThan(navigation.frame.minY, app.frame.minY)
+        XCTAssertLessThanOrEqual(navigation.frame.maxY, app.frame.maxY)
+    }
+
+    @MainActor
+    func testNewExpeditionKeepsStartGameButtonReachable() throws {
+        let app = launchJournal()
+
+        let navigation = app.otherElements["root-navigation"]
+        let newExpedition = app.buttons["root-navigation-new-game"]
+        XCTAssertTrue(newExpedition.waitForExistence(timeout: 5))
+        XCTAssertTrue(newExpedition.isHittable)
+        XCTAssertGreaterThanOrEqual(newExpedition.frame.minY, navigation.frame.minY)
+
+        newExpedition.tap()
+
+        let landingSiteSelector = app.otherElements["landing-site-selector"]
+        let startExpedition = app.buttons["start-expedition-button"]
+        XCTAssertTrue(landingSiteSelector.waitForExistence(timeout: 5))
+        XCTAssertTrue(startExpedition.isHittable)
+        XCTAssertLessThanOrEqual(startExpedition.frame.maxY, app.frame.maxY)
+
+        startExpedition.tap()
+
+        let teamScreen = app.otherElements["expedition-team-screen"]
+        let addPlayer = app.buttons["add-player-button"]
+        let startGame = app.buttons["start-game-button"]
+        XCTAssertTrue(teamScreen.waitForExistence(timeout: 5))
+        XCTAssertTrue(addPlayer.waitForExistence(timeout: 5))
+        XCTAssertTrue(startGame.waitForExistence(timeout: 5))
+        XCTAssertTrue(addPlayer.isHittable, "Кнопка добавления игрока должна оставаться доступной.")
+        XCTAssertTrue(startGame.isHittable, "Кнопка начала партии не должна уходить под нижний край экрана.")
+        XCTAssertLessThan(addPlayer.frame.maxY, startGame.frame.minY)
+        XCTAssertLessThanOrEqual(startGame.frame.maxY, app.frame.maxY)
+    }
+
+    @MainActor
+    private func launchJournal() -> XCUIApplication {
         let app = XCUIApplication()
+        app.launchArguments.append("-ui-test-seed-owner")
         app.launch()
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        XCTAssertTrue(
+            app.otherElements["owner-dashboard"].waitForExistence(timeout: 5),
+            "Тестовый запуск должен открыть бортовой журнал."
+        )
+        return app
     }
 
     @MainActor

@@ -10,11 +10,16 @@
 //  Atlas — AI-ассистент разработки
 //
 
+import CoreData
 import SwiftUI
+import UIKit
 
 struct SettingsScreen: View {
   /// Вызывается, когда настройки открыты во время создания конкретной партии.
   var onExpansionsChanged: ((GameExpansions) -> Void)?
+
+  /// Профиль нужен только в настройках из бортового журнала — для проверки старых партий.
+  var ownerProfile: OwnerProfile?
 
   @State private var expansions = ExpansionSettingsManager.load()
   @AppStorage(MoxieSoundManager.isEnabledKey) private var isMoxieSoundEnabled = false
@@ -23,8 +28,16 @@ struct SettingsScreen: View {
   @AppStorage(TestModeSettings.isEnabledKey) private var isTestModeEnabled = false
   @Environment(\.managedObjectContext) private var viewContext
   @Environment(\.locale) private var locale
+  @FetchRequest(
+    entity: Game.entity(),
+    sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
+  ) private var games: FetchedResults<Game>
   @State private var importMessage = ""
   @State private var showImportAlert = false
+
+  private var journalNavigationClearance: CGFloat {
+    UIDevice.current.userInterfaceIdiom == .phone ? 84 : 0
+  }
 
   var body: some View {
     NavigationStack {
@@ -58,7 +71,7 @@ struct SettingsScreen: View {
         Section(header: Text(testModeSectionTitle)) {
           Toggle(testModeToggleTitle, isOn: $isTestModeEnabled)
           Text(testModeDescription)
-            .font(.footnote)
+            .font(AppFont.font(.footnote))
             .foregroundStyle(.secondary)
         }
 
@@ -82,8 +95,21 @@ struct SettingsScreen: View {
             }
           }
         }
+
+        if hasHistoricalParticipationsToReview, let ownerProfile {
+          Section(header: Text("Бортовой журнал")) {
+            NavigationLink {
+              HistoricalParticipationLinkView(ownerProfile: ownerProfile)
+            } label: {
+              Label("Проверить прошлые партии", systemImage: "person.text.rectangle")
+            }
+          }
+        }
       }
       .navigationTitle("Настройки")
+      // Form не знает о нижней навигации родительского журнала.
+      // Добавляем резерв только для iPhone, не меняя iPad-разметку.
+      .safeAreaPadding(.bottom, journalNavigationClearance)
       .alert("Импорт JSON", isPresented: $showImportAlert) {
         Button("OK", role: .cancel) {}
       } message: {
@@ -101,6 +127,17 @@ struct SettingsScreen: View {
         onExpansionsChanged?(expansions)
       }
     )
+  }
+
+  private var hasHistoricalParticipationsToReview: Bool {
+    guard let ownerID = ownerProfile?.savedPlayerID else { return false }
+
+    return games.contains { game in
+      let players = game.players?.allObjects as? [Player] ?? []
+      return players.contains {
+        ($0.savedPlayerID == nil || $0.savedPlayerID == ownerID) && $0.id != ownerID
+      }
+    }
   }
 
   private var isEnglish: Bool {

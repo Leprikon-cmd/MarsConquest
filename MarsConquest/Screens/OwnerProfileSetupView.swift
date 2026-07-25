@@ -39,9 +39,9 @@ struct OwnerProfileSetupView: View {
       Form {
         Section {
           Text("Создайте журнал")
-            .font(.headline)
+            .font(AppFont.font(.headline))
           Text("Выберите сохранённого игрока или создайте новый профиль владельца.")
-            .font(.subheadline)
+            .font(AppFont.font(.subheadline))
             .foregroundStyle(.secondary)
         }
 
@@ -67,7 +67,7 @@ struct OwnerProfileSetupView: View {
           Toggle("Базовая игра", isOn: $hasBaseGame)
 
 Text("Дополнения")
-  .font(.footnote.weight(.semibold))
+  .font(AppFont.font(.footnote))
   .foregroundStyle(.secondary)
 Toggle("Прологи", isOn: expansionBinding(for: \.hasPrelude))
 Toggle("Венера", isOn: expansionBinding(for: \.hasVenus))

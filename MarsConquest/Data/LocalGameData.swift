@@ -25,23 +25,30 @@ struct LocalGameData {
   var id: UUID
   var date: Date
   var gameField: String
+  /// Фон, выбранный вместе с игровым полем для всей цепочки создания партии.
+  var backgroundImageName: String
   var players: [LocalPlayer] = []
   /// Колонии, выбранные для текущей партии до её сохранения.
   var colonies: [String] = []
   var achievements: [LocalAchievement] = []
   var awards: [LocalAward] = []
-  var generation: Int = GameConstants.startingGeneration
+  /// Поколение завершения проекта. До архивного уточнения не назначается.
+  var generation: Int? = nil
+  /// Итоговая шкала терраформирования Венеры. 0% — допустимое, но явно выбранное значение.
+  var venusTerraformingScale: Int? = nil
   var expansions: GameExpansions = GameExpansions()
 
-  static func empty(field: String) -> LocalGameData {
+  static func empty(field: String, backgroundImageName: String = "Tarsis_BG1") -> LocalGameData {
     LocalGameData(
       id: UUID(),
       date: Date(),
       gameField: field,
+      backgroundImageName: backgroundImageName,
       players: [],
       achievements: [],
       awards: [],
-      generation: GameConstants.startingGeneration,
+      generation: nil,
+      venusTerraformingScale: nil,
       expansions: ExpansionSettingsManager.load()
     )
   }
@@ -53,6 +60,8 @@ struct LocalPlayer: Identifiable {
   var id: UUID
   var name: String
   var color: String
+  var avatarStyle: String = OwnerAvatarStyle.commander.rawValue
+  var avatarImageData: Data? = nil
   var corporation: String
   var prologue1: String
   var prologue2: String

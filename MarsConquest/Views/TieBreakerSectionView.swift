@@ -50,7 +50,7 @@ struct TieBreakerSectionView: View {
                         ? "Players are first compared by remaining M€."
                         : "Сначала сравниваются оставшиеся M€ всех игроков с равными ПО."
                 )
-                .font(.footnote)
+                .font(AppFont.font(.footnote))
                 .foregroundStyle(.secondary)
 
                 ForEach(tiedLeaderIndices, id: \.self) { index in
@@ -64,7 +64,7 @@ struct TieBreakerSectionView: View {
                                 ? "The M€ result determines the winner; cards are not needed."
                                 : "Победитель определён по M€; карты не учитываются."
                         )
-                        .font(.footnote)
+                        .font(AppFont.font(.footnote))
                         .foregroundStyle(.secondary)
                     } else {
                         Text(
@@ -72,7 +72,7 @@ struct TieBreakerSectionView: View {
                                 ? "M€ are equal. Compare cards in hand only for these players."
                                 : "M€ равны. Теперь сравниваются карты в руке только у этих игроков."
                         )
-                        .font(.footnote)
+                        .font(AppFont.font(.footnote))
                         .foregroundStyle(.secondary)
 
                         ForEach(cardTieIndices, id: \.self) { index in
@@ -112,19 +112,18 @@ struct TieBreakerSectionView: View {
         let player = localGame.players[index]
 
         return HStack(spacing: 10) {
-            Circle()
-                .fill(Color.named(player.color))
-                .frame(width: 14, height: 14)
+            PlayerCubeImage(colorName: player.color)
+                .frame(width: 22, height: 22)
 
             Text(player.name)
-                .font(.headline)
+                .font(AppFont.font(.headline))
                 .lineLimit(1)
 
             Spacer()
 
             VStack(alignment: .trailing, spacing: 6) {
                 Text(title)
-                    .font(.caption)
+                    .font(AppFont.font(.caption))
                     .foregroundStyle(.secondary)
                 ScoreTextField(value: value)
                     .frame(width: 116)

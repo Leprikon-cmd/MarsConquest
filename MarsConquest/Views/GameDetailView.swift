@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreData
+import UIKit
 
 struct GameDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -29,6 +30,13 @@ struct GameDetailView: View {
             }
         }
         .navigationTitle(navigationTitle)
+        // Нижняя панель журнала накладывается поверх вложенного экрана на iPhone.
+        // Оставляем запас, чтобы последняя часть записи полностью прокручивалась выше неё.
+        .safeAreaPadding(.bottom, journalNavigationClearance)
+    }
+
+    private var journalNavigationClearance: CGFloat {
+        UIDevice.current.userInterfaceIdiom == .phone ? 84 : 0
     }
 
     private func gameInformationSection() -> some View {
@@ -41,7 +49,18 @@ struct GameDetailView: View {
         return Section("Информация об игре") {
             Text("Поле: \(localizedGameField)")
             Text("Дата: \(formattedDate(game.date))")
-            Text(isEnglish ? "Generation: \(game.generation)" : "Поколение: \(game.generation)")
+
+            if game.generation > 0 {
+                Text(isEnglish ? "Generation: \(game.generation)" : "Поколение: \(game.generation)")
+            }
+
+            if game.hasVenus {
+                Text(
+                    isEnglish
+                      ? "Venus terraforming: \(game.venusTerraformingScale)%"
+                      : "Шкала терраформирования Венеры: \(game.venusTerraformingScale)%"
+                )
+            }
 
             let expansions = expansionsList()
             if !expansions.isEmpty {
@@ -84,10 +103,9 @@ struct GameDetailView: View {
 
             HStack {
                 Text("Итог")
-                    .fontWeight(.semibold)
                 Spacer()
                 Text("\(totalScore(for: player))")
-                    .font(.title3.weight(.bold))
+                    .font(AppFont.font(.title3))
             }
         }
         .padding(.vertical, 3)
@@ -106,14 +124,14 @@ struct GameDetailView: View {
     private func scoreBreakdown(for player: Player) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Основные очки")
-                .font(.subheadline.weight(.semibold))
+                .font(AppFont.font(.subheadline))
 
             scoreRows(for: player)
 
             if usesTieBreaker(for: player) {
                 Divider()
                 Text(isEnglish ? "Tie-breaker" : "Тай-брейк")
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFont.font(.subheadline))
                 tieBreakerRow(
                     title: isEnglish ? "Remaining M€" : "Остаток M€",
                     value: player.remainingMegaCredits
@@ -128,7 +146,7 @@ struct GameDetailView: View {
             if !achievements.isEmpty {
                 Divider()
                 Text("Достижения")
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFont.font(.subheadline))
 
                 ForEach(Array(achievements.enumerated()), id: \.offset) { _, name in
                     detailRow(name, points: Int32(GameConstants.achievementPoints))
@@ -139,7 +157,7 @@ struct GameDetailView: View {
             if !awards.isEmpty {
                 Divider()
                 Text("Награды")
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFont.font(.subheadline))
 
                 ForEach(awards) { award in
                     HStack {
@@ -158,10 +176,8 @@ struct GameDetailView: View {
             Divider()
             HStack {
                 Text("Всего")
-                    .fontWeight(.semibold)
                 Spacer()
                 Text("\(totalScore(for: player))")
-                    .fontWeight(.bold)
                     .monospacedDigit()
             }
         }

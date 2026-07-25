@@ -41,17 +41,16 @@ struct ScoreTableView: View {
     /// Верхняя строка таблицы с колонкой категорий и цветами игроков.
     private func playersHeader() -> some View {
         HStack {
-            Text("Категория")
+            Color.clear
                 .frame(width: 120, alignment: .leading)
             
             ForEach(players) { player in
-                Circle()
-                    .fill(Color.named(player.color))
-                    .frame(width: 20, height: 20)
+                PlayerCubeImage(colorName: player.color)
+                    .frame(width: 26, height: 26)
                     .frame(maxWidth: .infinity, alignment: .center)
             }
         }
-        .font(.headline)
+        .font(AppFont.font(.headline))
     }
 
     /// Основные категории очков, вводимые вручную.
@@ -80,7 +79,7 @@ struct ScoreTableView: View {
 
             if !localGame.achievements.isEmpty {
                 Text("Достижения")
-                    .font(.headline)
+                    .font(AppFont.font(.headline))
 
                 ForEach(localGame.achievements.indices, id: \.self) { index in
                     achievementRow(index: index)
@@ -89,7 +88,7 @@ struct ScoreTableView: View {
 
             if !localGame.awards.isEmpty {
                 Text("Награды")
-                    .font(.headline)
+                    .font(AppFont.font(.headline))
                     .padding(.top, localGame.achievements.isEmpty ? 0 : 4)
 
                 ForEach(localGame.awards.indices, id: \.self) { index in
@@ -139,11 +138,11 @@ struct ScoreTableView: View {
             Group {
                 if isSelected {
                     Text("\(points)")
-                        .font(.headline)
+                        .font(AppFont.font(.headline))
                         .monospacedDigit()
                 } else {
                     Image(systemName: "circle")
-                        .font(.system(size: 28))
+                        .font(AppFont.fixed(28))
                 }
             }
             .foregroundStyle(color)
@@ -192,7 +191,7 @@ struct ScoreTableView: View {
         )
 
         Text(displayName)
-            .font(.subheadline)
+            .font(AppFont.font(.subheadline))
             .frame(maxWidth: .infinity, alignment: .leading)
 
         awardPlaceRow(

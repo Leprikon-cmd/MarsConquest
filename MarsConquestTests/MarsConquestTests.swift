@@ -95,10 +95,8 @@ struct MarsConquestTests {
             ownerID: ownerID,
             from: [win, second, twoPlayerLoss, unlinked]
         )
-        #expect(CareerProgressCalculator().hasVisibleRegalia(for: progress))
-        #expect(regalia.map(\.kind).contains(.firstExpedition))
-        #expect(regalia.map(\.kind).contains(.firstVictory))
-        #expect(regalia.map(\.kind).contains(.firstVictoryWithCorporation) == false)
+        #expect(!CareerProgressCalculator().hasVisibleRegalia(for: progress))
+        #expect(regalia.isEmpty)
     }
 
     @Test @MainActor func careerProgressAwardsObservedContentAndMilestoneOnlyOnce() throws {
@@ -172,14 +170,6 @@ struct MarsConquestTests {
 
         let regalia = CareerProgressCalculator().regalia(ownerID: ownerID, from: games)
         #expect(regalia.filter { $0.kind == .milestone }.count == 1)
-        #expect(regalia.filter { $0.kind == .newCorporationPreludePair }.count == 2)
-        #expect(regalia.filter { $0.kind == .newPrelude }.count == 2)
-        #expect(regalia.filter { $0.kind == .newColony }.count == 2)
-        #expect(regalia.filter { $0.kind == .firstExpeditionWithExpansion }.count == 1)
-        #expect(regalia.filter { $0.kind == .firstVictoryWithExpansion }.count == 1)
-        #expect(regalia.filter { $0.kind == .firstVictoryWithField }.count == 1)
-        #expect(regalia.filter { $0.kind == .firstVictoryWithCorporation }.count == 1)
-        #expect(regalia.filter { $0.kind == .firstVictoryWithPrelude }.count == 2)
         #expect(Set(regalia.map(\.id)).count == regalia.count)
     }
 
@@ -236,6 +226,7 @@ struct MarsConquestTests {
             id: UUID(),
             date: Date(),
             gameField: "Фарсида",
+            backgroundImageName: "Tarsis_BG1",
             players: players
         )
     }

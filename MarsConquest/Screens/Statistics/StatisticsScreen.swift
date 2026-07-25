@@ -74,20 +74,19 @@ struct StatisticsScreen: View {
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "chevron.left")
-                        .font(.caption)
+                        .font(AppFont.font(.caption))
                     Text(previousPage.title)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
-                .font(.footnote)
+                .font(AppFont.font(.footnote))
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(.plain)
 
             Text(selectedPage.title)
-                .font(.headline)
-                .bold()
+                .font(AppFont.font(.headline))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -100,9 +99,9 @@ struct StatisticsScreen: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                     Image(systemName: "chevron.right")
-                        .font(.caption)
+                        .font(AppFont.font(.caption))
                 }
-                .font(.footnote)
+                .font(AppFont.font(.footnote))
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }

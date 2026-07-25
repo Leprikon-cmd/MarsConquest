@@ -1,9 +1,9 @@
 import CoreData
 import SwiftUI
+import UIKit
 
 /// Бывший главный экран: выбор места высадки перед началом новой экспедиции.
 struct NewExpeditionView: View {
-  @Environment(\.dismiss) private var dismiss
   @Environment(\.managedObjectContext) private var viewContext
   @Environment(\.locale) private var locale
 
@@ -12,6 +12,7 @@ struct NewExpeditionView: View {
   @State private var showGameSetup = false
   @State private var navigateToGame: Game?
   @State private var localGame = LocalGameData.empty(field: GameField.farsida.rawValue)
+  @State private var landingBackgroundName = "Tarsis_BG1"
   @State private var didSetupNotificationObserver = false
   @AppStorage("landingSiteSwipeHintSeen") private var hasSeenLandingSiteSwipeHint = false
 
@@ -23,39 +24,66 @@ struct NewExpeditionView: View {
     GameField(rawValue: gameField) ?? .farsida
   }
 
+  private var selectedGameFieldFrameName: String {
+    switch selectedGameField {
+    case .farsida:
+      return "tharsis-blank"
+    case .hellas:
+      return "hellas-blank"
+    case .elysium:
+      return "elysium-blank"
+    }
+  }
+
+  private var selectedGameFieldTitleFont: Font {
+    switch selectedGameField {
+    case .farsida:
+      return .custom("RussoOne-Regular", size: 24).weight(.bold)
+    case .hellas:
+      return .custom("Forum", size: 28).weight(.bold)
+    case .elysium:
+      return .custom("Jura-Bold", size: 25)
+    }
+  }
+
+  private var selectedGameFieldSubtitleFont: Font {
+    switch selectedGameField {
+    case .farsida:
+      return .custom("RussoOne-Regular", size: 9)
+    case .hellas:
+      return .custom("Forum", size: 10)
+    case .elysium:
+      return .custom("Jura-Regular", size: 9)
+    }
+  }
+
+  private var isPhone: Bool {
+    UIDevice.current.userInterfaceIdiom == .phone
+  }
+
   var body: some View {
     NavigationStack {
       ZStack {
-        Image("fon")
+        Image(landingBackgroundName)
           .resizable()
           .scaledToFill()
           .ignoresSafeArea()
+          .id(landingBackgroundName)
+          .transition(.opacity)
 
-        VStack(spacing: 16) {
-          Text("Место высадки")
-            .font(.title2)
-            .foregroundColor(.white)
-
-          landingSiteSelector()
-
-          Button(action: startNewGame) {
-            Text("Высадка!")
-              .padding()
-              .frame(maxWidth: 300)
-              .gameFieldButtonStyle(for: gameField)
-              .shadow(radius: 5)
+        Group {
+          if isPhone {
+            GeometryReader { proxy in
+              phoneExpeditionControls(in: proxy.size)
+            }
+          } else {
+            ScrollView(showsIndicators: false) {
+              expeditionControls
+                .padding()
+            }
           }
         }
-        .padding()
-      }
-      .navigationTitle("Новая экспедиция")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .topBarLeading) {
-          Button("Закрыть") {
-            dismiss()
-          }
-        }
+        .accessibilityIdentifier("new-expedition-screen")
       }
       .navigationDestination(item: $navigateToGame) { game in
         GameDetailView(game: game)
@@ -63,6 +91,7 @@ struct NewExpeditionView: View {
     }
     .onAppear {
       expansions = ExpansionSettingsManager.load()
+      landingBackgroundName = randomBackgroundName(for: selectedGameField)
       prepareNotificationObserver()
     }
     .onReceive(
@@ -73,30 +102,116 @@ struct NewExpeditionView: View {
 
       if !gameFields.contains(where: { $0.rawValue == gameField }) {
         gameField = GameField.farsida.rawValue
+        landingBackgroundName = randomBackgroundName(for: .farsida)
       }
     }
     .fullScreenCover(isPresented: $showGameSetup) {
-      AddPlayersView(localGame: $localGame)
+      AddPlayersView(localGame: $localGame, opensFirstPlayerOnAppear: true)
     }
   }
 
-  private func landingSiteSelector() -> some View {
+  private var expeditionControls: some View {
+    VStack(spacing: 16) {
+      Spacer(minLength: 16)
+
+      Text("Место высадки")
+        .font(AppFont.font(.title2))
+        .foregroundColor(.white)
+
+      landingSiteTitleFrame()
+
+      landingSiteSelector()
+
+      Button(action: startNewGame) {
+        Text("Высадка!")
+          .font(AppFont.font(.title2))
+          .frame(maxWidth: 340, minHeight: 68)
+          .gameFieldButtonStyle(for: gameField, fontSize: 26)
+          .shadow(radius: 5)
+      }
+      .padding(.top, 32)
+      .accessibilityIdentifier("start-expedition-button")
+
+      Spacer(minLength: 16)
+    }
+    .adaptiveContentWidth(640)
+  }
+
+  /// Телефонная композиция: название в верхней безопасной зоне, планета по
+  /// центру экрана, а кнопка ниже неё с исходной пропорцией фоновой картинки.
+  private func phoneExpeditionControls(in size: CGSize) -> some View {
+    let availableWidth = max(size.width - 36, 0)
+    let planetSize = min(availableWidth, 350)
+    let planetTopOffset = max(142, size.height / 2 - planetSize / 2)
+
+    return ZStack(alignment: .top) {
+      VStack(spacing: 0) {
+        Spacer().frame(height: planetTopOffset)
+
+        landingSiteSelector(size: planetSize)
+
+        Button(action: startNewGame) {
+          Text("Высадка!")
+            .frame(width: 320, height: 60)
+            .gameFieldButtonStyle(for: gameField, fontSize: 26)
+            .shadow(radius: 5)
+        }
+        .padding(.top, 34)
+        .accessibilityIdentifier("start-expedition-button")
+
+        Spacer(minLength: 0)
+      }
+
+      VStack(spacing: 6) {
+        Text("Место высадки")
+          .font(AppFont.fixed(30))
+          .foregroundStyle(.white)
+
+        landingSiteTitleFrame(width: min(availableWidth, 350))
+      }
+      .padding(.top, 20)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+  }
+
+  private func landingSiteTitleFrame(width: CGFloat = 350) -> some View {
+    Image(selectedGameFieldFrameName)
+      .resizable()
+      .scaledToFill()
+      .frame(width: width, height: 72)
+      .clipped()
+      .overlay {
+        VStack(spacing: 1) {
+          Text(selectedGameField.localizedName(for: locale).uppercased(with: locale))
+            .font(selectedGameFieldTitleFont)
+            .lineLimit(1)
+            .minimumScaleFactor(0.72)
+            .shadow(color: .black.opacity(0.28), radius: 1, y: 1)
+
+          Text(selectedGameField.localizedSubtitle(for: locale))
+            .font(selectedGameFieldSubtitleFont)
+            .tracking(2.2)
+            .lineLimit(1)
+            .minimumScaleFactor(0.55)
+        }
+        .foregroundStyle(.black)
+        .frame(width: max(width - 108, 0), height: 58, alignment: .center)
+      }
+      .accessibilityHidden(true)
+  }
+
+  private func landingSiteSelector(size: CGFloat = 330) -> some View {
     ZStack {
       Image(selectedGameField.imageName)
         .resizable()
         .scaledToFill()
     }
     .clipShape(Circle())
-    .frame(width: 330, height: 330)
-    .overlay {
-      Text(selectedGameField.localizedName(for: locale))
-        .font(.system(size: 24, weight: .bold))
-        .foregroundStyle(.white)
-    }
+    .frame(width: size, height: size)
     .overlay(alignment: .bottom) {
       if gameFields.count > 1 && !hasSeenLandingSiteSwipeHint {
         Label("Листайте, чтобы выбрать место высадки", systemImage: "hand.draw.fill")
-          .font(.subheadline.weight(.semibold))
+          .font(AppFont.font(.subheadline))
           .foregroundStyle(.primary)
           .padding(.horizontal, 14)
           .padding(.vertical, 10)
@@ -112,21 +227,43 @@ struct NewExpeditionView: View {
 
         if gesture.translation.width < -50 {
           withAnimation {
-            gameField = gameFields[(currentIndex + 1) % gameFields.count].rawValue
+            selectGameField(gameFields[(currentIndex + 1) % gameFields.count])
           }
           hasSeenLandingSiteSwipeHint = true
         } else if gesture.translation.width > 50 {
           withAnimation {
-            gameField = gameFields[(currentIndex - 1 + gameFields.count) % gameFields.count].rawValue
+            selectGameField(gameFields[(currentIndex - 1 + gameFields.count) % gameFields.count])
           }
           hasSeenLandingSiteSwipeHint = true
         }
       }
     )
+    .accessibilityIdentifier("landing-site-selector")
+  }
+
+  private func selectGameField(_ field: GameField) {
+    gameField = field.rawValue
+    landingBackgroundName = randomBackgroundName(for: field)
+  }
+
+  private func randomBackgroundName(for field: GameField) -> String {
+    let number = Int.random(in: 1...6)
+
+    switch field {
+    case .farsida:
+      return "Tarsis_BG\(number)"
+    case .hellas:
+      return "Hellas\(number)"
+    case .elysium:
+      return "Elysium\(number)"
+    }
   }
 
 private func startNewGame() {
-  var newGame = LocalGameData.empty(field: gameField)
+  var newGame = LocalGameData.empty(
+    field: gameField,
+    backgroundImageName: landingBackgroundName
+  )
 
   if let owner = OwnerProfileManager.makeOwnerPlayer(
     for: newGame.expansions,

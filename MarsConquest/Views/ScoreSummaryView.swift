@@ -15,15 +15,14 @@ struct ScoreSummaryView: View {
     private let scoreManager = ScoreManager()
 
     var body: some View {
-        Section(header: Text(isEnglish ? "Ranking" : "Рейтинг")) {
+        Section(header: Text(isEnglish ? "Expedition placements" : "Места в экспедиции")) {
             ForEach(scoreManager.ranking(in: localGame)) { entry in
                 HStack(spacing: 12) {
                     Text(placeTitle(for: entry.place))
                         .frame(width: 88, alignment: .leading)
 
-                    Circle()
-                        .fill(Color.named(entry.player.color))
-                        .frame(width: 14, height: 14)
+                    PlayerCubeImage(colorName: entry.player.color)
+                        .frame(width: 22, height: 22)
 
                     Text(entry.player.name)
                         .lineLimit(1)
@@ -31,7 +30,7 @@ struct ScoreSummaryView: View {
                     Spacer()
 
                     Text("\(entry.score) \(isEnglish ? "VP" : "ПО")")
-                        .font(.headline)
+                        .font(AppFont.font(.headline))
                         .monospacedDigit()
                 }
                 .accessibilityElement(children: .combine)

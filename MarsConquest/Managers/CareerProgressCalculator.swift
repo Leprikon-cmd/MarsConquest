@@ -117,18 +117,6 @@ struct CareerProgressCalculator {
     }
 
     enum RegaliaKind: String {
-        case firstExpedition
-        case firstVictory
-        case newField
-        case newCorporation
-        case newPrelude
-        case newCorporationPreludePair
-        case newColony
-        case firstExpeditionWithExpansion
-        case firstVictoryWithExpansion
-        case firstVictoryWithField
-        case firstVictoryWithCorporation
-        case firstVictoryWithPrelude
         case milestone
     }
 
@@ -231,93 +219,18 @@ struct CareerProgressCalculator {
         })?.number ?? 0
     }
 
-    /// Первая подтверждённая регалия — завершённая экспедиция.
-    /// В будущем сюда добавятся титулы, рекорды и карьерные события.
+    /// Первые регалии выдаются только за подтверждённые повторённые действия.
     func hasVisibleRegalia(for progress: Progress) -> Bool {
-        progress.gamesPlayed > 0
+        rules.milestones.keys.contains { progress.gamesPlayed >= $0 }
     }
 
-    /// Личные регалии, которые можно честно восстановить из сохранённой истории.
+    /// Регалии начинаются с повторяемых действий, а не с первого знакомства с контентом.
     func regalia(ownerID: UUID, from games: [Game]) -> [Regalia] {
         let history = linkedOwnerGames(ownerID: ownerID, from: games)
-        var fields = Set<String>()
-        var corporations = Set<String>()
-        var preludes = Set<String>()
-        var pairs = Set<String>()
-        var colonies = Set<String>()
-        var expansions = Set<String>()
-        var winningFields = Set<String>()
-        var winningCorporations = Set<String>()
-        var winningPreludes = Set<String>()
-        var winningExpansions = Set<String>()
         var result: [Regalia] = []
 
         for (index, entry) in history.enumerated() {
             let ordinal = index + 1
-            let field = stableKey(id: entry.game.gameFieldID, name: entry.game.gameField)
-            let corporation = stableKey(id: entry.owner.corporationID, name: entry.owner.corporation)
-            let preludePairs = [
-                stableKey(id: entry.owner.prologue1ID, name: entry.owner.prologue1),
-                stableKey(id: entry.owner.prologue2ID, name: entry.owner.prologue2)
-            ].compactMap { $0 }
-            let gameColonies = (entry.game.colonies?.allObjects as? [Colony] ?? [])
-                .sorted { ($0.referenceID ?? $0.name ?? "") < ($1.referenceID ?? $1.name ?? "") }
-
-            if ordinal == 1 {
-                result.append(.init(kind: .firstExpedition, date: entry.game.date, detail: nil, ordinal: ordinal))
-            }
-            if entry.players.count > 1, StatisticsCalculator.place(of: entry.owner, in: entry.game) == 1,
-               !result.contains(where: { $0.kind == .firstVictory }) {
-                result.append(.init(kind: .firstVictory, date: entry.game.date, detail: nil, ordinal: ordinal))
-            }
-            if let field, fields.insert(field).inserted {
-                result.append(.init(kind: .newField, date: entry.game.date, detail: entry.game.gameField, ordinal: ordinal))
-            }
-            if let corporation, corporations.insert(corporation).inserted {
-                result.append(.init(kind: .newCorporation, date: entry.game.date, detail: entry.owner.corporation, ordinal: ordinal))
-            }
-            for prelude in preludePairs {
-                if preludes.insert(prelude).inserted {
-                    result.append(.init(kind: .newPrelude, date: entry.game.date, detail: preludeDisplayName(prelude, owner: entry.owner), ordinal: ordinal))
-                }
-            }
-            if let corporation {
-                for prelude in preludePairs {
-                    let key = "\(corporation)|\(prelude)"
-                    if pairs.insert(key).inserted {
-                        result.append(.init(kind: .newCorporationPreludePair, date: entry.game.date, detail: key, ordinal: ordinal))
-                    }
-                }
-            }
-            for colony in gameColonies {
-                if let key = stableKey(id: colony.referenceID, name: colony.name),
-                   colonies.insert(key).inserted {
-                    result.append(.init(kind: .newColony, date: entry.game.date, detail: colony.name, ordinal: ordinal))
-                }
-            }
-            for expansion in enabledExpansionKeys(in: entry.game) {
-                if expansions.insert(expansion).inserted {
-                    result.append(.init(kind: .firstExpeditionWithExpansion, date: entry.game.date, detail: expansion, ordinal: ordinal))
-                }
-            }
-            if entry.players.count > 1, StatisticsCalculator.place(of: entry.owner, in: entry.game) == 1 {
-                if let field, winningFields.insert(field).inserted {
-                    result.append(.init(kind: .firstVictoryWithField, date: entry.game.date, detail: entry.game.gameField, ordinal: ordinal))
-                }
-                if let corporation, winningCorporations.insert(corporation).inserted {
-                    result.append(.init(kind: .firstVictoryWithCorporation, date: entry.game.date, detail: entry.owner.corporation, ordinal: ordinal))
-                }
-                for prelude in preludePairs {
-                    if winningPreludes.insert(prelude).inserted {
-                        result.append(.init(kind: .firstVictoryWithPrelude, date: entry.game.date, detail: preludeDisplayName(prelude, owner: entry.owner), ordinal: ordinal))
-                    }
-                }
-                for expansion in enabledExpansionKeys(in: entry.game) {
-                    if winningExpansions.insert(expansion).inserted {
-                        result.append(.init(kind: .firstVictoryWithExpansion, date: entry.game.date, detail: expansion, ordinal: ordinal))
-                    }
-                }
-            }
             if rules.milestones[ordinal] != nil {
                 result.append(.init(kind: .milestone, date: entry.game.date, detail: "\(ordinal)", ordinal: ordinal))
             }
@@ -351,26 +264,6 @@ struct CareerProgressCalculator {
             }
         }
         return []
-    }
-
-    private func preludeDisplayName(_ key: String, owner: Player) -> String? {
-        if stableKey(id: owner.prologue1ID, name: owner.prologue1) == key {
-            return owner.prologue1
-        }
-        if stableKey(id: owner.prologue2ID, name: owner.prologue2) == key {
-            return owner.prologue2
-        }
-        return nil
-    }
-
-    private func enabledExpansionKeys(in game: Game) -> [String] {
-        var result: [String] = []
-        if game.hasPrelude { result.append("prelude") }
-        if game.hasVenus { result.append("venus") }
-        if game.hasColonies { result.append("colonies") }
-        if game.hasHellasElysium { result.append("hellasElysium") }
-        if game.hasTurmoil { result.append("turmoil") }
-        return result
     }
 
     private func linkedOwnerGames(ownerID: UUID, from games: [Game]) -> [OwnerGame] {

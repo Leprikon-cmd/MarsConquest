@@ -35,7 +35,7 @@ struct PreludeCardPickerView: View {
                                     .overlay(alignment: .topTrailing) {
                                         if selections.contains(prologue) {
                                             Image(systemName: "checkmark.circle.fill")
-                                                .font(.title2)
+                                                .font(AppFont.font(.title2))
                                                 .foregroundStyle(.white, Color.accentColor)
                                                 .padding(10)
                                         }
@@ -67,7 +67,7 @@ struct PreludeCardPickerView: View {
                 }
                 ToolbarItem(placement: .principal) {
                     Text("Выбрано: \(selections.count) из 2")
-                        .font(.subheadline.weight(.semibold))
+                        .font(AppFont.font(.subheadline))
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Готово") {
@@ -107,7 +107,7 @@ struct PreludeCardImage: View {
             } else {
                 VStack(spacing: 8) {
                     Image(systemName: "photo")
-                        .font(.title2)
+                        .font(AppFont.font(.title2))
                     Text(prologueName)
                         .multilineTextAlignment(.center)
                 }

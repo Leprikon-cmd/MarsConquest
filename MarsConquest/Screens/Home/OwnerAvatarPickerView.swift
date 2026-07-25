@@ -34,7 +34,7 @@ struct OwnerAvatarPickerView: View {
                   }
 
                 Text(style.title)
-                  .font(.caption.weight(.semibold))
+                  .font(AppFont.font(.caption))
                   .multilineTextAlignment(.center)
                   .foregroundStyle(.primary)
               }
@@ -58,7 +58,7 @@ struct OwnerAvatarPickerView: View {
                       .stroke(selection == OwnerAvatarStyle.selfie.rawValue ? Color.orange : Color.secondary.opacity(0.35), lineWidth: 3)
                   }
                 Text(selfieTitle)
-                  .font(.caption.weight(.semibold))
+                  .font(AppFont.font(.caption))
                   .foregroundStyle(.primary)
               }
             }
@@ -75,7 +75,7 @@ struct OwnerAvatarPickerView: View {
           }
         } label: {
           Label(takeSelfieTitle, systemImage: "camera.fill")
-            .font(.headline)
+            .font(AppFont.font(.headline))
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
         }
@@ -143,8 +143,9 @@ enum OwnerSelfieStore {
   }
 }
 
-private struct SelfieCameraPicker: UIViewControllerRepresentable {
+struct SelfieCameraPicker: UIViewControllerRepresentable {
   let onImagePicked: (UIImage) -> Void
+  var cameraDevice: UIImagePickerController.CameraDevice = .front
   @Environment(\.dismiss) private var dismiss
 
   func makeCoordinator() -> Coordinator {
@@ -154,7 +155,9 @@ private struct SelfieCameraPicker: UIViewControllerRepresentable {
   func makeUIViewController(context: Context) -> UIImagePickerController {
     let picker = UIImagePickerController()
     picker.sourceType = .camera
-    picker.cameraDevice = .front
+    if UIImagePickerController.isCameraDeviceAvailable(cameraDevice) {
+      picker.cameraDevice = cameraDevice
+    }
     picker.allowsEditing = true
     picker.delegate = context.coordinator
     return picker

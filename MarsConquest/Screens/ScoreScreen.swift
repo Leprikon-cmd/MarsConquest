@@ -28,6 +28,14 @@ private enum SelectionSheet: String, Identifiable {
     var id: String { rawValue }
 }
 
+/// Реквизит, который архив уточняет перед внесением записи.
+private enum ArchiveDetailRequest: String, Identifiable {
+    case generation
+    case venusTerraforming
+
+    var id: String { rawValue }
+}
+
 struct ScoreScreen: View {
     /// Контекст CoreData для сохранения результатов игры.
     @Environment(\.managedObjectContext) private var viewContext
@@ -43,6 +51,10 @@ struct ScoreScreen: View {
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var activeSelectionSheet: SelectionSheet?
+    @State private var archiveDetailRequest: ArchiveDetailRequest?
+    @State private var showArchiveConfirmation = false
+    @State private var showArchiveRecorded = false
+    @State private var archivedGame: Game?
     /// Не позволяет сохранить одну и ту же партию повторным быстрым нажатием.
     @State private var isSaving = false
 
@@ -51,30 +63,72 @@ struct ScoreScreen: View {
         localGame.players
     }
 
-    var body: some View {
-        Form {
-            GameInfoView(
-                date: localGame.date,
-                gameField: localGame.gameField,
-                generation: $localGame.generation
-            )
+    /// Лёгкая подложка оставляет читаемость поверх игрового фона, не перекрывая его.
+    private let scorePanelBackground = Color.white.opacity(0.22)
 
-            playersTable()
-            rewardsSection()
-            ScoreSummaryView(localGame: localGame)
-            TieBreakerSectionView(localGame: $localGame)
-            saveButton()
+    var body: some View {
+        ZStack {
+            Image(localGame.backgroundImageName)
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+
+            Form {
+                GameInfoView(
+                    date: localGame.date,
+                    gameField: localGame.gameField,
+                    generation: $localGame.generation,
+                    hasVenus: localGame.expansions.hasVenus,
+                    venusTerraformingScale: $localGame.venusTerraformingScale
+                )
+                .listRowBackground(scorePanelBackground)
+
+                playersTable()
+                    .listRowBackground(scorePanelBackground)
+                rewardsSection()
+                    .listRowBackground(Color.clear)
+                TieBreakerSectionView(localGame: $localGame)
+                    .listRowBackground(scorePanelBackground)
+                ScoreSummaryView(localGame: localGame)
+                    .listRowBackground(scorePanelBackground)
+                saveButton()
+                    .listRowBackground(Color.clear)
+            }
+            .scrollContentBackground(.hidden)
         }
-        .navigationTitle("Подсчет очков")
-        .alert("Ошибка", isPresented: $showError) {
+        .navigationTitle("")
+        .alert("Архив временно недоступен", isPresented: $showError) {
             Button("OK", role: .cancel) { }
         } message: {
             Text(errorMessage)
+        }
+        .alert("Подтверждение записи", isPresented: $showArchiveConfirmation) {
+            Button("Отмена", role: .cancel) { }
+            Button("Внести в журнал") {
+                saveGameResults()
+            }
+        } message: {
+            Text(archiveConfirmationMessage)
+        }
+        .alert("Запись внесена в архив.", isPresented: $showArchiveRecorded) {
+            Button("Продолжить") {
+                completeArchive()
+            }
         }
         .sheet(item: $activeSelectionSheet) { sheet in
             SelectionSheetContent(sheet: sheet, localGame: $localGame)
                 // Не даём SwiftUI сохранить экран предыдущего типа.
                 .id(sheet.id)
+        }
+        .sheet(item: $archiveDetailRequest) { request in
+            ArchiveDetailRequestView(
+                request: request,
+                generation: $localGame.generation,
+                venusTerraformingScale: $localGame.venusTerraformingScale,
+                onDetailRecorded: continueArchivePreparation
+            )
+            .presentationDetents([.height(230)])
+            .presentationDragIndicator(.visible)
         }
     }
 
@@ -96,9 +150,9 @@ struct ScoreScreen: View {
                 }) {
                     Text("Достижения")
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical)
-                        .padding(.horizontal, 10)
-                        .gameFieldButtonStyle(for: localGame.gameField)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .compactGameFieldButtonStyle(for: localGame.gameField)
                 }
                 // Form иначе может объединить обе кнопки строки в одну область тапа.
                 .buttonStyle(.borderless)
@@ -109,14 +163,15 @@ struct ScoreScreen: View {
                 }) {
                     Text("Награды")
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical)
-                        .padding(.horizontal, 10)
-                        .gameFieldButtonStyle(for: localGame.gameField)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .compactGameFieldButtonStyle(for: localGame.gameField)
                 }
                 // У наград своя независимая область нажатия.
                 .buttonStyle(.borderless)
                 .contentShape(Rectangle())
             }
+            .frame(maxWidth: .infinity)
             .padding(.vertical, 4)
         }
     }
@@ -124,14 +179,14 @@ struct ScoreScreen: View {
     /// Кнопка сохранения итогов партии.
     private func saveButton() -> some View {
         Button(action: {
-            saveGameResults()
+            prepareArchiveEntry()
         }) {
             HStack(spacing: 8) {
                 if isSaving {
                     ProgressView()
                         .tint(.black)
                 }
-                Text(isSaving ? "Сохранение..." : "Сохранить результаты")
+                Text(isSaving ? "Внесение записи…" : "Внести в журнал")
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)
@@ -142,36 +197,130 @@ struct ScoreScreen: View {
         .disabled(isSaving)
     }
 
-    // MARK: - Сохранение игры
+    // MARK: - Архивирование экспедиции
 
-    /// Сохраняет игру через GameSaver и после этого отправляет пользователя
-    /// к экрану статистики / сохранённой партии.
+    private var archiveConfirmationMessage: String {
+        let name = players.first?.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let addressee = (name?.isEmpty == false ? name! : "руководитель")
+        return "Мистер \(addressee),\n\nВы подтверждаете достоверность сведений, указанных в журнале экспедиции?"
+    }
+
+    /// Сначала спокойно уточняем только отсутствующие реквизиты, затем просим подтверждение.
+    private func prepareArchiveEntry() {
+        guard !isSaving else { return }
+
+        if localGame.generation == nil {
+            archiveDetailRequest = .generation
+        } else if localGame.expansions.hasVenus, localGame.venusTerraformingScale == nil {
+            archiveDetailRequest = .venusTerraforming
+        } else {
+            showArchiveConfirmation = true
+        }
+    }
+
+    private func continueArchivePreparation() {
+        archiveDetailRequest = nil
+        DispatchQueue.main.async {
+            prepareArchiveEntry()
+        }
+    }
+
+    /// Вносит подтверждённую экспедицию в архив и показывает спокойное подтверждение.
     private func saveGameResults() {
         guard !isSaving else { return }
         isSaving = true
 
         do {
-            let savedGame = try GameSaver().save(localGame: localGame, in: viewContext)
-            
+            archivedGame = try GameSaver().save(localGame: localGame, in: viewContext)
             DispatchQueue.main.async {
-                dismiss()
-                NotificationCenter.default.post(
-                    name: Notification.Name("NavigateToStatistics"),
-                    object: savedGame
-                )
+                showArchiveRecorded = true
             }
         } catch {
             // Не оставляем в контексте недосохранённую партию перед повторной попыткой.
             viewContext.rollback()
             isSaving = false
-            print("Ошибка сохранения: \(error.localizedDescription)")
             errorMessage = String(
-                format: String(localized: "Ошибка сохранения: %@", locale: locale),
+                format: String(localized: "Не удалось внести запись: %@", locale: locale),
                 locale: locale,
                 error.localizedDescription
             )
             showError = true
         }
+    }
+
+    private func completeArchive() {
+        guard let archivedGame else { return }
+        dismiss()
+        NotificationCenter.default.post(
+            name: Notification.Name("NavigateToStatistics"),
+            object: archivedGame
+        )
+    }
+}
+
+/// Небольшой архивный запрос: выбор реквизита сразу продолжает оформление записи.
+private struct ArchiveDetailRequestView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let request: ArchiveDetailRequest
+    @Binding var generation: Int?
+    @Binding var venusTerraformingScale: Int?
+    let onDetailRecorded: () -> Void
+
+    private let venusValues = Array(stride(from: 0, through: 30, by: 2))
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Уточнение записи")
+                .font(AppFont.font(.headline))
+
+            Text(prompt)
+                .font(AppFont.font(.body))
+
+            Picker(selectionTitle, selection: selection) {
+                Text("—").tag(nil as Int?)
+                ForEach(values, id: \.self) { value in
+                    Text(valueLabel(value)).tag(Optional(value))
+                }
+            }
+            .pickerStyle(.menu)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(24)
+        .onChange(of: selectedValue) { _, value in
+            guard value != nil else { return }
+            dismiss()
+            onDetailRecorded()
+        }
+    }
+
+    private var prompt: String {
+        switch request {
+        case .generation:
+            return "Прежде чем принять запись, позвольте уточнить: на каком поколении был завершён проект?"
+        case .venusTerraforming:
+            return "Не могли бы вы уточнить, до какого уровня удалось терраформировать Венеру?"
+        }
+    }
+
+    private var selectionTitle: String {
+        request == .generation ? "Поколение" : "Шкала Венеры"
+    }
+
+    private var selection: Binding<Int?> {
+        request == .generation ? $generation : $venusTerraformingScale
+    }
+
+    private var selectedValue: Int? {
+        request == .generation ? generation : venusTerraformingScale
+    }
+
+    private var values: [Int] {
+        request == .generation ? Array(5...20) : venusValues
+    }
+
+    private func valueLabel(_ value: Int) -> String {
+        request == .generation ? "\(value)" : "\(value)%"
     }
 }
 

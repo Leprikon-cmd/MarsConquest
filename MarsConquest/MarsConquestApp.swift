@@ -28,12 +28,17 @@ struct MarsConquestApp: App {
     private let coreDataManager = CoreDataManager.shared
     
     init() {
+        AppFont.configureSystemControls()
+
         // Проверяем соответствие данных при запуске
         GameData.validateCorporations(with: coreDataManager.viewContext)
         GameData.validatePrologues(with: coreDataManager.viewContext)
         
         // Дополнительная настройка Core Data при необходимости
         configureCoreData()
+
+        // Используется только автоматическим UI-тестом с launch argument.
+        UITestDataBootstrapper.seedOwnerIfRequested(in: coreDataManager.viewContext)
 
         // Если пользователь уже включил МОКСИ, звук начнётся при открытии приложения.
         MoxieSoundManager.shared.startIfEnabled()
@@ -42,7 +47,11 @@ struct MarsConquestApp: App {
     var body: some Scene {
         WindowGroup {
             OwnerProfileGateView()
+                // Пока фиксируем единое светлое оформление. Переключение тем
+                // вернём только вместе с отдельной проработкой дизайна.
+                .preferredColorScheme(.light)
                 .environment(\.locale, selectedLanguage.locale)
+                .environment(\.font, AppFont.font(.body))
                 // Передаем контекст в окружение
                 .environment(\.managedObjectContext, coreDataManager.viewContext)
                 // Для обработки ошибок Core Data
