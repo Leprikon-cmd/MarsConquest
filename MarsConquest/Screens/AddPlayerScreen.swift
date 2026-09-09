@@ -15,6 +15,9 @@
 //  - проверка корректности ввода
 //  - добавление игрока в LocalGameData
 //
+//  Что можно менять руками:
+//  - подписи, порядок полей и вид карточки; правила проверки лежат в AddPlayerValidator.
+//
 
 import CoreData
 import SwiftUI
@@ -51,6 +54,9 @@ struct AddPlayerScreen: View {
   /// При наличии значения экран редактирует существующего игрока,
   /// а не добавляет нового.
   let editingPlayer: LocalPlayer?
+
+  /// Первый показ владельца после «Высадка!»: участие подтверждается, а не сохраняется как профиль.
+  let isInitialOwnerEditor: Bool
 
   /// Цвет фишки нового игрока.
   @State private var selectedColor: String = ""
@@ -192,6 +198,7 @@ struct AddPlayerScreen: View {
       hasSavedPlayers: !savedPlayers.isEmpty,
       hasSelectedSavedPlayer: selectedSavedPlayer != nil,
       isEditing: isEditing,
+      isInitialOwnerEditor: isInitialOwnerEditor,
       hasPrelude: localGame.expansions.hasPrelude,
       isInputValid: isInputValid,
       gameField: localGame.gameField,

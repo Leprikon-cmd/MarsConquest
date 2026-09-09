@@ -1,3 +1,16 @@
+//
+//  PlayerEditorCardView.swift
+//
+//  Зачем:
+//  Отрисовывает и редактирует одну карточку участника новой экспедиции.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Что можно менять руками:
+//  - размеры, интервалы, цвета и изображения карточки; правила добавления игрока находятся в экране.
+//
 import CoreData
 import SwiftUI
 import UIKit
@@ -16,6 +29,8 @@ struct PlayerEditorCardView: View {
   let hasSavedPlayers: Bool
   let hasSelectedSavedPlayer: Bool
   let isEditing: Bool
+  /// Меняет подпись основной кнопки только при первом подтверждении владельца в экспедиции.
+  let isInitialOwnerEditor: Bool
   let hasPrelude: Bool
   let isInputValid: Bool
   let gameField: String
@@ -49,6 +64,7 @@ struct PlayerEditorCardView: View {
         .strokeBorder(.white.opacity(0.28), lineWidth: 1)
     }
     .shadow(color: .black.opacity(0.18), radius: 14, y: 7)
+    .accessibilityIdentifier("player-editor-card")
   }
 
   private var header: some View {
@@ -206,7 +222,7 @@ struct PlayerEditorCardView: View {
 
   private var saveButton: some View {
     Button(action: onSave) {
-      Text(isEditing ? "Сохранить игрока" : "Добавить игрока")
+      Text(primaryActionTitle)
         .font(AppFont.font(.headline))
         .frame(maxWidth: .infinity, minHeight: 54)
         .gameFieldButtonStyle(for: gameField)
@@ -214,6 +230,14 @@ struct PlayerEditorCardView: View {
     .buttonStyle(.plain)
     .disabled(!isInputValid)
     .opacity(isInputValid ? 1 : 0.48)
+    .accessibilityIdentifier("save-player-button")
+  }
+
+  private var primaryActionTitle: LocalizedStringKey {
+    if isInitialOwnerEditor {
+      return "Подтвердить участие"
+    }
+    return isEditing ? "Сохранить изменения" : "Добавить игрока"
   }
 
   @ViewBuilder

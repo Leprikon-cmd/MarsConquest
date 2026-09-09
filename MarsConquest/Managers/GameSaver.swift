@@ -14,6 +14,9 @@
 //  - создание связанных сущностей Score
 //  - создание связанных сущностей Achievement
 //  - создание связанных сущностей Award
+//
+//  Что можно менять руками:
+//  - соответствие LocalGameData и Core Data — только вместе с моделью данных и архивом журнала.
 //  - перенос данных из временной модели LocalGameData в CoreData
 //
 
@@ -21,8 +24,59 @@ import Foundation
 import CoreData
 
 struct GameSaver {
+    /// Единственная точка фиксации записи. В обычном приложении это `save()` контекста;
+    /// отдельная операция позволяет воспроизводимо проверить отказ хранилища в тесте.
+    private let commit: (NSManagedObjectContext) throws -> Void
+
+    init(commit: @escaping (NSManagedObjectContext) throws -> Void = { try $0.save() }) {
+        self.commit = commit
+    }
     
     func save(localGame: LocalGameData, in context: NSManagedObjectContext) throws -> Game {
+        guard let coordinator = context.persistentStoreCoordinator else {
+            throw SaveError.missingPersistentStoreCoordinator
+        }
+
+        let savingContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        savingContext.persistentStoreCoordinator = coordinator
+        savingContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+
+        let gameObjectID = try savingContext.performAndWait {
+            // Повторная попытка с тем же идентификатором должна вернуть уже внесённую запись,
+            // а не создать её копию.
+            if let existingGame = try existingGame(id: localGame.id, in: savingContext) {
+                return existingGame.objectID
+            }
+
+            do {
+                let game = try insert(localGame: localGame, in: savingContext)
+                try commit(savingContext)
+                return game.objectID
+            } catch {
+                // Все новые объекты жили только в частном контексте. Явно отбрасываем их,
+                // прежде чем вернуть ошибку и позволить пользователю повторить попытку.
+                savingContext.rollback()
+                throw error
+            }
+        }
+
+        return context.performAndWait {
+            // После успешного сохранения objectID постоянный и относится к сущности Game.
+            context.object(with: gameObjectID) as! Game
+        }
+    }
+
+    private func existingGame(id: UUID, in context: NSManagedObjectContext) throws -> Game? {
+        let request = NSFetchRequest<Game>(entityName: "Game")
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        return try context.fetch(request).first
+    }
+
+    private func insert(
+        localGame: LocalGameData,
+        in context: NSManagedObjectContext
+    ) throws -> Game {
         let game = Game(context: context)
         game.id = localGame.id
         game.date = localGame.date
@@ -128,8 +182,17 @@ struct GameSaver {
             }
         }
         
-        try context.save()
-        
         return game
+    }
+
+    enum SaveError: LocalizedError {
+        case missingPersistentStoreCoordinator
+
+        var errorDescription: String? {
+            switch self {
+            case .missingPersistentStoreCoordinator:
+                return "Хранилище журнала недоступно."
+            }
+        }
     }
 }

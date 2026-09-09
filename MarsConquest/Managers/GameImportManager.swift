@@ -8,6 +8,10 @@
 //  Евгений Зотчик — автор проекта
 //  Atlas — AI-ассистент разработки
 //
+//  Что можно менять руками:
+//  - правила исторического импорта; для резервных копий используйте JournalBackupManager;
+//  - импорт всегда проходит в отдельном контексте, чтобы ошибка не оставляла частичные записи.
+//
 
 import Foundation
 import CoreData
@@ -24,6 +28,49 @@ struct GameImportManager {
         let data = try Data(contentsOf: url)
         let games = try JSONDecoder().decode([ImportedGame].self, from: data)
 
+        guard let coordinator = context.persistentStoreCoordinator else {
+            throw ImportError.missingPersistentStoreCoordinator
+        }
+
+        let savingContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        savingContext.persistentStoreCoordinator = coordinator
+
+        let saveObserver = ImportContextSaveObserver()
+        let token = NotificationCenter.default.addObserver(
+            forName: .NSManagedObjectContextDidSave,
+            object: savingContext,
+            queue: nil
+        ) { notification in
+            saveObserver.notification = notification
+        }
+        defer { NotificationCenter.default.removeObserver(token) }
+
+        let importedCount = try savingContext.performAndWait {
+            do {
+                let count = try restoreImportedGames(games, in: savingContext)
+                try savingContext.save()
+                return count
+            } catch {
+                savingContext.rollback()
+                throw error
+            }
+        }
+
+        if let notification = saveObserver.notification {
+            context.performAndWait {
+                context.mergeChanges(fromContextDidSave: notification)
+            }
+        }
+
+        return importedCount
+    }
+
+    /// Вносит исторические записи только в переданный частный контекст.
+    /// Внешний метод сохраняет его одним атомарным действием.
+    private static func restoreImportedGames(
+        _ games: [ImportedGame],
+        in context: NSManagedObjectContext
+    ) throws -> Int {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
 
@@ -35,6 +82,7 @@ struct GameImportManager {
             game.date = formatter.date(from: importedGame.date) ?? Date()
             game.gameField = importedGame.gameField
             game.gameFieldID = GameData.gameFieldID(named: importedGame.gameField)
+            game.gameNumber = Int32(importedGame.gameNumber ?? 0)
             game.generation = Int32(importedGame.generation)
 
             game.hasPrelude = importedGame.expansions.hasPrelude
@@ -51,8 +99,11 @@ struct GameImportManager {
                 player.name = importedPlayer.name
                 player.color = normalizedColor(importedPlayer.color)
                 player.corporation = importedPlayer.corporation
+                player.corporationID = GameData.corporationID(named: importedPlayer.corporation)
                 player.prologue1 = importedPlayer.prologue1
+                player.prologue1ID = GameData.preludeID(named: importedPlayer.prologue1)
                 player.prologue2 = importedPlayer.prologue2
+                player.prologue2ID = GameData.preludeID(named: importedPlayer.prologue2)
 
                 let score = Score(context: context)
                 score.terraformingRating = importedPlayer.score.terraformingRating
@@ -75,6 +126,10 @@ struct GameImportManager {
 
                     let achievement = Achievement(context: context)
                     achievement.name = importedAchievement.name
+                    achievement.referenceID = GameData.achievementID(
+                        named: importedAchievement.name,
+                        for: importedGame.gameField
+                    )
                     achievement.game = game
                     achievement.player = player
                 }
@@ -86,6 +141,10 @@ struct GameImportManager {
 
                     let award = Award(context: context)
                     award.name = importedAward.name
+                    award.referenceID = GameData.awardID(
+                        named: importedAward.name,
+                        for: importedGame.gameField
+                    )
                     award.place = 1
                     award.game = game
                     award.player = player
@@ -96,6 +155,10 @@ struct GameImportManager {
 
                     let award = Award(context: context)
                     award.name = importedAward.name
+                    award.referenceID = GameData.awardID(
+                        named: importedAward.name,
+                        for: importedGame.gameField
+                    )
                     award.place = 2
                     award.game = game
                     award.player = player
@@ -105,7 +168,6 @@ struct GameImportManager {
             importedCount += 1
         }
 
-        try context.save()
         return importedCount
     }
 
@@ -116,7 +178,21 @@ struct GameImportManager {
         return allowed.contains(color) ? color : ""
     }
 
-    enum ImportError: Error {
+    enum ImportError: LocalizedError {
         case fileNotFound
+        case missingPersistentStoreCoordinator
+
+        var errorDescription: String? {
+            switch self {
+            case .fileNotFound:
+                return "Файл исторического импорта не найден."
+            case .missingPersistentStoreCoordinator:
+                return "Хранилище журнала недоступно."
+            }
+        }
     }
+}
+
+private final class ImportContextSaveObserver {
+    var notification: Notification?
 }

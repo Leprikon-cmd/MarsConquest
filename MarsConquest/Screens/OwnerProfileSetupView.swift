@@ -1,5 +1,20 @@
+//
+//  OwnerProfileSetupView.swift
+//
+//  Зачем:
+//  Оформляет первый запуск: создаёт владельца или принимает его архив журнала.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Что можно менять руками:
+//  - подписи, порядок разделов и первоначальный набор дополнений;
+//  - правила архива и профиля менять в соответствующих менеджерах, не на экране.
+//
 import CoreData
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Первый запуск: создаёт владельца журнала и его настройки по умолчанию.
 struct OwnerProfileSetupView: View {
@@ -20,6 +35,9 @@ struct OwnerProfileSetupView: View {
   @State private var expansions = ExpansionSettingsManager.load()
   @State private var errorMessage = ""
   @State private var showError = false
+  @State private var showBackupImporter = false
+  @State private var pendingBackup: JournalBackup?
+  @State private var showRestoreConfirmation = false
 
   private var selectedSavedPlayer: SavedPlayer? {
     guard let selectedSavedPlayerID else { return nil }
@@ -42,6 +60,17 @@ struct OwnerProfileSetupView: View {
             .font(AppFont.font(.headline))
           Text("Выберите сохранённого игрока или создайте новый профиль владельца.")
             .font(AppFont.font(.subheadline))
+            .foregroundStyle(.secondary)
+        }
+
+        Section("Архив журнала") {
+          Button {
+            showBackupImporter = true
+          } label: {
+            Label("Восстановить журнал из архива", systemImage: "tray.and.arrow.down")
+          }
+          Text("Архив будет проверен до внесения записей. Уже существующие сведения не перезаписываются.")
+            .font(AppFont.font(.footnote))
             .foregroundStyle(.secondary)
         }
 
@@ -91,6 +120,28 @@ Toggle("Кризис", isOn: expansionBinding(for: \.hasTurmoil))
         Button("OK", role: .cancel) {}
       } message: {
         Text(errorMessage)
+      }
+      .alert("Принять архив", isPresented: $showRestoreConfirmation) {
+        Button("Отмена", role: .cancel) {
+          pendingBackup = nil
+        }
+        Button("Принять архив") {
+          restorePendingBackup()
+        }
+      } message: {
+        Text(restoreConfirmationMessage)
+      }
+      .fileImporter(
+        isPresented: $showBackupImporter,
+        allowedContentTypes: [.json]
+      ) { result in
+        switch result {
+        case .success(let url):
+          prepareRestoration(from: url)
+        case .failure:
+          errorMessage = "Архив не принят. Журнал остался без изменений."
+          showError = true
+        }
       }
     }
   }
@@ -160,6 +211,70 @@ Toggle("Кризис", isOn: expansionBinding(for: \.hasTurmoil))
       errorMessage = "\(String(localized: "Не удалось создать журнал:", locale: locale)) \(error.localizedDescription)"
       showError = true
     }
+  }
+
+  private func prepareRestoration(from url: URL) {
+    let accessGranted = url.startAccessingSecurityScopedResource()
+    defer {
+      if accessGranted {
+        url.stopAccessingSecurityScopedResource()
+      }
+    }
+
+    do {
+      let data = try Data(contentsOf: url)
+      let backup = try JournalBackupManager.decode(data)
+      guard backup.profile != nil else {
+        throw JournalBackupError.invalidArchive
+      }
+      pendingBackup = backup
+      showRestoreConfirmation = true
+    } catch {
+      errorMessage = "Архив не принят. Журнал остался без изменений."
+      showError = true
+    }
+  }
+
+  private func restorePendingBackup() {
+    guard let pendingBackup else { return }
+
+    do {
+      let report = try JournalBackupManager.restore(pendingBackup, in: viewContext)
+      guard report.profileRestored else {
+        throw JournalBackupError.invalidArchive
+      }
+
+      restoreCollectionDefaults(from: pendingBackup.profile)
+      UserDefaults.standard.set(pendingBackup.avatar.style, forKey: OwnerAvatarStyle.storageKey)
+      if let selfie = pendingBackup.avatar.selfieJPEGData,
+         !OwnerSelfieStore.restoreBackupData(selfie) {
+        errorMessage = "Записи внесены, но личный снимок не удалось разместить на этом устройстве."
+        showError = true
+      }
+
+      self.pendingBackup = nil
+      onCompleted()
+    } catch {
+      errorMessage = "Архив не принят. Журнал остался без изменений."
+      showError = true
+    }
+  }
+
+  private func restoreCollectionDefaults(from profile: JournalBackupOwnerProfile?) {
+    guard let profile else { return }
+    expansions = GameExpansions(
+      hasPrelude: profile.hasPrelude,
+      hasVenus: profile.hasVenus,
+      hasColonies: profile.hasColonies,
+      hasHellasElysium: profile.hasHellasElysium,
+      hasTurmoil: profile.hasTurmoil
+    )
+    ExpansionSettingsManager.save(expansions)
+  }
+
+  private var restoreConfirmationMessage: String {
+    guard let pendingBackup else { return "" }
+    return "Архив содержит экспедиций: \(pendingBackup.games.count). Сохранённых профилей: \(pendingBackup.savedPlayers.count). Продолжить внесение сведений в журнал?"
   }
 
   private func normalized(_ value: String) -> String {

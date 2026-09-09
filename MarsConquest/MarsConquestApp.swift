@@ -15,6 +15,9 @@
 //  - проверка справочных данных (корпорации, прологи)
 //  - передача managedObjectContext в SwiftUI окружение
 //
+//  Что можно менять руками:
+//  - только стартовые системные настройки; порядок инициализации хранилища не менять.
+//
 
 import SwiftUI
 import CoreData
@@ -29,6 +32,8 @@ struct MarsConquestApp: App {
     
     init() {
         AppFont.configureSystemControls()
+
+        guard coreDataManager.loadError == nil else { return }
 
         // Проверяем соответствие данных при запуске
         GameData.validateCorporations(with: coreDataManager.viewContext)
@@ -46,7 +51,13 @@ struct MarsConquestApp: App {
     
     var body: some Scene {
         WindowGroup {
-            OwnerProfileGateView()
+            Group {
+                if let loadError = coreDataManager.loadError {
+                    JournalUnavailableView(error: loadError)
+                } else {
+                    OwnerProfileGateView()
+                }
+            }
                 // Пока фиксируем единое светлое оформление. Переключение тем
                 // вернём только вместе с отдельной проработкой дизайна.
                 .preferredColorScheme(.light)
@@ -84,6 +95,43 @@ struct MarsConquestApp: App {
         if let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last {
             print("Core Data Store Location: \(url)")
         }
+    }
+}
+
+private struct JournalUnavailableView: View {
+    let error: Error
+
+    var body: some View {
+        ZStack {
+            Image("fon")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+
+            VStack(spacing: 18) {
+                Image(systemName: "archivebox")
+                    .font(.system(size: 42, weight: .semibold))
+
+                Text("Архив временно недоступен")
+                    .font(AppFont.font(.title2))
+
+                Text("Локальное хранилище не удалось открыть. Данные не удалены. Закройте приложение и повторите запуск.")
+                    .font(AppFont.font(.body))
+                    .multilineTextAlignment(.center)
+
+                DisclosureGroup("Технические сведения") {
+                    Text(verbatim: error.localizedDescription)
+                        .font(AppFont.font(.footnote))
+                        .textSelection(.enabled)
+                        .padding(.top, 8)
+                }
+            }
+            .foregroundStyle(.primary)
+            .padding(24)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
+            .padding(24)
+        }
+        .accessibilityIdentifier("journal-unavailable-screen")
     }
 }
 

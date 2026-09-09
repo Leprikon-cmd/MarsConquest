@@ -1,13 +1,19 @@
 //
 //  GameDetailView.swift
 //
-//  Показывает сохранённую партию: краткую сводку по игрокам и,
-//  по явному действию, подробную разбивку их очков.
+//  Зачем:
+//  Показывает сохранённую экспедицию: сводку участников и подробную разбивку очков.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Что можно менять руками:
+//  - порядок блоков, интервалы и карточки результатов; нижний запас нужен для навигации iPhone.
 //
 
 import SwiftUI
 import CoreData
-import UIKit
 
 struct GameDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -30,13 +36,10 @@ struct GameDetailView: View {
             }
         }
         .navigationTitle(navigationTitle)
+        .accessibilityIdentifier("game-detail-screen")
         // Нижняя панель журнала накладывается поверх вложенного экрана на iPhone.
         // Оставляем запас, чтобы последняя часть записи полностью прокручивалась выше неё.
-        .safeAreaPadding(.bottom, journalNavigationClearance)
-    }
-
-    private var journalNavigationClearance: CGFloat {
-        UIDevice.current.userInterfaceIdiom == .phone ? 84 : 0
+        .safeAreaPadding(.bottom, JournalNavigationLayout.contentBottomClearance)
     }
 
     private func gameInformationSection() -> some View {

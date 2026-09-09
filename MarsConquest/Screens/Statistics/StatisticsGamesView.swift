@@ -2,12 +2,19 @@
 //  StatisticsGamesView.swift
 //  MarsConquest
 //
-//  Created by Евгений on 12.03.2026.
+//  Зачем:
+//  Показывает список сохранённых экспедиций и действия с записями.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Что можно менять руками:
+//  - внешний вид строк, подписи и отступы; удаление записей — осознанное действие владельца.
 //
 
 import SwiftUI
 import CoreData
-import UIKit
 
 struct StatisticsGamesView: View {
     let games: [Game]
@@ -57,11 +64,7 @@ struct StatisticsGamesView: View {
                 }
             }
         }
-        .safeAreaPadding(.bottom, journalNavigationClearance)
-    }
-
-    private var journalNavigationClearance: CGFloat {
-        UIDevice.current.userInterfaceIdiom == .phone ? 84 : 0
+        .safeAreaPadding(.bottom, JournalNavigationLayout.contentBottomClearance)
     }
 
     private func gameRow(index: Int, game: Game) -> some View {

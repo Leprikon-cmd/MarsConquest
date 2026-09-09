@@ -1,6 +1,18 @@
+//
+//  ContentView.swift
+//
+//  Зачем:
+//  Собирает главный экран личного журнала и нижнюю навигацию iPhone.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Что можно менять руками:
+//  - состав разделов, подписи и иконки нижней навигации; порядок влияет на привычный маршрут владельца.
+//
 import CoreData
 import SwiftUI
-import UIKit
 
 /// Главный экран личного журнала владельца.
 struct ContentView: View {
@@ -138,10 +150,6 @@ private struct OwnerDashboardView: View {
     sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
   ) private var games: FetchedResults<Game>
 
-  private var journalNavigationClearance: CGFloat {
-    UIDevice.current.userInterfaceIdiom == .phone ? 84 : 0
-  }
-
 private func isOwner(_ player: Player) -> Bool {
   guard let ownerID = ownerProfile.savedPlayerID else { return false }
   return player.savedPlayerID == ownerID || player.id == ownerID
@@ -219,7 +227,7 @@ OwnerProfileBadgeView(
           // Нижняя навигация накладывается поверх корневого экрана. На iPhone
           // оставляем запас, чтобы последние действия журнала можно было
           // полностью прокрутить выше неё.
-          .padding(.bottom, 16 + journalNavigationClearance)
+          .padding(.bottom, 16 + JournalNavigationLayout.contentBottomClearance)
           .padding(.top, 56)
           .adaptiveContentWidth(560)
         }

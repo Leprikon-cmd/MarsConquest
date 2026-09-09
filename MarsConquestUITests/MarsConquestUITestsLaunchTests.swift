@@ -2,7 +2,15 @@
 //  MarsConquestUITestsLaunchTests.swift
 //  MarsConquestUITests
 //
-//  Created by Евгений Зотчик on 06.03.2025.
+//  Зачем:
+//  Проверяет, что приложение запускается и формирует снимок стартового экрана.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Что можно менять руками:
+//  - параметры запуска и сценарий снимка; на интерфейс приложения они не влияют.
 //
 
 import XCTest
@@ -20,10 +28,11 @@ final class MarsConquestUITestsLaunchTests: XCTestCase {
     @MainActor
     func testLaunch() throws {
         let app = XCUIApplication()
+        app.launchArguments.append("-ui-test-in-memory-store")
+        app.launchArguments.append("-ui-test-seed-owner")
         app.launch()
 
-        // Insert steps here to perform after app launch but before taking a screenshot,
-        // such as logging into a test account or navigating somewhere in the app
+        // Здесь размещаются действия после запуска и до снимка стартового экрана.
 
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = "Launch Screen"

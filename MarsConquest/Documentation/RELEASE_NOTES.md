@@ -1,5 +1,39 @@
 # Release Notes
 
+## В работе — «Надёжный журнал» / In Progress — Reliable Logbook
+
+Дата / Date: 9 сентября 2026
+
+- Core Data обновлена до `GameDataModel 11`: исправлены обратные связи колоний и достижений;
+  миграция с версии 10 проверена на временной SQLite-базе.
+- Сохранение новой партии изолировано от остальных изменений основного контекста.
+- При невозможности открыть локальное хранилище приложение сохраняет исходную базу нетронутой
+  и показывает отдельный экран с раскрываемыми техническими сведениями.
+- Добавлены проверки полной записи партии, связей активной модели и сценария
+  «Высадка! → редактор владельца → команда» на iPhone.
+- Быстрые проверки разделены на целевые наборы для подсчёта очков, состава экспедиции,
+  совместимости старых записей и надёжности журнала.
+- UI-тесты запускаются с отдельной чистой базой в памяти и не зависят от истории симулятора.
+- При отказе записи новые объекты явно отбрасываются; повторное внесение той же экспедиции
+  не создаёт дубликат.
+- В настройках появился версионированный резервный архив журнала: он переносит историю,
+  профиль, коллекцию и личный аватар, а при повторном восстановлении не создаёт копии записей.
+
+- Core Data now uses `GameDataModel 11`, with corrected colony and achievement inverse
+  relationships and an automated migration check from version 10.
+- Saving a new game is isolated from unrelated changes in the main context.
+- If the local store cannot be opened, the original database remains untouched and the app
+  presents a dedicated screen with expandable technical details.
+- Automated checks now cover a complete saved game, current-model relationships, and the
+  iPhone flow from Landing through the owner editor to the expedition team.
+- Fast checks are grouped into targeted suites for scoring, expedition setup, legacy-entry
+  compatibility, and logbook reliability.
+- UI tests now use an isolated clean in-memory store instead of relying on simulator history.
+- A failed journal write explicitly discards new objects, and retrying the same expedition
+  does not create a duplicate.
+- Settings now offers a versioned journal archive that carries history, profile, collection,
+  and personal avatar; restoring the same archive again does not create duplicate entries.
+
 ## Mars LogBook 1.4 (6) - TestFlight
 
 Дата: 25 июля 2026

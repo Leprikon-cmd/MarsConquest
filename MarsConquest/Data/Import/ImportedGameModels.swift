@@ -9,6 +9,9 @@
 //  Atlas — AI-ассистент разработки
 //
 
+//  Что можно менять руками:
+//  - поля старого mars_import.json; не использовать для нового резервного архива.
+//
 import Foundation
 
 struct ImportedGame: Codable {

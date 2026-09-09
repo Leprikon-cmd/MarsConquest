@@ -2,7 +2,15 @@
 //  AddPlayersView.swift
 //  MarsConquest
 //
-//  Экран формирования команды новой экспедиции.
+//  Зачем:
+//  Формирует команду новой экспедиции и открывает карточку владельца сразу после высадки.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Что можно менять руками:
+//  - порядок карточек, интервалы и фон экрана; правила состава команды не менять без проверки запуска.
 //
 
 import SwiftUI
@@ -20,6 +28,8 @@ struct AddPlayersView: View {
   /// Игрок, которого пользователь открыл для редактирования.
   @State private var playerToEdit: LocalPlayer?
   @State private var showPlayerEditor = false
+  /// Отличает автоматическое первое открытие владельца от обычного редактирования карточки.
+  @State private var isPresentingInitialOwner = false
 
   /// В сценарии новой экспедиции сразу открываем карточку первого игрока.
   let opensFirstPlayerOnAppear: Bool
@@ -99,7 +109,8 @@ struct AddPlayersView: View {
         AddPlayerScreen(
           availableColors: availableColors,
           localGame: $localGame,
-          editingPlayer: nil
+          editingPlayer: nil,
+          isInitialOwnerEditor: false
         )
       }
       .navigationDestination(isPresented: $showPlayerEditor) {
@@ -107,10 +118,12 @@ struct AddPlayersView: View {
           AddPlayerScreen(
             availableColors: availableColors(for: player),
             localGame: $localGame,
-            editingPlayer: player
+            editingPlayer: player,
+            isInitialOwnerEditor: isPresentingInitialOwner
           )
           .onDisappear {
             playerToEdit = nil
+            isPresentingInitialOwner = false
           }
         }
       }
@@ -213,6 +226,7 @@ struct AddPlayersView: View {
       ForEach(localGame.players) { player in
         Button {
           playerToEdit = player
+          isPresentingInitialOwner = false
           showPlayerEditor = true
         } label: {
           playerRowView(player: player)
@@ -359,6 +373,7 @@ struct AddPlayersView: View {
     }
     didPresentInitialPlayer = true
     playerToEdit = owner
+    isPresentingInitialOwner = true
     showPlayerEditor = true
   }
 

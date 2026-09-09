@@ -1,6 +1,18 @@
+//
+//  RegaliaView.swift
+//
+//  Зачем:
+//  Показывает карьерные вехи владельца отдельно от достижений конкретной партии.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Что можно менять руками:
+//  - внешний вид карточек и их подписи; правила присвоения вех находятся в CareerProgressCalculator.
+//
 import CoreData
 import SwiftUI
-import UIKit
 
 /// Личная коллекция карьерных вех владельца журнала.
 /// Игровые достижения Terraforming Mars остаются частью конкретной партии.
@@ -53,10 +65,6 @@ struct RegaliaView: View {
       .map { ($0.key, $0.value) }
   }
 
-  private var journalNavigationClearance: CGFloat {
-    UIDevice.current.userInterfaceIdiom == .phone ? 84 : 0
-  }
-
   var body: some View {
     NavigationStack {
       ZStack {
@@ -76,7 +84,7 @@ struct RegaliaView: View {
           .padding(.top)
           // Нижняя навигация корневого журнала расположена поверх экрана.
           // Оставляем место, чтобы нижние регалии не оказывались под ней.
-          .padding(.bottom, 16 + journalNavigationClearance)
+          .padding(.bottom, 16 + JournalNavigationLayout.contentBottomClearance)
         }
       }
       .navigationTitle(regaliaTitle)

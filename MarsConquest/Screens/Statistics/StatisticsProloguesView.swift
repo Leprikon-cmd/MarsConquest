@@ -2,11 +2,18 @@
 //  StatisticsProloguesView.swift
 //  MarsConquest
 //
-//  Created by Евгений on 12.03.2026.
+//  Зачем:
+//  Показывает статистику выбранных прологов по сохранённым экспедициям.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Что можно менять руками:
+//  - сортировку, подписи, интервалы и оформление строк; формулы находятся в StatisticsCalculator.
 //
 import SwiftUI
 import CoreData
-import UIKit
 
 struct StatisticsProloguesView: View {
     @Environment(\.locale) private var locale
@@ -39,11 +46,7 @@ struct StatisticsProloguesView: View {
                 }
             }
         }
-        .safeAreaPadding(.bottom, journalNavigationClearance)
-    }
-
-    private var journalNavigationClearance: CGFloat {
-        UIDevice.current.userInterfaceIdiom == .phone ? 84 : 0
+        .safeAreaPadding(.bottom, JournalNavigationLayout.contentBottomClearance)
     }
 
     private func localizedPreludeName(_ name: String) -> String {

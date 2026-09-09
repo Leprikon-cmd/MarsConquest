@@ -1,10 +1,24 @@
+//
+//  UITestDataBootstrapper.swift
+//
+//  Зачем:
+//  Создаёт минимальные данные только для автоматического запуска интерфейсных тестов.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Что можно менять руками:
+//  - аргументы запуска и тестовые данные; обычный запуск приложения их не использует.
+//
 import CoreData
 import Foundation
 
 /// Готовит минимальные данные только для автоматического UI-теста.
 /// Обычные запуски приложения этот код не выполняют.
 enum UITestDataBootstrapper {
-  static let seedOwnerArgument = "-ui-test-seed-owner"
+    static let seedOwnerArgument = "-ui-test-seed-owner"
+    static let inMemoryStoreArgument = "-ui-test-in-memory-store"
 
   static func seedOwnerIfRequested(in context: NSManagedObjectContext) {
     guard ProcessInfo.processInfo.arguments.contains(seedOwnerArgument) else { return }

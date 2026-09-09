@@ -2,6 +2,16 @@
 //  MarsConquestTests.swift
 //  MarsConquestTests
 //
+//  Зачем:
+//  Проверяет модель Core Data, миграции и безопасное сохранение журнала.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Что можно менять руками:
+//  - тестовые сценарии и данные; на интерфейс приложения они не влияют.
+//
 
 import Foundation
 import CoreData
@@ -9,42 +19,298 @@ import Testing
 @testable import MarsConquest
 
 struct MarsConquestTests {
-    @Test func tieBreakerUsesRemainingMegaCreditsBeforeCards() {
-        let game = makeGame([
-            makePlayer(name: "Аня", score: 80, megaCredits: 10, cards: 1),
-            makePlayer(name: "Борис", score: 80, megaCredits: 9, cards: 9),
-            makePlayer(name: "Вера", score: 75, megaCredits: 99, cards: 99)
-        ])
+    @Test @MainActor func currentModelHasReciprocalJournalRelationships() throws {
+        let context = try makeInMemoryContext()
+        let model = try #require(context.persistentStoreCoordinator?.managedObjectModel)
 
-        let ranking = ScoreManager().ranking(in: game)
+        let colonies = try #require(model.entitiesByName["Game"]?.relationshipsByName["colonies"])
+        let colonyGame = try #require(model.entitiesByName["Colony"]?.relationshipsByName["game"])
+        #expect(colonies.inverseRelationship === colonyGame)
+        #expect(colonyGame.inverseRelationship === colonies)
 
-        #expect(ranking.map(\.place) == [1, 2, 3])
-        #expect(ranking.map(\.player.name) == ["Аня", "Борис", "Вера"])
+        let achievements = try #require(
+            model.entitiesByName["Player"]?.relationshipsByName["achievements"]
+        )
+        let achievementPlayer = try #require(
+            model.entitiesByName["Achievement"]?.relationshipsByName["player"]
+        )
+        #expect(achievements.inverseRelationship === achievementPlayer)
+        #expect(achievementPlayer.inverseRelationship === achievements)
     }
 
-    @Test func tieBreakerUsesCardsWhenMegaCreditsAreEqual() {
-        let game = makeGame([
-            makePlayer(name: "Аня", score: 80, megaCredits: 7, cards: 2),
-            makePlayer(name: "Борис", score: 80, megaCredits: 7, cards: 4),
-            makePlayer(name: "Вера", score: 75, megaCredits: 0, cards: 0)
-        ])
+    @Test @MainActor func gameSaverPersistsCompleteJournalEntry() throws {
+        let context = try makeInMemoryContext()
+        let firstPlayerID = UUID()
+        let secondPlayerID = UUID()
+        let gameID = UUID()
+        let date = Date(timeIntervalSinceReferenceDate: 123_456)
+        let firstScore = LocalScore(
+            terraformingRating: 36,
+            greenery: 12,
+            cities: 8,
+            victoryPoints: 15,
+            resourcesOnCards: 6,
+            conditionsOnCards: 4,
+            politics: 3
+        )
+        let secondScore = LocalScore(victoryPoints: 70)
+        let firstPlayer = LocalPlayer(
+            id: firstPlayerID,
+            name: "Владелец",
+            color: "Красный",
+            corporation: "Ecoline",
+            prologue1: "Allied Banks",
+            prologue2: "Biolab",
+            score: firstScore,
+            remainingMegaCredits: 11,
+            unplayedCards: 2
+        )
+        let secondPlayer = LocalPlayer(
+            id: secondPlayerID,
+            name: "Соперник",
+            color: "Синий",
+            corporation: "Helion",
+            prologue1: "Business Empire",
+            prologue2: "Donation",
+            score: secondScore,
+            remainingMegaCredits: 5,
+            unplayedCards: 1
+        )
+        let expansions = GameExpansions(
+            hasPrelude: true,
+            hasVenus: true,
+            hasColonies: true,
+            hasHellasElysium: true,
+            hasTurmoil: true
+        )
+        let localGame = LocalGameData(
+            id: gameID,
+            date: date,
+            gameField: GameField.hellas.rawValue,
+            backgroundImageName: "Hellas1",
+            players: [firstPlayer, secondPlayer],
+            colonies: ["Luna", "Titan"],
+            achievements: [
+                LocalAchievement(name: "Эрудит", winnerPlayerIDs: [firstPlayerID])
+            ],
+            awards: [
+                LocalAward(
+                    name: "Агроном",
+                    firstPlacePlayerIDs: [firstPlayerID],
+                    secondPlacePlayerIDs: [secondPlayerID]
+                )
+            ],
+            generation: 9,
+            venusTerraformingScale: 20,
+            expansions: expansions
+        )
 
-        let ranking = ScoreManager().ranking(in: game)
+        _ = try GameSaver().save(localGame: localGame, in: context)
+        context.reset()
 
-        #expect(ranking.map(\.place) == [1, 2, 3])
-        #expect(ranking.map(\.player.name) == ["Борис", "Аня", "Вера"])
+        let request = NSFetchRequest<Game>(entityName: "Game")
+        request.predicate = NSPredicate(format: "id == %@", gameID as CVarArg)
+        let game = try #require(context.fetch(request).first)
+        #expect(game.date == date)
+        #expect(game.gameField == GameField.hellas.rawValue)
+        #expect(game.generation == 9)
+        #expect(game.venusTerraformingScale == 20)
+        #expect(game.hasPrelude && game.hasVenus && game.hasColonies)
+        #expect(game.hasHellasElysium && game.hasTurmoil)
+
+        let colonies = game.colonies?.allObjects as? [Colony] ?? []
+        #expect(Set(colonies.compactMap(\.name)) == ["Luna", "Titan"])
+        #expect(colonies.allSatisfy { $0.game === game })
+
+        let players = game.players?.allObjects as? [Player] ?? []
+        #expect(players.count == 2)
+        let savedFirst = try #require(players.first { $0.savedPlayerID == firstPlayerID })
+        let savedSecond = try #require(players.first { $0.savedPlayerID == secondPlayerID })
+        #expect(savedFirst.score?.terraformingRating == 36)
+        #expect(savedFirst.score?.politics == 3)
+        #expect(savedFirst.remainingMegaCredits == 11)
+        #expect(savedFirst.unplayedCards == 2)
+        #expect(savedFirst.achievements?.count == 1)
+        #expect(savedSecond.awards?.contains { ($0 as? Award)?.place == 2 } == true)
+        #expect(game.achievments?.count == 1)
+        #expect(game.awards?.count == 2)
     }
 
-    @Test func equalTieBreakerValuesPreserveTie() {
-        let game = makeGame([
-            makePlayer(name: "Аня", score: 80, megaCredits: 7, cards: 4),
-            makePlayer(name: "Борис", score: 80, megaCredits: 7, cards: 4),
-            makePlayer(name: "Вера", score: 75, megaCredits: 0, cards: 0)
+    @Test @MainActor func gameSaverKeepsUnrelatedContextChangesIsolated() throws {
+        let context = try makeInMemoryContext()
+        let pendingPlayer = SavedPlayer(context: context)
+        pendingPlayer.id = UUID()
+        pendingPlayer.name = "Несохранённый профиль"
+        pendingPlayer.createdAt = Date()
+        pendingPlayer.updatedAt = Date()
+
+        let localGame = makeGame([
+            makePlayer(name: "Владелец", score: 70, megaCredits: 0, cards: 0)
         ])
+        let savedGame = try GameSaver().save(localGame: localGame, in: context)
 
-        let ranking = ScoreManager().ranking(in: game)
+        #expect(savedGame.id == localGame.id)
+        #expect(context.insertedObjects.contains(pendingPlayer))
+        #expect(context.hasChanges)
 
-        #expect(ranking.map(\.place) == [1, 1, 2])
+        let request = NSFetchRequest<Game>(entityName: "Game")
+        request.predicate = NSPredicate(format: "id == %@", localGame.id as CVarArg)
+        #expect(try context.count(for: request) == 1)
+    }
+
+    @Test @MainActor func failedSaveLeavesNoEntryAndRetryDoesNotDuplicateIt() throws {
+        enum SimulatedSaveError: Error {
+            case storageRejected
+        }
+
+        let context = try makeInMemoryContext()
+        let localGame = makeGame([
+            makePlayer(name: "Владелец", score: 70, megaCredits: 0, cards: 0)
+        ])
+        let request = NSFetchRequest<Game>(entityName: "Game")
+        request.predicate = NSPredicate(format: "id == %@", localGame.id as CVarArg)
+
+        let rejectingSaver = GameSaver { _ in
+            throw SimulatedSaveError.storageRejected
+        }
+        #expect(throws: SimulatedSaveError.self) {
+            _ = try rejectingSaver.save(localGame: localGame, in: context)
+        }
+        #expect(try context.count(for: request) == 0)
+
+        _ = try GameSaver().save(localGame: localGame, in: context)
+        context.reset()
+        #expect(try context.count(for: request) == 1)
+
+        _ = try GameSaver().save(localGame: localGame, in: context)
+        context.reset()
+        #expect(try context.count(for: request) == 1)
+    }
+
+    @Test @MainActor func modelTenStoreMigratesToCurrentModelWithRelationshipsIntact() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(
+            at: directory,
+            withIntermediateDirectories: true
+        )
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let storeURL = directory.appendingPathComponent("GameDataModel.sqlite")
+        let model10 = try compiledModel(named: "GameDataModel 10")
+        let oldCoordinator = NSPersistentStoreCoordinator(managedObjectModel: model10)
+        let oldStore = try oldCoordinator.addPersistentStore(
+            ofType: NSSQLiteStoreType,
+            configurationName: nil,
+            at: storeURL
+        )
+        let oldContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        oldContext.persistentStoreCoordinator = oldCoordinator
+
+        let gameID = UUID()
+        let playerID = UUID()
+        let game = NSEntityDescription.insertNewObject(forEntityName: "Game", into: oldContext)
+        game.setValue(gameID, forKey: "id")
+        game.setValue(GameField.hellas.rawValue, forKey: "gameField")
+        let player = NSEntityDescription.insertNewObject(forEntityName: "Player", into: oldContext)
+        player.setValue(playerID, forKey: "id")
+        player.setValue("Владелец", forKey: "name")
+        player.setValue(game, forKey: "game")
+        let colony = NSEntityDescription.insertNewObject(forEntityName: "Colony", into: oldContext)
+        colony.setValue("Luna", forKey: "name")
+        colony.setValue(game, forKey: "game")
+        let achievement = NSEntityDescription.insertNewObject(
+            forEntityName: "Achievement",
+            into: oldContext
+        )
+        achievement.setValue("Эрудит", forKey: "name")
+        achievement.setValue(game, forKey: "game")
+        achievement.setValue(player, forKey: "player")
+        try oldContext.save()
+        try oldCoordinator.remove(oldStore)
+
+        let currentModel = try compiledModel(named: "GameDataModel 11")
+        let container = NSPersistentContainer(
+            name: "GameDataModel",
+            managedObjectModel: currentModel
+        )
+        let description = NSPersistentStoreDescription(url: storeURL)
+        description.shouldMigrateStoreAutomatically = true
+        description.shouldInferMappingModelAutomatically = true
+        container.persistentStoreDescriptions = [description]
+
+        var migrationError: Error?
+        container.loadPersistentStores { _, error in
+            migrationError = error
+        }
+        if let migrationError { throw migrationError }
+
+        let request = NSFetchRequest<Game>(entityName: "Game")
+        request.predicate = NSPredicate(format: "id == %@", gameID as CVarArg)
+        let migratedGame = try #require(container.viewContext.fetch(request).first)
+        let migratedPlayers = migratedGame.players?.allObjects as? [Player] ?? []
+        let migratedPlayer = try #require(migratedPlayers.first { $0.id == playerID })
+        #expect(migratedGame.colonies?.count == 1)
+        #expect(migratedGame.achievments?.count == 1)
+        #expect(migratedPlayer.achievements?.count == 1)
+    }
+
+    @Test @MainActor func modelsFiveThroughNineMigrateToCurrentJournalModel() throws {
+        for version in 5...9 {
+            let directory = FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString, isDirectory: true)
+            try FileManager.default.createDirectory(
+                at: directory,
+                withIntermediateDirectories: true
+            )
+            defer { try? FileManager.default.removeItem(at: directory) }
+
+            let storeURL = directory.appendingPathComponent("GameDataModel.sqlite")
+            let legacyModel = try compiledModel(named: "GameDataModel \(version)")
+            let legacyCoordinator = NSPersistentStoreCoordinator(managedObjectModel: legacyModel)
+            let legacyStore = try legacyCoordinator.addPersistentStore(
+                ofType: NSSQLiteStoreType,
+                configurationName: nil,
+                at: storeURL
+            )
+            let legacyContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+            legacyContext.persistentStoreCoordinator = legacyCoordinator
+
+            let gameID = UUID()
+            let playerID = UUID()
+            let game = NSEntityDescription.insertNewObject(forEntityName: "Game", into: legacyContext)
+            game.setValue(gameID, forKey: "id")
+            game.setValue(GameField.farsida.rawValue, forKey: "gameField")
+            let player = NSEntityDescription.insertNewObject(forEntityName: "Player", into: legacyContext)
+            player.setValue(playerID, forKey: "id")
+            player.setValue("Исторический игрок", forKey: "name")
+            player.setValue(game, forKey: "game")
+            try legacyContext.save()
+            try legacyCoordinator.remove(legacyStore)
+
+            let currentModel = try compiledModel(named: "GameDataModel 11")
+            let container = NSPersistentContainer(
+                name: "GameDataModel",
+                managedObjectModel: currentModel
+            )
+            let description = NSPersistentStoreDescription(url: storeURL)
+            description.shouldMigrateStoreAutomatically = true
+            description.shouldInferMappingModelAutomatically = true
+            container.persistentStoreDescriptions = [description]
+
+            var migrationError: Error?
+            container.loadPersistentStores { _, error in
+                migrationError = error
+            }
+            if let migrationError { throw migrationError }
+
+            let request = NSFetchRequest<Game>(entityName: "Game")
+            request.predicate = NSPredicate(format: "id == %@", gameID as CVarArg)
+            let migratedGame = try #require(container.viewContext.fetch(request).first)
+            let migratedPlayers = migratedGame.players?.allObjects as? [Player] ?? []
+            #expect(migratedGame.gameField == GameField.farsida.rawValue)
+            #expect(migratedPlayers.contains { $0.id == playerID && $0.name == "Исторический игрок" })
+        }
     }
 
     @Test @MainActor func careerProgressUsesOnlyLinkedHistoryAndAwardsBaseResults() throws {
@@ -268,6 +534,14 @@ struct MarsConquestTests {
         // может быть освобождено до создания связанных объектов.
         container.viewContext.userInfo["testPersistentContainer"] = container
         return container.viewContext
+    }
+
+    private func compiledModel(named name: String) throws -> NSManagedObjectModel {
+        let modelDirectory = try #require(
+            Bundle.main.url(forResource: "GameDataModel", withExtension: "momd")
+        )
+        let modelURL = modelDirectory.appendingPathComponent("\(name).mom")
+        return try #require(NSManagedObjectModel(contentsOf: modelURL))
     }
 
     private func makeSavedGame(

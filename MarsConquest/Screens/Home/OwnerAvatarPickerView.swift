@@ -1,3 +1,17 @@
+//
+//  OwnerAvatarPickerView.swift
+//
+//  Зачем:
+//  Позволяет владельцу выбрать готовый аватар или сделать личный снимок.
+//
+//  Кто:
+//  Евгений Зотчик — автор проекта
+//  Atlas — AI-ассистент разработки
+//
+//  Что можно менять руками:
+//  - сетку выбора: minimum 96 и spacing 16;
+//  - набор изображений — в OwnerAvatarStyle.swift и каталоге Assets.
+//
 import SwiftUI
 import UIKit
 
@@ -128,7 +142,26 @@ enum OwnerSelfieStore {
   }
 
   static func save(_ image: UIImage) -> Bool {
-    guard let fileURL, let data = image.jpegData(compressionQuality: 0.9) else { return false }
+    guard let data = image.jpegData(compressionQuality: 0.9) else { return false }
+    return saveJPEGData(data)
+  }
+
+  static func backupData() -> Data? {
+    guard let fileURL else { return nil }
+    return try? Data(contentsOf: fileURL)
+  }
+
+  static func restoreBackupData(_ data: Data) -> Bool {
+    guard isValidBackupData(data) else { return false }
+    return saveJPEGData(data)
+  }
+
+  static func isValidBackupData(_ data: Data) -> Bool {
+    UIImage(data: data) != nil
+  }
+
+  private static func saveJPEGData(_ data: Data) -> Bool {
+    guard let fileURL else { return false }
     do {
       try FileManager.default.createDirectory(
         at: fileURL.deletingLastPathComponent(),

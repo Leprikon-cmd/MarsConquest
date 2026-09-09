@@ -13,13 +13,16 @@
 //  - предоставление основного контекста данных
 //  - сохранение изменений в базе данных
 //
+//  Что можно менять руками:
+//  - имя модели и настройки хранилища только вместе с проверкой миграции сохранённых журналов.
+//
 
 import CoreData
 
 /// Менеджер работы с CoreData.
 /// Используется как Singleton, чтобы всё приложение работало
 /// с одним контейнером и одним основным контекстом.
-class CoreDataManager {
+final class CoreDataManager {
     
     /// Глобальный экземпляр менеджера CoreData.
     /// Используется во всём приложении.
@@ -27,8 +30,20 @@ class CoreDataManager {
     
     /// Основной контейнер CoreData.
     /// Загружает модель данных `GameDataModel` и создаёт хранилище SQLite.
-    lazy var persistentContainer: NSPersistentContainer = {
+    let persistentContainer: NSPersistentContainer
+
+    /// Ошибка открытия постоянного хранилища. Исходный файл базы при этом не изменяется.
+    private(set) var loadError: Error?
+
+    private init() {
         let container = NSPersistentContainer(name: "GameDataModel")
+
+        // UI-тесты получают отдельное чистое хранилище и не зависят от истории симулятора.
+        if ProcessInfo.processInfo.arguments.contains(UITestDataBootstrapper.inMemoryStoreArgument) {
+            let testDescription = NSPersistentStoreDescription()
+            testDescription.type = NSInMemoryStoreType
+            container.persistentStoreDescriptions = [testDescription]
+        }
 
         // Разрешаем Core Data автоматически обновить локальную базу при смене версии модели.
         // Например, при удалении устаревшего поля Game.duration.
@@ -37,14 +52,12 @@ class CoreDataManager {
             storeDescription.shouldInferMappingModelAutomatically = true
         }
         
-        container.loadPersistentStores { description, error in
-            if let error = error {
-                fatalError("Не удалось загрузить хранилище: \(error)")
-            }
+        persistentContainer = container
+
+        container.loadPersistentStores { [weak self] _, error in
+            self?.loadError = error
         }
-        
-        return container
-    }()
+    }
     
     /// Основной контекст приложения.
     /// Через него выполняются все операции чтения и записи в CoreData.

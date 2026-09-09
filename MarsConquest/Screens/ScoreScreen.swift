@@ -15,6 +15,10 @@
 //  - показ итогов партии
 //  - сохранение результатов игры в CoreData
 //
+//  Что можно менять руками:
+//  - реквизиты, интервалы, прозрачность плашек и подпись «Внести в журнал»;
+//    правила полноты записи и сохранение находятся в GameSaver.
+//
 
 import SwiftUI
 import CoreData
@@ -96,6 +100,7 @@ struct ScoreScreen: View {
             }
             .scrollContentBackground(.hidden)
         }
+        .accessibilityIdentifier("score-screen")
         .navigationTitle("")
         .alert("Архив временно недоступен", isPresented: $showError) {
             Button("OK", role: .cancel) { }
@@ -195,6 +200,7 @@ struct ScoreScreen: View {
         }
         .buttonStyle(.plain)
         .disabled(isSaving)
+        .accessibilityIdentifier("archive-entry-button")
     }
 
     // MARK: - Архивирование экспедиции
@@ -236,8 +242,6 @@ struct ScoreScreen: View {
                 showArchiveRecorded = true
             }
         } catch {
-            // Не оставляем в контексте недосохранённую партию перед повторной попыткой.
-            viewContext.rollback()
             isSaving = false
             errorMessage = String(
                 format: String(localized: "Не удалось внести запись: %@", locale: locale),

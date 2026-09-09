@@ -12,7 +12,9 @@
 //  - шапка архивного журнала
 //  - реквизиты завершённой экспедиции
 //
-
+//  Что можно менять руками:
+//  - тексты реквизитов, типографику, прозрачность и интервалы архивной страницы.
+//
 import SwiftUI
 
 struct GameInfoView: View {
@@ -109,6 +111,11 @@ struct GameInfoView: View {
                 .foregroundStyle(.red)
             }
             .accessibilityLabel(title)
+            .accessibilityIdentifier(
+                title == "Поколение"
+                    ? "game-info-generation-menu"
+                    : "game-info-venus-menu"
+            )
             .frame(maxWidth: 112)
         }
     }

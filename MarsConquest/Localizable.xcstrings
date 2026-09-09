@@ -254,7 +254,20 @@
         }
       }
     },
+    "Архив будет проверен до внесения записей. Уже существующие сведения не перезаписываются." : {
+
+    },
     "Архив временно недоступен" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archive Temporarily Unavailable"
+          }
+        }
+      }
+    },
+    "Архив журнала" : {
 
     },
     "Базовая игра" : {
@@ -325,6 +338,9 @@
 
     },
     "Внести в журнал" : {
+
+    },
+    "Восстановить журнал из архива" : {
 
     },
     "Все доступные записи уже проверены." : {
@@ -1004,6 +1020,16 @@
         }
       }
     },
+    "Локальное хранилище не удалось открыть. Данные не удалены. Закройте приложение и повторите запуск." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The local archive could not be opened. Your data has not been deleted. Close the app and try again."
+          }
+        }
+      }
+    },
     "Лучший результат" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1459,6 +1485,16 @@
         }
       }
     },
+    "Подтвердить участие" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm Participation"
+          }
+        }
+      }
+    },
     "Подтверждение записи" : {
 
     },
@@ -1598,6 +1634,9 @@
           }
         }
       }
+    },
+    "Принять архив" : {
+
     },
     "Проверить прошлые партии" : {
       "localizations" : {
@@ -1816,8 +1855,15 @@
         }
       }
     },
-    "Сохранить игрока" : {
-
+    "Сохранить изменения" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save Changes"
+          }
+        }
+      }
     },
     "Сохранить результаты" : {
       "extractionState" : "stale",
@@ -1896,6 +1942,16 @@
     },
     "Тай-брейк за 1 место" : {
 
+    },
+    "Технические сведения" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Technical Details"
+          }
+        }
+      }
     },
     "Убрать из партии" : {
       "localizations" : {
