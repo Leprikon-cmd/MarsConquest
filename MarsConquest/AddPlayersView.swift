@@ -11,6 +11,7 @@
 //
 //  Что можно менять руками:
 //  - порядок карточек, интервалы и фон экрана; правила состава команды не менять без проверки запуска.
+//  - при восстановлении черновика автоматически возвращается путь к регламенту, а не создаётся новая партия.
 //
 
 import SwiftUI
@@ -33,8 +34,11 @@ struct AddPlayersView: View {
 
   /// В сценарии новой экспедиции сразу открываем карточку первого игрока.
   let opensFirstPlayerOnAppear: Bool
+  /// Восстанавливает путь «команда → регламент → центр управления» для черновика.
+  let resumesHostExpedition: Bool
 
   @State private var didPresentInitialPlayer = false
+  @State private var didRestoreHostSetup = false
 
   /// Показывает настройки дополнений для текущей незавершённой партии.
   @State private var showSettings = false
@@ -44,9 +48,8 @@ struct AddPlayersView: View {
 
   /// Флаг перехода на экран ввода очков.
   @State private var navigateToScoreScreen = false
-
-  /// Подтверждение отмены незавершённой партии.
-  @State private var showDiscardConfirmation = false
+  /// Экран настройки очередности и регламента для необязательного режима ведущего.
+  @State private var navigateToHostSetup = false
 
   /// Доступные цвета игроков.
   private let colors = GameData.colors
@@ -78,19 +81,18 @@ struct AddPlayersView: View {
       .accessibilityIdentifier("expedition-team-screen")
       .navigationTitle("Команда экспедиции")
       .navigationBarTitleDisplayMode(.inline)
-      .toolbarBackground(.visible, for: .navigationBar)
-      .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+      .toolbarBackground(.hidden, for: .navigationBar)
       .toolbar {
         ToolbarItem(placement: .topBarLeading) {
           Button {
-            discardGame()
+            // Возврат к месту высадки не удаляет сохранённый черновик экспедиции.
+            dismiss()
           } label: {
-            Image(systemName: "xmark")
+            Image(systemName: "chevron.backward")
               .font(AppFont.font(.body))
-              .frame(width: 36, height: 36)
-              .background(.ultraThinMaterial, in: Circle())
+              .frame(width: 44, height: 44)
           }
-          .accessibilityLabel("Отменить создание партии")
+          .accessibilityLabel("Вернуться к выбору игрового поля")
         }
 
         ToolbarItem(placement: .topBarTrailing) {
@@ -99,8 +101,7 @@ struct AddPlayersView: View {
           } label: {
             Image(systemName: "gearshape.fill")
               .font(AppFont.font(.body))
-              .frame(width: 36, height: 36)
-              .background(.ultraThinMaterial, in: Circle())
+              .frame(width: 44, height: 44)
           }
           .accessibilityLabel("Настройки дополнений")
         }
@@ -128,7 +129,8 @@ struct AddPlayersView: View {
         }
       }
       .sheet(isPresented: $showSettings) {
-        SettingsScreen { updatedExpansions in
+        SettingsScreen(
+          onExpansionsChanged: { updatedExpansions in
           localGame.expansions = updatedExpansions
 
           localGame.players = localGame.players.map { player in
@@ -151,10 +153,15 @@ struct AddPlayersView: View {
             return updatedPlayer
           }
 
-          if !updatedExpansions.hasColonies {
-            localGame.colonies = []
+            if !updatedExpansions.hasColonies {
+              localGame.colonies = []
+            }
+          },
+          initialHostConfiguration: localGame.hostConfiguration,
+          onHostConfigurationChanged: { updatedConfiguration in
+            localGame.hostConfiguration = updatedConfiguration
           }
-        }
+        )
       }
       .sheet(isPresented: $showColonyPicker) {
         ColonyCardPickerView(
@@ -163,16 +170,14 @@ struct AddPlayersView: View {
           maximumSelection: colonyLimit
         )
       }
-      .alert("Отменить создание партии?", isPresented: $showDiscardConfirmation) {
-        Button("Продолжить настройку", role: .cancel) {}
-        Button("Отменить партию", role: .destructive) {
-          dismiss()
-        }
-      } message: {
-        Text("Добавленные игроки будут удалены из незавершённой партии.")
-      }
       .navigationDestination(isPresented: $navigateToScoreScreen) {
         ScoreScreen(localGame: $localGame)
+      }
+      .navigationDestination(isPresented: $navigateToHostSetup) {
+        HostGameSetupView(
+          localGame: $localGame,
+          resumesExistingSession: resumesHostExpedition
+        )
       }
       // `AddPlayersView` появляется внутри fullScreenCover. Открываем карточку
       // после завершения анимации этого перехода — иначе iOS игнорирует второй
@@ -183,6 +188,19 @@ struct AddPlayersView: View {
         try? await Task.sleep(for: .milliseconds(500))
         guard !Task.isCancelled else { return }
         presentInitialPlayerIfNeeded()
+      }
+      .task(id: resumesHostExpedition) {
+        guard resumesHostExpedition,
+              !didRestoreHostSetup,
+              localGame.hostSession != nil
+        else { return }
+
+        didRestoreHostSetup = true
+        // Переход выполняется после показа экрана команды, чтобы SwiftUI сохранил
+        // настоящий стек навигации и кнопки «Назад» на каждом уровне.
+        try? await Task.sleep(for: .milliseconds(250))
+        guard !Task.isCancelled else { return }
+        navigateToHostSetup = true
       }
       .onChange(of: localGame.players.count) { _, _ in
         localGame.colonies = Array(localGame.colonies.prefix(colonyLimit))
@@ -255,7 +273,11 @@ struct AddPlayersView: View {
 
   private var startGameButton: some View {
     Button {
-      navigateToScoreScreen = true
+      if localGame.hostConfiguration.isEnabled {
+        navigateToHostSetup = true
+      } else {
+        navigateToScoreScreen = true
+      }
     } label: {
       Text("Начать партию")
         .frame(maxWidth: .infinity, minHeight: 64)
@@ -377,11 +399,4 @@ struct AddPlayersView: View {
     showPlayerEditor = true
   }
 
-  private func discardGame() {
-    if localGame.players.isEmpty {
-      dismiss()
-    } else {
-      showDiscardConfirmation = true
-    }
-  }
 }

@@ -288,6 +288,8 @@ struct JournalBackupManager {
             hasHellasElysium: game.hasHellasElysium,
             hasTurmoil: game.hasTurmoil,
             hasTieBreakerData: game.hasTieBreakerData,
+            usesHostMode: game.usesHostMode,
+            sports: backupSports(game),
             players: players,
             colonies: colonies,
             achievements: achievements,
@@ -311,7 +313,22 @@ struct JournalBackupManager {
             prologue2ID: player.prologue2ID,
             remainingMegaCredits: player.remainingMegaCredits,
             unplayedCards: player.unplayedCards,
+            sportsTimeUsedSeconds: player.sportsTimeUsedSeconds,
+            sportsTimeExceeded: player.sportsTimeExceeded,
             score: player.score.map(backupScore)
+        )
+    }
+
+    private static func backupSports(_ game: Game) -> JournalBackupSports? {
+        guard game.isSportsMode else { return nil }
+        return JournalBackupSports(
+            ruleID: game.sportsRuleID ?? SportsRegulationMetadata.ruleID,
+            ruleVersion: game.sportsRuleVersion ?? SportsRegulationMetadata.ruleVersion,
+            timeLimitSeconds: game.sportsTimeLimitSeconds,
+            generationLimit: game.sportsGenerationLimit,
+            allTimedOutRule: game.sportsAllTimedOutRule,
+            outcome: game.sportsOutcome,
+            winnerPlayerID: game.sportsWinnerPlayerID
         )
     }
 
@@ -361,6 +378,18 @@ struct JournalBackupManager {
         restoredGame.hasHellasElysium = game.hasHellasElysium
         restoredGame.hasTurmoil = game.hasTurmoil
         restoredGame.hasTieBreakerData = game.hasTieBreakerData
+        restoredGame.usesHostMode = game.usesHostMode ?? false
+
+        if let sports = game.sports {
+            restoredGame.isSportsMode = true
+            restoredGame.sportsRuleID = sports.ruleID
+            restoredGame.sportsRuleVersion = sports.ruleVersion
+            restoredGame.sportsTimeLimitSeconds = sports.timeLimitSeconds
+            restoredGame.sportsGenerationLimit = sports.generationLimit
+            restoredGame.sportsAllTimedOutRule = sports.allTimedOutRule
+            restoredGame.sportsOutcome = sports.outcome
+            restoredGame.sportsWinnerPlayerID = sports.winnerPlayerID
+        }
 
         var playersByID: [UUID: Player] = [:]
         for player in game.players {
@@ -377,6 +406,8 @@ struct JournalBackupManager {
             restoredPlayer.prologue2ID = player.prologue2ID
             restoredPlayer.remainingMegaCredits = player.remainingMegaCredits
             restoredPlayer.unplayedCards = player.unplayedCards
+            restoredPlayer.sportsTimeUsedSeconds = player.sportsTimeUsedSeconds ?? 0
+            restoredPlayer.sportsTimeExceeded = player.sportsTimeExceeded ?? false
 
             if let score = player.score {
                 let restoredScore = Score(context: context)
@@ -428,7 +459,7 @@ struct JournalBackupManager {
     }
 
     private static func validate(_ backup: JournalBackup) throws {
-        guard backup.formatVersion == JournalBackup.currentFormatVersion else {
+        guard (1...JournalBackup.currentFormatVersion).contains(backup.formatVersion) else {
             throw JournalBackupError.unsupportedArchiveVersion
         }
         guard OwnerAvatarStyle(rawValue: backup.avatar.style) != nil else {
@@ -478,6 +509,11 @@ struct JournalBackupManager {
             }
             guard game.achievements.allSatisfy({ uniquePlayerIDs.contains($0.playerID) }),
                   game.awards.allSatisfy({ uniquePlayerIDs.contains($0.playerID) }) else {
+                throw JournalBackupError.invalidArchive
+            }
+            if let sports = game.sports,
+               let winnerPlayerID = sports.winnerPlayerID,
+               !uniquePlayerIDs.contains(winnerPlayerID) {
                 throw JournalBackupError.invalidArchive
             }
         }

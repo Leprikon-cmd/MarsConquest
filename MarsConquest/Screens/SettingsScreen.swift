@@ -20,12 +20,16 @@ import UniformTypeIdentifiers
 
 struct SettingsScreen: View {
   /// Вызывается, когда настройки открыты во время создания конкретной партии.
-  var onExpansionsChanged: ((GameExpansions) -> Void)?
+  var onExpansionsChanged: ((GameExpansions) -> Void)? = nil
+  /// Если настройки открыты из набора команды, они применяются и к этой экспедиции.
+  var initialHostConfiguration: HostGameConfiguration? = nil
+  var onHostConfigurationChanged: ((HostGameConfiguration) -> Void)? = nil
 
   /// Профиль нужен только в настройках из бортового журнала — для проверки старых партий.
   var ownerProfile: OwnerProfile?
 
   @State private var expansions = ExpansionSettingsManager.load()
+  @State private var hostConfiguration = HostModeSettingsManager.load()
   @AppStorage(MoxieSoundManager.isEnabledKey) private var isMoxieSoundEnabled = false
   @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.automatic.rawValue
   @AppStorage(OwnerAvatarStyle.storageKey) private var ownerAvatarStyleRawValue = OwnerAvatarStyle.commander.rawValue
@@ -75,6 +79,15 @@ struct SettingsScreen: View {
           Toggle("Колонии", isOn: binding(for: \.hasColonies))
           Toggle("Эллада и Элизий", isOn: binding(for: \.hasHellasElysium))
           Toggle("Кризис", isOn: binding(for: \.hasTurmoil))
+        }
+
+        Section(header: Text(isEnglish ? "Game mode" : "Режим партии")) {
+          Toggle(isEnglish ? "Host mode" : "Режим ведущего", isOn: $hostConfiguration.isEnabled)
+          Text(isEnglish
+            ? "One iPhone remains with the host, who manages the turn order, generations, and optional participant time."
+            : "Один iPhone остаётся у ведущего: он ведёт порядок хода, поколения и при необходимости время участников.")
+            .font(AppFont.font(.footnote))
+            .foregroundStyle(.secondary)
         }
 
         Section(header: Text(testModeSectionTitle)) {
@@ -189,6 +202,15 @@ struct SettingsScreen: View {
       }
       .sheet(isPresented: $showImportedParticipationPicker) {
         importedParticipationPicker
+      }
+      .onAppear {
+        if let initialHostConfiguration {
+          hostConfiguration = initialHostConfiguration
+        }
+      }
+      .onChange(of: hostConfiguration) { _, updatedConfiguration in
+        HostModeSettingsManager.save(updatedConfiguration)
+        onHostConfigurationChanged?(updatedConfiguration)
       }
     }
   }

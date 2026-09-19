@@ -20,8 +20,8 @@
 материал, к которому можно вернуться только при отдельном решении начать соответствующий этап.
 
 - [Личный журнал — исходная концепция](Archive/PersonalJournal/concept-2026-09.md)
-- [Карьерные идеи: карта CEO, статусы и Career XP](Archive/Career/)
-- [Завершённые этапы и история сборок](Archive/Completed/)
+- [Карьерные идеи: карта CEO, статусы и Career XP](Archive/Career/CAREER_ARCHIVE.md)
+- [Завершённые этапы и история сборок](Archive/Completed/COMPLETED_WORK.md)
 
 ## Простое правило
 

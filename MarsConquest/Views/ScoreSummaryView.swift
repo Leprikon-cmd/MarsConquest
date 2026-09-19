@@ -23,7 +23,10 @@ struct ScoreSummaryView: View {
     private let scoreManager = ScoreManager()
 
     var body: some View {
-        Section(header: Text(isEnglish ? "Expedition placements" : "Места в экспедиции")) {
+        Section {
+            Text(isEnglish ? "Expedition placements" : "Места в экспедиции")
+                .font(AppFont.font(.headline))
+                .foregroundStyle(.black)
             ForEach(scoreManager.ranking(in: localGame)) { entry in
                 HStack(spacing: 12) {
                     Text(placeTitle(for: entry.place))

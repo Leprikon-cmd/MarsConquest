@@ -136,6 +136,9 @@
     "CEO // ID 01" : {
 
     },
+    "Discard draft" : {
+
+    },
     "English" : {
       "localizations" : {
         "en" : {
@@ -171,6 +174,18 @@
         }
       }
     },
+    "Game mode" : {
+
+    },
+    "Generation limit reached: %lld" : {
+
+    },
+    "Generation limit: %d" : {
+
+    },
+    "Generation limit: %lld" : {
+
+    },
     "Generation: %d" : {
       "localizations" : {
         "en" : {
@@ -186,6 +201,15 @@
           }
         }
       }
+    },
+    "Host mode" : {
+
+    },
+    "Later" : {
+
+    },
+    "Limit: %lld min per participant" : {
+
     },
     "LV" : {
 
@@ -205,6 +229,9 @@
           }
         }
       }
+    },
+    "One iPhone remains with the host, who manages the turn order, generations, and optional participant time." : {
+
     },
     "Players are first compared by remaining M€." : {
 
@@ -229,6 +256,33 @@
     "Recent expeditions" : {
 
     },
+    "Resume expedition" : {
+
+    },
+    "Sports expeditions: %lld" : {
+
+    },
+    "Sports mode" : {
+
+    },
+    "Sports outcome: all participants lost" : {
+
+    },
+    "Sports outcome: everyone loses." : {
+
+    },
+    "Sports outcome: generation limit reached, no winner." : {
+
+    },
+    "Sports outcome: no winner" : {
+
+    },
+    "Sports winner: %@" : {
+
+    },
+    "The journal has saved the turn order, generations, and participant clocks. You can continue from the same point." : {
+
+    },
     "The M€ result determines the winner; cards are not needed." : {
 
     },
@@ -236,6 +290,21 @@
 
     },
     "Tie-breaker for 1st place" : {
+
+    },
+    "Time" : {
+
+    },
+    "Time limit exceeded" : {
+
+    },
+    "Time limit: %lld min per player" : {
+
+    },
+    "Time limits exceeded: %lld" : {
+
+    },
+    "Unfinished expedition" : {
 
     },
     "Venus terraforming: %d%%" : {
@@ -303,6 +372,9 @@
     "Бортовой журнал" : {
 
     },
+    "В журнале сохранены порядок хода, поколения и время участников. Их можно продолжить с того же места." : {
+
+    },
     "Введите имя CEO" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -334,6 +406,9 @@
         }
       }
     },
+    "Вернуться к выбору игрового поля" : {
+
+    },
     "Внесение записи…" : {
 
     },
@@ -341,6 +416,9 @@
 
     },
     "Восстановить журнал из архива" : {
+
+    },
+    "Время" : {
 
     },
     "Все доступные записи уже проверены." : {
@@ -476,6 +554,7 @@
 
     },
     "Высадка!" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -599,6 +678,7 @@
       }
     },
     "Добавленные игроки будут удалены из незавершённой партии." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -989,6 +1069,24 @@
         }
       }
     },
+    "Лимит времени превышен" : {
+
+    },
+    "Лимит времени: %lld мин. на участника" : {
+
+    },
+    "Лимит поколений достигнут: %lld" : {
+
+    },
+    "Лимит поколений: %d" : {
+
+    },
+    "Лимит поколений: %lld" : {
+
+    },
+    "Лимит: %lld мин. на участника" : {
+
+    },
     "Листайте, чтобы выбрать место высадки" : {
       "localizations" : {
         "en" : {
@@ -1045,6 +1143,7 @@
 
     },
     "Место высадки" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1127,6 +1226,9 @@
           }
         }
       }
+    },
+    "Незавершённая экспедиция" : {
+
     },
     "Неизвестно" : {
       "localizations" : {
@@ -1211,6 +1313,9 @@
           }
         }
       }
+    },
+    "Один iPhone остаётся у ведущего: он ведёт порядок хода, поколения и при необходимости время участников." : {
+
     },
     "Озеленение" : {
       "extractionState" : "stale",
@@ -1299,6 +1404,7 @@
       }
     },
     "Отменить партию" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1309,6 +1415,7 @@
       }
     },
     "Отменить создание партии" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1319,6 +1426,7 @@
       }
     },
     "Отменить создание партии?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1401,6 +1509,18 @@
         }
       }
     },
+    "По регламенту: лимит поколений достигнут, победителя нет." : {
+
+    },
+    "По регламенту: победителя нет" : {
+
+    },
+    "По регламенту: проиграли все" : {
+
+    },
+    "По регламенту: проиграли все." : {
+
+    },
     "Побед" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1424,6 +1544,9 @@
       }
     },
     "Победитель определён по M€; карты не учитываются." : {
+
+    },
+    "Победитель по регламенту: %@" : {
 
     },
     "Победитель: %@ — %lld" : {
@@ -1496,6 +1619,9 @@
       }
     },
     "Подтверждение записи" : {
+
+    },
+    "Позже" : {
 
     },
     "Поиск по имени" : {
@@ -1625,6 +1751,9 @@
         }
       }
     },
+    "Превышений времени: %lld" : {
+
+    },
     "Привязать" : {
       "localizations" : {
         "en" : {
@@ -1652,6 +1781,7 @@
 
     },
     "Продолжить настройку" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1660,6 +1790,9 @@
           }
         }
       }
+    },
+    "Продолжить экспедицию" : {
+
     },
     "Прологи" : {
       "localizations" : {
@@ -1712,6 +1845,12 @@
           }
         }
       }
+    },
+    "Режим ведущего" : {
+
+    },
+    "Режим партии" : {
+
     },
     "Рейтинг" : {
       "extractionState" : "stale",
@@ -1813,6 +1952,9 @@
         }
       }
     },
+    "Состав команды и регламент сохранятся" : {
+
+    },
     "Сохранение..." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1885,6 +2027,12 @@
           }
         }
       }
+    },
+    "Спортивный режим" : {
+
+    },
+    "Спортивных экспедиций: %lld" : {
+
     },
     "Средний результат" : {
       "extractionState" : "stale",
@@ -1973,6 +2121,9 @@
         }
       }
     },
+    "Убрать черновик" : {
+
+    },
     "Удалить" : {
       "localizations" : {
         "en" : {
@@ -2042,6 +2193,9 @@
           }
         }
       }
+    },
+    "Формат партий" : {
+
     },
     "Цвет игрока" : {
 

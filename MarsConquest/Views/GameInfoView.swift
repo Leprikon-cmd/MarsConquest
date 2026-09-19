@@ -29,6 +29,9 @@ struct GameInfoView: View {
     /// Количество поколений / длительность партии. До уточнения не задано.
     @Binding var generation: Int?
 
+    /// Режим ведущего уже зафиксировал поколение, поэтому ручной пикер не показывается.
+    let isGenerationLocked: Bool
+
     /// Показывать ли шкалу дополнения «Венера».
     let hasVenus: Bool
 
@@ -45,6 +48,11 @@ struct GameInfoView: View {
         )
 
         VStack(spacing: 16) {
+            Text("ЖУРНАЛ ЭКСПЕДИЦИИ")
+                .font(AppFont.font(.title3))
+                .tracking(2.4)
+                .frame(maxWidth: .infinity)
+
             HStack(alignment: .firstTextBaseline) {
                 Text(localizedGameField.uppercased(with: locale))
                     .font(AppFont.font(.headline))
@@ -57,15 +65,14 @@ struct GameInfoView: View {
                     .monospacedDigit()
             }
 
-            Text("ЖУРНАЛ ЭКСПЕДИЦИИ")
-                .font(AppFont.font(.title3))
-                .tracking(2.4)
-                .frame(maxWidth: .infinity)
-
             Divider()
 
-            archiveDetailRow(title: "Поколение", selection: $generation, values: Array(5...20)) { value in
-                "\(value)"
+            if isGenerationLocked {
+                archiveReadOnlyRow(title: "Поколение", value: generation.map(String.init) ?? "—")
+            } else {
+                archiveDetailRow(title: "Поколение", selection: $generation, values: Array(5...20)) { value in
+                    "\(value)"
+                }
             }
 
             if hasVenus {
@@ -79,6 +86,17 @@ struct GameInfoView: View {
             }
         }
         .padding(.vertical, 8)
+    }
+
+    private func archiveReadOnlyRow(title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(AppFont.font(.body))
+            Spacer()
+            Text(value)
+                .font(AppFont.font(.body).weight(.bold))
+                .foregroundStyle(.red)
+        }
     }
 
     private func archiveDetailRow(

@@ -67,8 +67,16 @@ struct ScoreScreen: View {
         localGame.players
     }
 
-    /// Лёгкая подложка оставляет читаемость поверх игрового фона, не перекрывая его.
-    private let scorePanelBackground = Color.white.opacity(0.22)
+    /// Единый материал карточек: совпадает с блоками центра управления экспедицией.
+    /// Углы оставляет Form, чтобы связанные строки выглядели единым блоком.
+    private var scorePanelBackground: some View {
+        Rectangle()
+            .fill(.ultraThinMaterial)
+    }
+
+    private var isEnglish: Bool {
+        locale.identifier.lowercased().hasPrefix("en")
+    }
 
     var body: some View {
         ZStack {
@@ -82,6 +90,7 @@ struct ScoreScreen: View {
                     date: localGame.date,
                     gameField: localGame.gameField,
                     generation: $localGame.generation,
+                    isGenerationLocked: localGame.hostSession != nil,
                     hasVenus: localGame.expansions.hasVenus,
                     venusTerraformingScale: $localGame.venusTerraformingScale
                 )
@@ -92,6 +101,8 @@ struct ScoreScreen: View {
                 rewardsSection()
                     .listRowBackground(Color.clear)
                 TieBreakerSectionView(localGame: $localGame)
+                    .listRowBackground(scorePanelBackground)
+                sportsRegulationSection()
                     .listRowBackground(scorePanelBackground)
                 ScoreSummaryView(localGame: localGame)
                     .listRowBackground(scorePanelBackground)
@@ -238,6 +249,7 @@ struct ScoreScreen: View {
 
         do {
             archivedGame = try GameSaver().save(localGame: localGame, in: viewContext)
+            ActiveExpeditionStore.clear()
             DispatchQueue.main.async {
                 showArchiveRecorded = true
             }
@@ -254,11 +266,47 @@ struct ScoreScreen: View {
 
     private func completeArchive() {
         guard let archivedGame else { return }
+        // Сбрасываем локальную сессию до возврата на предыдущий экран: иначе
+        // его onAppear может снова записать уже внесённую экспедицию в черновик.
+        localGame.hostSession = nil
+        ActiveExpeditionStore.clear()
         dismiss()
         NotificationCenter.default.post(
             name: Notification.Name("NavigateToStatistics"),
             object: archivedGame
         )
+    }
+
+    @ViewBuilder
+    private func sportsRegulationSection() -> some View {
+        if let session = localGame.hostSession, session.configuration.isSportsMode {
+            Section {
+                Text(isEnglish ? "Sports mode" : "Спортивный режим")
+                    .font(AppFont.font(.headline))
+                    .foregroundStyle(.black)
+                if session.configuration.usesTimer {
+                    Text(
+                        isEnglish
+                          ? "Limit: \(session.configuration.timeLimitSeconds / 60) min per participant"
+                          : "Лимит: \(session.configuration.timeLimitSeconds / 60) мин. на участника"
+                    )
+                }
+                if let generationLimit = session.configuration.generationLimit {
+                    Text(isEnglish ? "Generation limit: \(generationLimit)" : "Лимит поколений: \(generationLimit)")
+                }
+                if session.sportsOutcome == .generationLimitReached {
+                    Text(isEnglish ? "Sports outcome: generation limit reached, no winner." : "По регламенту: лимит поколений достигнут, победителя нет.")
+                        .foregroundStyle(.red)
+                } else if let winnerID = SportsRegulationCalculator.winnerID(in: localGame),
+                          let winner = localGame.players.first(where: { $0.id == winnerID }) {
+                    Text(isEnglish ? "Sports winner: \(winner.name)" : "Победитель по регламенту: \(winner.name)")
+                        .foregroundStyle(.green)
+                } else {
+                    Text(isEnglish ? "Sports outcome: everyone loses." : "По регламенту: проиграли все.")
+                        .foregroundStyle(.red)
+                }
+            }
+        }
     }
 }
 

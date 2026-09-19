@@ -35,6 +35,14 @@ struct StatisticsGamesView: View {
                 }
             }
 
+            if !sportsGames.isEmpty {
+                Section(header: Text(isEnglish ? "Sports mode" : "Спортивный режим")) {
+                    Text(isEnglish ? "Sports expeditions: \(sportsGames.count)" : "Спортивных экспедиций: \(sportsGames.count)")
+                    Text(isEnglish ? "Time limits exceeded: \(sportsTimeExceededCount)" : "Превышений времени: \(sportsTimeExceededCount)")
+                    Text(isEnglish ? "Generation limit reached: \(generationLimitReachedCount)" : "Лимит поколений достигнут: \(generationLimitReachedCount)")
+                }
+            }
+
             Section(header: Text("Список игр")) {
                 ForEach(Array(games.enumerated()), id: \.element.objectID) { index, game in
                     if editMode?.wrappedValue.isEditing == true {
@@ -81,6 +89,12 @@ struct StatisticsGamesView: View {
             Text("Поле: \(localizedGameField)")
             Text("Дата: \(StatisticsCalculator.formattedDate(game.date, locale: locale))")
 
+            if game.isSportsMode {
+                Text(isEnglish ? "Sports mode" : "Спортивный режим")
+                    .font(AppFont.font(.subheadline))
+                    .foregroundStyle(.red)
+            }
+
             let colonies = colonyNames(for: game)
             if !colonies.isEmpty {
                 Text("Колонии: \(colonies.joined(separator: ", "))")
@@ -112,5 +126,21 @@ struct StatisticsGamesView: View {
 
     private var isEnglish: Bool {
         locale.identifier.lowercased().hasPrefix("en")
+    }
+
+    private var sportsGames: [Game] {
+        games.filter(\.isSportsMode)
+    }
+
+    private var sportsTimeExceededCount: Int {
+        sportsGames.reduce(0) { result, game in
+            result + ((game.players?.allObjects as? [Player] ?? []).filter(\.sportsTimeExceeded).count)
+        }
+    }
+
+    private var generationLimitReachedCount: Int {
+        sportsGames.filter {
+            $0.sportsOutcome == SportsOutcome.generationLimitReached.rawValue
+        }.count
     }
 }

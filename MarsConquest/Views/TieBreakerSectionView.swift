@@ -52,7 +52,10 @@ struct TieBreakerSectionView: View {
 
     var body: some View {
         if !tiedLeaderIndices.isEmpty {
-            Section(header: Text(isEnglish ? "Tie-breaker for 1st place" : "Тай-брейк за 1 место")) {
+            Section {
+                Text(isEnglish ? "Tie-breaker for 1st place" : "Тай-брейк за 1 место")
+                    .font(AppFont.font(.headline))
+                    .foregroundStyle(.black)
                 Text(
                     isEnglish
                         ? "Players are first compared by remaining M€."

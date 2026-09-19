@@ -65,6 +65,32 @@ struct GameDetailView: View {
                 )
             }
 
+            if game.usesHostMode {
+                Text(isEnglish ? "Host mode" : "Режим ведущего")
+            }
+
+            if game.isSportsMode {
+                Text(isEnglish ? "Sports mode" : "Спортивный режим")
+
+                if game.sportsTimeLimitSeconds > 0 {
+                    Text(
+                        isEnglish
+                          ? "Time limit: \(game.sportsTimeLimitSeconds / 60) min per player"
+                          : "Лимит времени: \(game.sportsTimeLimitSeconds / 60) мин. на участника"
+                    )
+                }
+
+                if game.sportsGenerationLimit > 0 {
+                    Text(
+                        isEnglish
+                          ? "Generation limit: \(game.sportsGenerationLimit)"
+                          : "Лимит поколений: \(game.sportsGenerationLimit)"
+                    )
+                }
+
+                sportsOutcomeRow()
+            }
+
             let expansions = expansionsList()
             if !expansions.isEmpty {
                 Text("Дополнения: \(expansions.joined(separator: ", "))")
@@ -109,6 +135,21 @@ struct GameDetailView: View {
                 Spacer()
                 Text("\(totalScore(for: player))")
                     .font(AppFont.font(.title3))
+            }
+
+            if game.isSportsMode, game.sportsTimeLimitSeconds > 0 {
+                HStack {
+                    Text(isEnglish ? "Time" : "Время")
+                    Spacer()
+                    Text(formattedTime(player.sportsTimeUsedSeconds))
+                        .monospacedDigit()
+                        .foregroundStyle(player.sportsTimeExceeded ? .red : .primary)
+                }
+                if player.sportsTimeExceeded {
+                    Text(isEnglish ? "Time limit exceeded" : "Лимит времени превышен")
+                        .font(AppFont.font(.footnote))
+                        .foregroundStyle(.red)
+                }
             }
         }
         .padding(.vertical, 3)
@@ -266,6 +307,30 @@ private func place(for player: Player) -> Int {
         if game.hasTurmoil { expansions.append(localizedExpansion(russian: "Кризис", english: "Turmoil")) }
 
         return expansions
+    }
+
+    @ViewBuilder
+    private func sportsOutcomeRow() -> some View {
+        if game.sportsOutcome == SportsOutcome.generationLimitReached.rawValue {
+            Text(isEnglish ? "Sports outcome: all participants lost" : "По регламенту: проиграли все")
+                .foregroundStyle(.red)
+        } else if let winnerID = game.sportsWinnerPlayerID,
+                  let player = (game.players?.allObjects as? [Player])?.first(where: { $0.id == winnerID }) {
+            Text(
+                isEnglish
+                  ? "Sports winner: \(player.name ?? UIStrings.noName(locale: locale))"
+                  : "Победитель по регламенту: \(player.name ?? UIStrings.noName(locale: locale))"
+            )
+            .foregroundStyle(.green)
+        } else {
+            Text(isEnglish ? "Sports outcome: no winner" : "По регламенту: победителя нет")
+                .foregroundStyle(.red)
+        }
+    }
+
+    private func formattedTime(_ seconds: Int64) -> String {
+        let absoluteValue = abs(seconds)
+        return String(format: "%02lld:%02lld", absoluteValue / 60, absoluteValue % 60)
     }
 
     private var colonyNames: [String] {

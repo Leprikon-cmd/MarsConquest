@@ -10,6 +10,8 @@
 //
 //  Что можно менять руками:
 //  - изображения посадочных площадок, размеры рамки и интервалы; имена Assets указаны в свойствах экрана.
+//  - проверка черновика сверяет его с архивом, чтобы записанная партия не предлагалась к продолжению.
+//  - смена поля до старта сохраняет команду и регламент; после старта место высадки блокируется.
 //
 import CoreData
 import SwiftUI
@@ -25,8 +27,15 @@ struct NewExpeditionView: View {
   @State private var showGameSetup = false
   @State private var navigateToGame: Game?
   @State private var localGame = LocalGameData.empty(field: GameField.farsida.rawValue)
+  /// Незавершённая партия ведущего предлагается к продолжению после перезапуска приложения.
+  @State private var resumableHostGame: LocalGameData?
   @State private var landingBackgroundName = "Tarsis_BG1"
   @State private var didSetupNotificationObserver = false
+  @State private var showHostResumePrompt = false
+  /// Восстанавливает навигационную цепочку команды, регламента и центра управления.
+  @State private var resumesHostExpedition = false
+  /// Не открывает карточку владельца повторно при возврате к незавершённой команде.
+  @State private var resumesTeamDraft = false
   @AppStorage("landingSiteSwipeHintSeen") private var hasSeenLandingSiteSwipeHint = false
 
   private var gameFields: [GameField] {
@@ -35,6 +44,10 @@ struct NewExpeditionView: View {
 
   private var selectedGameField: GameField {
     GameField(rawValue: gameField) ?? .farsida
+  }
+
+  private var isEnglish: Bool {
+    locale.identifier.lowercased().hasPrefix("en")
   }
 
   private var selectedGameFieldFrameName: String {
@@ -74,6 +87,24 @@ struct NewExpeditionView: View {
     UIDevice.current.userInterfaceIdiom == .phone
   }
 
+  /// До старта можно сменить только поле и фон, не теряя собранную команду.
+  private var canEditLandingSiteForDraft: Bool {
+    !localGame.players.isEmpty && localGame.hostSession?.isStarted != true
+  }
+
+  private var isLandingSiteLocked: Bool {
+    localGame.hostSession?.isStarted == true
+  }
+
+  private var landingTitle: String {
+    canEditLandingSiteForDraft ? "Изменить место высадки" : "Место высадки"
+  }
+
+  private var landingActionTitle: String {
+    if isLandingSiteLocked { return "Экспедиция уже начата" }
+    return canEditLandingSiteForDraft ? "Подтвердить новое поле" : "Высадка!"
+  }
+
   var body: some View {
     NavigationStack {
       ZStack {
@@ -104,8 +135,15 @@ struct NewExpeditionView: View {
     }
     .onAppear {
       expansions = ExpansionSettingsManager.load()
-      landingBackgroundName = randomBackgroundName(for: selectedGameField)
+      if canEditLandingSiteForDraft {
+        // Возвращаем исходный фон черновика: без выбора другого поля ничего не меняется.
+        gameField = localGame.gameField
+        landingBackgroundName = localGame.backgroundImageName
+      } else {
+        landingBackgroundName = randomBackgroundName(for: selectedGameField)
+      }
       prepareNotificationObserver()
+      presentSavedHostGameIfNeeded()
     }
     .onReceive(
       NotificationCenter.default.publisher(
@@ -118,8 +156,34 @@ struct NewExpeditionView: View {
         landingBackgroundName = randomBackgroundName(for: .farsida)
       }
     }
-    .fullScreenCover(isPresented: $showGameSetup) {
-      AddPlayersView(localGame: $localGame, opensFirstPlayerOnAppear: true)
+    .fullScreenCover(isPresented: $showGameSetup, onDismiss: {
+      // При возврате к высадке снова показываем выбор действий с сохранённым черновиком.
+      resumesHostExpedition = false
+      resumesTeamDraft = false
+      resumableHostGame = nil
+    }) {
+      AddPlayersView(
+        localGame: $localGame,
+        opensFirstPlayerOnAppear: !resumesHostExpedition && !resumesTeamDraft,
+        resumesHostExpedition: resumesHostExpedition
+      )
+    }
+    .alert(isEnglish ? "Unfinished expedition" : "Незавершённая экспедиция", isPresented: $showHostResumePrompt) {
+      Button(isEnglish ? "Resume expedition" : "Продолжить экспедицию") {
+        guard let resumableHostGame else { return }
+        localGame = resumableHostGame
+        resumesHostExpedition = true
+        showGameSetup = true
+      }
+      Button(isEnglish ? "Discard draft" : "Убрать черновик", role: .destructive) {
+        ActiveExpeditionStore.clear()
+        resumableHostGame = nil
+      }
+      Button(isEnglish ? "Later" : "Позже", role: .cancel) {}
+    } message: {
+      Text(isEnglish
+        ? "The journal has saved the turn order, generations, and participant clocks. You can continue from the same point."
+        : "В журнале сохранены порядок хода, поколения и время участников. Их можно продолжить с того же места.")
     }
   }
 
@@ -127,7 +191,7 @@ struct NewExpeditionView: View {
     VStack(spacing: 16) {
       Spacer(minLength: 16)
 
-      Text("Место высадки")
+      Text(landingTitle)
         .font(AppFont.font(.title2))
         .foregroundColor(.white)
 
@@ -135,13 +199,21 @@ struct NewExpeditionView: View {
 
       landingSiteSelector()
 
+      if canEditLandingSiteForDraft {
+        Text("Состав команды и регламент сохранятся")
+          .font(AppFont.font(.footnote))
+          .foregroundStyle(.white.opacity(0.9))
+      }
+
       Button(action: startNewGame) {
-        Text("Высадка!")
+        Text(landingActionTitle)
           .font(AppFont.font(.title2))
           .frame(maxWidth: 340, minHeight: 68)
           .gameFieldButtonStyle(for: gameField, fontSize: 26)
           .shadow(radius: 5)
       }
+      .disabled(isLandingSiteLocked)
+      .opacity(isLandingSiteLocked ? 0.55 : 1)
       .padding(.top, 32)
       .accessibilityIdentifier("start-expedition-button")
 
@@ -165,20 +237,29 @@ struct NewExpeditionView: View {
 
         landingSiteSelector(size: planetSize)
 
+        if canEditLandingSiteForDraft {
+          Text("Состав команды и регламент сохранятся")
+            .font(AppFont.font(.footnote))
+            .foregroundStyle(.white.opacity(0.9))
+            .padding(.top, 8)
+        }
+
         Button(action: startNewGame) {
-          Text("Высадка!")
+          Text(landingActionTitle)
             .frame(width: 320, height: 60)
             .gameFieldButtonStyle(for: gameField, fontSize: 26)
             .shadow(radius: 5)
         }
-        .padding(.top, 34)
+        .disabled(isLandingSiteLocked)
+        .opacity(isLandingSiteLocked ? 0.55 : 1)
+        .padding(.top, canEditLandingSiteForDraft ? 12 : 34)
         .accessibilityIdentifier("start-expedition-button")
 
         Spacer(minLength: 0)
       }
 
       VStack(spacing: 6) {
-        Text("Место высадки")
+        Text(landingTitle)
           .font(AppFont.fixed(30))
           .foregroundStyle(.white)
 
@@ -285,6 +366,17 @@ struct NewExpeditionView: View {
   }
 
 private func startNewGame() {
+  guard !isLandingSiteLocked else { return }
+
+  // Возврат со страницы команды — это пауза настройки, а не отмена партии.
+  // Новое поле применяется только после явного подтверждения этой кнопкой.
+  if canEditLandingSiteForDraft {
+    applyLandingSiteToDraft()
+    resumesTeamDraft = true
+    showGameSetup = true
+    return
+  }
+
   var newGame = LocalGameData.empty(
     field: gameField,
     backgroundImageName: landingBackgroundName
@@ -298,7 +390,24 @@ private func startNewGame() {
   }
 
   localGame = newGame
+  resumesTeamDraft = false
   showGameSetup = true
+}
+
+private func applyLandingSiteToDraft() {
+  guard localGame.gameField != gameField || localGame.backgroundImageName != landingBackgroundName else {
+    return
+  }
+
+  localGame.gameField = gameField
+  localGame.backgroundImageName = landingBackgroundName
+  // Достижения и награды принадлежат игровому полю. До записи их можно выбрать заново.
+  localGame.achievements = []
+  localGame.awards = []
+
+  if localGame.hostSession != nil {
+    ActiveExpeditionStore.save(localGame)
+  }
 }
 
 
@@ -313,8 +422,42 @@ private func startNewGame() {
       guard let game = notification.object as? Game else { return }
       navigateToGame = game
       showGameSetup = false
+      resumableHostGame = nil
     }
 
     didSetupNotificationObserver = true
+  }
+
+  private func presentSavedHostGameIfNeeded() {
+    guard resumableHostGame == nil,
+          let savedGame = ActiveExpeditionStore.load()
+    else { return }
+
+    // Второй предохранитель: если запись уже находится в Core Data, черновик
+    // не имеет права вернуть пользователя в завершённую экспедицию.
+    guard !isArchived(savedGame) else {
+      ActiveExpeditionStore.clear()
+      return
+    }
+
+    // До первого старта это ещё редактируемый черновик команды и регламента.
+    // Возвращаем его на посадочную страницу без принудительного прыжка в центр управления.
+    if savedGame.hostSession?.isStarted != true {
+      localGame = savedGame
+      resumesTeamDraft = true
+      gameField = savedGame.gameField
+      landingBackgroundName = savedGame.backgroundImageName
+      return
+    }
+
+    resumableHostGame = savedGame
+    showHostResumePrompt = true
+  }
+
+  private func isArchived(_ localGame: LocalGameData) -> Bool {
+    let request = NSFetchRequest<Game>(entityName: "Game")
+    request.fetchLimit = 1
+    request.predicate = NSPredicate(format: "id == %@", localGame.id as CVarArg)
+    return ((try? viewContext.count(for: request)) ?? 0) > 0
   }
 }

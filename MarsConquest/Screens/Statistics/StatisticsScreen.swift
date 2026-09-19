@@ -17,6 +17,7 @@ import CoreData
 
 struct StatisticsScreen: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.locale) private var locale
 
     @FetchRequest(
         entity: Game.entity(),
@@ -24,32 +25,34 @@ struct StatisticsScreen: View {
     ) private var games: FetchedResults<Game>
 
     @State private var selectedPage: StatisticsPage = .games
+    @State private var gameFilter: GameHistoryFilter = .all
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 statisticsPagePicker()
+                gameFilterPicker()
 
                 TabView(selection: $selectedPage) {
                     StatisticsGamesView(
-                        games: Array(games),
-                        onDelete: deleteGames,
+                        games: filteredGames,
+                        onDelete: { offsets in deleteGames(at: offsets, from: filteredGames) },
                         onDeleteSelected: deleteSelectedGames
                     )
                     .tag(StatisticsPage.games)
 
                     StatisticsPlayersView(
-                        games: Array(games)
+                        games: filteredGames
                     )
                     .tag(StatisticsPage.players)
 
                     StatisticsCorporationsView(
-                        games: Array(games)
+                        games: filteredGames
                     )
                         .tag(StatisticsPage.corporations)
 
                     StatisticsProloguesView(
-                        games: Array(games)
+                        games: filteredGames
                     )
                         .tag(StatisticsPage.prologues)
                 }
@@ -57,6 +60,28 @@ struct StatisticsScreen: View {
             }
             .navigationTitle("Статистика")
         }
+    }
+
+    private var filteredGames: [Game] {
+        switch gameFilter {
+        case .all:
+            return Array(games)
+        case .classic:
+            return games.filter { !$0.isSportsMode }
+        case .sports:
+            return games.filter(\.isSportsMode)
+        }
+    }
+
+    private func gameFilterPicker() -> some View {
+        Picker("Формат партий", selection: $gameFilter) {
+            ForEach(GameHistoryFilter.allCases) { filter in
+                Text(filter.title(for: locale)).tag(filter)
+            }
+        }
+        .pickerStyle(.segmented)
+        .padding(.horizontal)
+        .padding(.bottom, 8)
     }
 
     private func statisticsPagePicker() -> some View {
@@ -115,9 +140,9 @@ struct StatisticsScreen: View {
         .padding(.bottom, 6)
     }
 
-    private func deleteGames(at offsets: IndexSet) {
+    private func deleteGames(at offsets: IndexSet, from displayedGames: [Game]) {
         for index in offsets {
-            let game = games[index]
+            let game = displayedGames[index]
             viewContext.delete(game)
         }
 
@@ -138,6 +163,24 @@ struct StatisticsScreen: View {
             try viewContext.save()
         } catch {
             print("Ошибка удаления выбранных игр: \(error.localizedDescription)")
+        }
+    }
+}
+
+/// Фильтр один для журнала и всех страниц статистики: форматы не смешиваются незаметно.
+private enum GameHistoryFilter: String, CaseIterable, Identifiable {
+    case all
+    case classic
+    case sports
+
+    var id: String { rawValue }
+
+    func title(for locale: Locale) -> String {
+        let isEnglish = locale.identifier.lowercased().hasPrefix("en")
+        switch self {
+        case .all: return isEnglish ? "All" : "Все"
+        case .classic: return isEnglish ? "Classic" : "Классика"
+        case .sports: return isEnglish ? "Sports" : "Спортивный"
         }
     }
 }

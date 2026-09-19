@@ -14,7 +14,7 @@
 //
 import Foundation
 
-struct GameExpansions {
+struct GameExpansions: Codable, Equatable {
     var hasPrelude: Bool = true
     var hasVenus: Bool = true
     var hasColonies: Bool = true

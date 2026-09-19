@@ -15,7 +15,7 @@
 import Foundation
 
 struct JournalBackup: Codable {
-    static let currentFormatVersion = 1
+    static let currentFormatVersion = 2
 
     let formatVersion: Int
     let createdAt: Date
@@ -68,10 +68,24 @@ struct JournalBackupGame: Codable {
     let hasHellasElysium: Bool
     let hasTurmoil: Bool
     let hasTieBreakerData: Bool
+    /// Необязателен для чтения архивов формата 1.
+    let usesHostMode: Bool?
+    /// Снимок спортивного регламента и его итога. Классические записи его не содержат.
+    let sports: JournalBackupSports?
     let players: [JournalBackupPlayer]
     let colonies: [JournalBackupColony]
     let achievements: [JournalBackupAchievement]
     let awards: [JournalBackupAward]
+}
+
+struct JournalBackupSports: Codable {
+    let ruleID: String
+    let ruleVersion: String
+    let timeLimitSeconds: Int64
+    let generationLimit: Int32
+    let allTimedOutRule: String?
+    let outcome: String?
+    let winnerPlayerID: UUID?
 }
 
 struct JournalBackupPlayer: Codable {
@@ -87,6 +101,9 @@ struct JournalBackupPlayer: Codable {
     let prologue2ID: String?
     let remainingMegaCredits: Int32
     let unplayedCards: Int32
+    /// Необязательны для чтения архивов формата 1.
+    let sportsTimeUsedSeconds: Int64?
+    let sportsTimeExceeded: Bool?
     let score: JournalBackupScore?
 }
 

@@ -93,6 +93,23 @@ struct GameSaver {
         game.hasTurmoil = localGame.expansions.hasTurmoil
         game.hasTieBreakerData = ScoreManager().hasTieForFirst(in: localGame)
 
+        if let hostSession = localGame.hostSession {
+            game.usesHostMode = true
+            game.isSportsMode = hostSession.configuration.isSportsMode
+
+            if hostSession.configuration.isSportsMode {
+                game.sportsRuleID = SportsRegulationMetadata.ruleID
+                game.sportsRuleVersion = SportsRegulationMetadata.ruleVersion
+                game.sportsTimeLimitSeconds = Int64(
+                    hostSession.configuration.usesTimer ? hostSession.configuration.timeLimitSeconds : 0
+                )
+                game.sportsGenerationLimit = Int32(hostSession.configuration.generationLimit ?? 0)
+                game.sportsAllTimedOutRule = hostSession.configuration.allTimedOutRule.rawValue
+                game.sportsOutcome = (hostSession.sportsOutcome ?? .marsTerraformed).rawValue
+                game.sportsWinnerPlayerID = SportsRegulationCalculator.winnerID(in: localGame)
+            }
+        }
+
         for colonyName in localGame.colonies {
             let colony = Colony(context: context)
             colony.name = colonyName
@@ -116,6 +133,13 @@ struct GameSaver {
             player.prologue2ID = GameData.preludeID(named: localPlayer.prologue2)
             player.remainingMegaCredits = localPlayer.remainingMegaCredits
             player.unplayedCards = localPlayer.unplayedCards
+
+            if let hostSession = localGame.hostSession,
+               hostSession.configuration.usesTimer {
+                let usedSeconds = hostSession.elapsedSeconds(for: localPlayer.id)
+                player.sportsTimeUsedSeconds = Int64(usedSeconds)
+                player.sportsTimeExceeded = hostSession.hasExceededTime(for: localPlayer.id)
+            }
 
             let score = Score(context: context)
             score.terraformingRating = localPlayer.score.terraformingRating

@@ -24,7 +24,7 @@ import Foundation
 
 /// Локальная модель состояния игры.
 /// Используется в UI до момента сохранения партии в CoreData.
-struct LocalGameData {
+struct LocalGameData: Codable {
   var id: UUID
   var date: Date
   var gameField: String
@@ -40,6 +40,10 @@ struct LocalGameData {
   /// Итоговая шкала терраформирования Венеры. 0% — допустимое, но явно выбранное значение.
   var venusTerraformingScale: Int? = nil
   var expansions: GameExpansions = GameExpansions()
+  /// Включается из настроек экспедиции и определяет маршрут после состава команды.
+  var hostConfiguration: HostGameConfiguration = HostGameConfiguration()
+  /// Состояние уже начатой партии ведущего. Наличие этого значения позволяет её продолжить.
+  var hostSession: HostGameSession? = nil
 
   static func empty(field: String, backgroundImageName: String = "Tarsis_BG1") -> LocalGameData {
     LocalGameData(
@@ -52,14 +56,16 @@ struct LocalGameData {
       awards: [],
       generation: nil,
       venusTerraformingScale: nil,
-      expansions: ExpansionSettingsManager.load()
+      expansions: ExpansionSettingsManager.load(),
+      hostConfiguration: HostModeSettingsManager.load(),
+      hostSession: nil
     )
   }
 }
 
 /// Локальная модель игрока.
 /// Хранит данные игрока до записи в сущность Player.
-struct LocalPlayer: Identifiable {
+struct LocalPlayer: Identifiable, Codable {
   var id: UUID
   var name: String
   var color: String
@@ -76,7 +82,7 @@ struct LocalPlayer: Identifiable {
 }
 
 /// Локальная модель очков игрока.
-struct LocalScore {
+struct LocalScore: Codable {
   var terraformingRating: Int32 = 0
   var greenery: Int32 = 0
   var cities: Int32 = 0
@@ -88,7 +94,7 @@ struct LocalScore {
 
 /// Локальная модель достижения.
 /// Нужна для выбора достижения и назначения победителя(ей) до сохранения в БД.
-struct LocalAchievement: Identifiable {
+struct LocalAchievement: Identifiable, Codable {
   var id = UUID()
   var name: String
   var winnerPlayerIDs: [UUID] = []
@@ -96,7 +102,7 @@ struct LocalAchievement: Identifiable {
 
 /// Локальная модель награды.
 /// Нужна для выбора награды и назначения первого/второго места до сохранения в БД.
-struct LocalAward: Identifiable {
+struct LocalAward: Identifiable, Codable {
   var id = UUID()
   var name: String
   var firstPlacePlayerIDs: [UUID] = []
