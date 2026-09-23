@@ -13,6 +13,7 @@
 | [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) | Сущности Core Data, миграции и резервный архив. |
 | [LOCALIZATION.md](LOCALIZATION.md) | Русский/английский интерфейс и устойчивость игровых названий. |
 | [TESTING.md](TESTING.md) | Наборы проверок и ручные сценарии. |
+| [TESTFLIGHT_1_5.md](TESTFLIGHT_1_5.md) | Текущий кандидат TestFlight и текст «Что проверить» на двух языках. |
 
 ## Архив идей
 

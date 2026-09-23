@@ -793,12 +793,6 @@
             "state" : "translated",
             "value" : "Games: %1$lld • Wins: %2$lld"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Игр: %1$lld • Побед: %2$lld"
-          }
         }
       }
     },
@@ -985,12 +979,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Colonies %1$lld/%2$lld"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Колонии %1$lld/%2$lld"
           }
         }
       }
@@ -1556,12 +1544,6 @@
             "state" : "translated",
             "value" : "Winner: %1$@ — %2$lld"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Победитель: %1$@ — %2$lld"
-          }
         }
       }
     },
@@ -1817,12 +1799,6 @@
             "state" : "translated",
             "value" : "Preludes: %1$@, %2$@"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Прологи: %1$@, %2$@"
-          }
         }
       }
     },
@@ -2051,12 +2027,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Average: %1$@ • Best: %2$lld"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Средний счёт: %1$@ • Лучший: %2$lld"
           }
         }
       }
