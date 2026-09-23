@@ -17,6 +17,7 @@ import SwiftUI
 /// Главный экран личного журнала владельца.
 struct ContentView: View {
   @Environment(\.managedObjectContext) private var viewContext
+  @Environment(\.locale) private var locale
 
   let ownerProfile: OwnerProfile
 
@@ -53,19 +54,19 @@ struct ContentView: View {
   private var journalNavigation: some View {
     HStack(spacing: 8) {
       navigationButton(
-        title: "Бортовой журнал",
+        title: locale.identifier.lowercased().hasPrefix("en") ? "Logbook" : "Бортовой журнал",
         imageName: "journal",
         section: .journal
       )
 
       newExpeditionButton
 
-      navigationButton(title: "Статистика", imageName: "statistics", section: .statistics)
+      navigationButton(title: locale.identifier.lowercased().hasPrefix("en") ? "Statistics" : "Статистика", imageName: "statistics", section: .statistics)
 
       if hasVisibleRegalia {
-        navigationButton(title: "Регалии", imageName: "achievements", section: .regalia)
+        navigationButton(title: locale.identifier.lowercased().hasPrefix("en") ? "Honors" : "Регалии", imageName: "achievements", section: .regalia)
       }
-      navigationButton(title: "Настройки", imageName: "settings", section: .settings)
+      navigationButton(title: locale.identifier.lowercased().hasPrefix("en") ? "Settings" : "Настройки", imageName: "settings", section: .settings)
     }
     .padding(8)
     .background(.ultraThinMaterial, in: Capsule(style: .continuous))
@@ -127,7 +128,7 @@ struct ContentView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
     .buttonStyle(.plain)
-    .accessibilityLabel("Новая игра")
+    .accessibilityLabel(locale.identifier.lowercased().hasPrefix("en") ? "New Game" : "Новая игра")
     .accessibilityIdentifier("root-navigation-new-game")
   }
 }

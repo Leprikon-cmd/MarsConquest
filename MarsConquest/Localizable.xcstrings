@@ -220,6 +220,9 @@
     "M€ равны. Теперь сравниваются карты в руке только у этих игроков." : {
 
     },
+    "New Game" : {
+
+    },
     "OK" : {
       "localizations" : {
         "en" : {
@@ -370,7 +373,14 @@
       }
     },
     "Бортовой журнал" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logbook"
+          }
+        }
+      }
     },
     "В журнале сохранены порядок хода, поколения и время участников. Их можно продолжить с того же места." : {
 
@@ -410,10 +420,24 @@
 
     },
     "Внесение записи…" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adding Entry…"
+          }
+        }
+      }
     },
     "Внести в журнал" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Log"
+          }
+        }
+      }
     },
     "Восстановить журнал из архива" : {
 
@@ -740,7 +764,14 @@
       }
     },
     "ЖУРНАЛ ЭКСПЕДИЦИИ" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EXPEDITION LOG"
+          }
+        }
+      }
     },
     "Журнал экспедиций" : {
       "extractionState" : "stale",
@@ -764,7 +795,14 @@
       }
     },
     "Запись внесена в архив." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entry Added to Archive"
+          }
+        }
+      }
     },
     "Звук" : {
       "localizations" : {
@@ -852,6 +890,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Games"
+          }
+        }
+      }
+    },
+    "Изменить место высадки" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Landing Site"
           }
         }
       }
@@ -1202,6 +1251,16 @@
         }
       }
     },
+    "Не могли бы вы уточнить, до какого уровня удалось терраформировать Венеру?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could you confirm the final terraforming rating for Venus?"
+          }
+        }
+      }
+    },
     "Не удалось внести запись: %@" : {
 
     },
@@ -1249,7 +1308,14 @@
       }
     },
     "Новая игра" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Game"
+          }
+        }
+      }
     },
     "Новая экспедиция" : {
       "extractionState" : "stale",
@@ -1590,6 +1656,17 @@
         }
       }
     },
+    "Подтвердить новое поле" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm New Board"
+          }
+        }
+      }
+    },
     "Подтвердить участие" : {
       "localizations" : {
         "en" : {
@@ -1601,7 +1678,14 @@
       }
     },
     "Подтверждение записи" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm Entry"
+          }
+        }
+      }
     },
     "Позже" : {
 
@@ -1642,6 +1726,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No prelude data yet"
+          }
+        }
+      }
+    },
+    "Поколение" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generation"
           }
         }
       }
@@ -1736,6 +1831,16 @@
     "Превышений времени: %lld" : {
 
     },
+    "Прежде чем принять запись, позвольте уточнить: на каком поколении был завершён проект?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Before adding this entry, please confirm: in which generation was the project completed?"
+          }
+        }
+      }
+    },
     "Привязать" : {
       "localizations" : {
         "en" : {
@@ -1760,7 +1865,14 @@
       }
     },
     "Продолжить" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
     },
     "Продолжить настройку" : {
       "extractionState" : "stale",
@@ -1818,6 +1930,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Past Games"
+          }
+        }
+      }
+    },
+    "Регалии" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Honors"
           }
         }
       }
@@ -2141,7 +2264,14 @@
       }
     },
     "Уточнение записи" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entry Details"
+          }
+        }
+      }
     },
     "Фарсида" : {
       "extractionState" : "stale",
@@ -2181,8 +2311,37 @@
         }
       }
     },
+    "Шкала Венеры" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Venus Scale"
+          }
+        }
+      }
+    },
     "Шкала терраформирования Венеры: %d%%" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Venus Terraforming Rating: %d%%"
+          }
+        }
+      }
+    },
+    "Экспедиция уже начата" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expedition Already Started"
+          }
+        }
+      }
     },
     "Элизий" : {
       "extractionState" : "stale",

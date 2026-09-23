@@ -219,6 +219,9 @@ struct ScoreScreen: View {
     private var archiveConfirmationMessage: String {
         let name = players.first?.name.trimmingCharacters(in: .whitespacesAndNewlines)
         let addressee = (name?.isEmpty == false ? name! : "руководитель")
+        if isEnglish {
+            return "Mr. \(addressee),\n\nDo you confirm that the information in the expedition log is accurate?"
+        }
         return "Мистер \(addressee),\n\nВы подтверждаете достоверность сведений, указанных в журнале экспедиции?"
     }
 
@@ -313,6 +316,7 @@ struct ScoreScreen: View {
 /// Небольшой архивный запрос: выбор реквизита сразу продолжает оформление записи.
 private struct ArchiveDetailRequestView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
 
     let request: ArchiveDetailRequest
     @Binding var generation: Int?
@@ -323,7 +327,7 @@ private struct ArchiveDetailRequestView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Уточнение записи")
+            Text(String(localized: "Уточнение записи", locale: locale))
                 .font(AppFont.font(.headline))
 
             Text(prompt)
@@ -349,14 +353,20 @@ private struct ArchiveDetailRequestView: View {
     private var prompt: String {
         switch request {
         case .generation:
-            return "Прежде чем принять запись, позвольте уточнить: на каком поколении был завершён проект?"
+            return String(
+                localized: "Прежде чем принять запись, позвольте уточнить: на каком поколении был завершён проект?",
+                locale: locale
+            )
         case .venusTerraforming:
-            return "Не могли бы вы уточнить, до какого уровня удалось терраформировать Венеру?"
+            return String(
+                localized: "Не могли бы вы уточнить, до какого уровня удалось терраформировать Венеру?",
+                locale: locale
+            )
         }
     }
 
     private var selectionTitle: String {
-        request == .generation ? "Поколение" : "Шкала Венеры"
+        String(localized: request == .generation ? "Поколение" : "Шкала Венеры", locale: locale)
     }
 
     private var selection: Binding<Int?> {

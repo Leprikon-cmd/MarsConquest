@@ -97,12 +97,16 @@ struct NewExpeditionView: View {
   }
 
   private var landingTitle: String {
-    canEditLandingSiteForDraft ? "Изменить место высадки" : "Место высадки"
+    if canEditLandingSiteForDraft {
+      return isEnglish ? "Change Landing Site" : "Изменить место высадки"
+    }
+    return isEnglish ? "Landing Site" : "Место высадки"
   }
 
   private var landingActionTitle: String {
-    if isLandingSiteLocked { return "Экспедиция уже начата" }
-    return canEditLandingSiteForDraft ? "Подтвердить новое поле" : "Высадка!"
+    if isLandingSiteLocked { return isEnglish ? "Expedition Already Started" : "Экспедиция уже начата" }
+    if canEditLandingSiteForDraft { return isEnglish ? "Confirm New Board" : "Подтвердить новое поле" }
+    return isEnglish ? "Land!" : "Высадка!"
   }
 
   var body: some View {
