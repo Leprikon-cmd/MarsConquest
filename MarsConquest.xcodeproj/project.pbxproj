@@ -207,7 +207,7 @@
 				};
 			};
 			buildConfigurationList = 27F94A3B2D7A0DCD0089E4A4 /* Build configuration list for PBXProject "MarsConquest" */;
-			developmentRegion = ru;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,

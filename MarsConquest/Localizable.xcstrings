@@ -1,5 +1,5 @@
 {
-  "sourceLanguage" : "ru",
+  "sourceLanguage" : "en",
   "strings" : {
     "" : {
 
@@ -9,7 +9,7 @@
     },
     "%@ · %lld %@" : {
       "localizations" : {
-        "ru" : {
+        "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ · %2$lld %3$@"
@@ -22,7 +22,7 @@
     },
     "%d %@" : {
       "localizations" : {
-        "ru" : {
+        "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$d %2$@"
@@ -56,7 +56,7 @@
     },
     "%lld/%lld" : {
       "localizations" : {
-        "ru" : {
+        "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$lld/%2$lld"
@@ -205,6 +205,9 @@
     "Host mode" : {
 
     },
+    "Journal Archive" : {
+
+    },
     "Later" : {
 
     },
@@ -259,6 +262,9 @@
     "Recent expeditions" : {
 
     },
+    "Restore Journal from Archive" : {
+
+    },
     "Resume expedition" : {
 
     },
@@ -281,6 +287,9 @@
 
     },
     "Sports winner: %@" : {
+
+    },
+    "The archive will be checked before entries are added. Existing information will not be overwritten." : {
 
     },
     "The journal has saved the turn order, generations, and participant clocks. You can continue from the same point." : {

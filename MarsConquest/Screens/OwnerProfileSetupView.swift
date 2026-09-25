@@ -21,6 +21,10 @@ struct OwnerProfileSetupView: View {
   @Environment(\.managedObjectContext) private var viewContext
   @Environment(\.locale) private var locale
 
+  private var isEnglish: Bool {
+    locale.identifier.lowercased().hasPrefix("en")
+  }
+
   @FetchRequest(
     entity: SavedPlayer.entity(),
     sortDescriptors: [NSSortDescriptor(key: "name", ascending: true)]
@@ -63,13 +67,15 @@ struct OwnerProfileSetupView: View {
             .foregroundStyle(.secondary)
         }
 
-        Section("Архив журнала") {
+        Section(isEnglish ? "Journal Archive" : "Архив журнала") {
           Button {
             showBackupImporter = true
           } label: {
-            Label("Восстановить журнал из архива", systemImage: "tray.and.arrow.down")
+            Label(isEnglish ? "Restore Journal from Archive" : "Восстановить журнал из архива", systemImage: "tray.and.arrow.down")
           }
-          Text("Архив будет проверен до внесения записей. Уже существующие сведения не перезаписываются.")
+          Text(isEnglish
+            ? "The archive will be checked before entries are added. Existing information will not be overwritten."
+            : "Архив будет проверен до внесения записей. Уже существующие сведения не перезаписываются.")
             .font(AppFont.font(.footnote))
             .foregroundStyle(.secondary)
         }
