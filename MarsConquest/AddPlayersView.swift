@@ -140,9 +140,13 @@ struct AddPlayersView: View {
               named: updatedPlayer.corporation,
               for: updatedExpansions
             ) {
+#if DEBUG
               updatedPlayer.corporation = TestModeSettings.isEnabled
                 ? GameData.beginnerCorporation
                 : ""
+#else
+              updatedPlayer.corporation = ""
+#endif
             }
 
             if !updatedExpansions.hasPrelude {

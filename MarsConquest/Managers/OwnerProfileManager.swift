@@ -67,6 +67,7 @@ struct OwnerProfileManager {
     }
 
     let name = savedPlayer.nickname ?? savedPlayer.name ?? "Владелец"
+#if DEBUG
     let preferredColor = savedPlayer.favoriteColor ?? ""
     let preferredOrDefaultColor = GameData.colors.contains(preferredColor)
       ? preferredColor
@@ -75,6 +76,12 @@ struct OwnerProfileManager {
     let preludeChoices = TestModeSettings.isEnabled && expansions.hasPrelude
       ? Array(GameData.prologues.prefix(2))
       : []
+    let corporation = TestModeSettings.isEnabled ? GameData.beginnerCorporation : ""
+#else
+    let color = ""
+    let preludeChoices: [String] = []
+    let corporation = ""
+#endif
     let avatarStyle = UserDefaults.standard.string(forKey: OwnerAvatarStyle.storageKey)
       ?? OwnerAvatarStyle.commander.rawValue
     let avatarImageData = avatarStyle == OwnerAvatarStyle.selfie.rawValue
@@ -87,7 +94,7 @@ struct OwnerProfileManager {
       color: color,
       avatarStyle: avatarStyle,
       avatarImageData: avatarImageData,
-      corporation: TestModeSettings.isEnabled ? GameData.beginnerCorporation : "",
+      corporation: corporation,
       prologue1: preludeChoices.first ?? "",
       prologue2: preludeChoices.dropFirst().first ?? "",
       score: LocalScore()

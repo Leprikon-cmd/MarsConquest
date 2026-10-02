@@ -11,6 +11,8 @@
 //  Что можно менять руками:
 //  - только ключ UserDefaults; менять его без миграции сбросит настройку на устройствах.
 //
+// Тестовый режим доступен только в локальных Debug-сборках.
+#if DEBUG
 import Foundation
 
 /// Локальный режим для быстрого заполнения тестовых партий.
@@ -21,3 +23,4 @@ enum TestModeSettings {
     UserDefaults.standard.bool(forKey: isEnabledKey)
   }
 }
+#endif

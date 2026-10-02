@@ -33,7 +33,9 @@ struct SettingsScreen: View {
   @AppStorage(MoxieSoundManager.isEnabledKey) private var isMoxieSoundEnabled = false
   @AppStorage(AppLanguage.storageKey) private var appLanguageRawValue = AppLanguage.automatic.rawValue
   @AppStorage(OwnerAvatarStyle.storageKey) private var ownerAvatarStyleRawValue = OwnerAvatarStyle.commander.rawValue
+#if DEBUG
   @AppStorage(TestModeSettings.isEnabledKey) private var isTestModeEnabled = false
+#endif
   @Environment(\.managedObjectContext) private var viewContext
   @Environment(\.locale) private var locale
   @FetchRequest(
@@ -90,12 +92,14 @@ struct SettingsScreen: View {
             .foregroundStyle(.secondary)
         }
 
+#if DEBUG
         Section(header: Text(testModeSectionTitle)) {
           Toggle(testModeToggleTitle, isOn: $isTestModeEnabled)
           Text(testModeDescription)
             .font(AppFont.font(.footnote))
             .foregroundStyle(.secondary)
         }
+#endif
 
         Section(header: Text("Звук")) {
           Toggle("Звук МОКСИ", isOn: $isMoxieSoundEnabled)
@@ -143,6 +147,14 @@ struct SettingsScreen: View {
             } label: {
               Label("Проверить прошлые партии", systemImage: "person.text.rectangle")
             }
+          }
+        }
+
+        Section {
+          NavigationLink {
+            AboutProjectView()
+          } label: {
+            Label(isEnglish ? "About the Project" : "О проекте", systemImage: "info.circle")
           }
         }
       }
@@ -493,6 +505,7 @@ struct SettingsScreen: View {
     isEnglish ? "Avatar" : "Аватар"
   }
 
+#if DEBUG
   private var testModeSectionTitle: String {
     isEnglish ? "Testing" : "Тестирование"
   }
@@ -506,6 +519,7 @@ struct SettingsScreen: View {
       ? "Automatically fills a color, corporation, and two preludes when adding players."
       : "Автоматически подставляет цвет, корпорацию и два пролога при добавлении игроков."
   }
+#endif
 }
 
 /// Один стабильный профиль участника из только что внесённых партий чужого архива.
