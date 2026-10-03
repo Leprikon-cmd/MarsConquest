@@ -2,9 +2,9 @@
 
 Mars LogBook is a free iPhone companion app for **Terraforming Mars**. It helps players calculate final scores, preserve game history, and explore long-term personal statistics.
 
-## Public beta
+## Get the app
 
-[Join Mars LogBook on TestFlight](https://testflight.apple.com/join/WnQq5pCD)
+[Download Mars LogBook on the App Store](https://apps.apple.com/tr/app/mars-logbook/id6760551286)
 
 ## Website
 
